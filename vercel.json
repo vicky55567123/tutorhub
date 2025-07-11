@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "tutorub",
+  "name": "tutorhub",
   "builds": [
     {
       "src": "package.json",
