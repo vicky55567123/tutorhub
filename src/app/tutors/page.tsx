@@ -1,0 +1,201 @@
+import Link from 'next/link'
+
+const tutors = [
+  {
+    id: 1,
+    name: 'Dr. Sarah Johnson',
+    subject: 'Mathematics',
+    experience: '8 years',
+    rating: 4.9,
+    reviews: 156,
+    price: '$50/hour',
+    description: 'PhD in Mathematics with expertise in calculus, algebra, and statistics. Helped 500+ students achieve their academic goals.',
+    availability: 'Available today',
+    verified: true,
+    avatar: '👩‍🏫'
+  },
+  {
+    id: 2,
+    name: 'Prof. Michael Chen',
+    subject: 'Computer Science',
+    experience: '10 years',
+    rating: 4.8,
+    reviews: 203,
+    price: '$65/hour',
+    description: 'Former Google engineer teaching programming, algorithms, and software development. Specializes in Python and JavaScript.',
+    availability: 'Available tomorrow',
+    verified: true,
+    avatar: '👨‍💻'
+  },
+  {
+    id: 3,
+    name: 'Emma Rodriguez',
+    subject: 'Spanish',
+    experience: '6 years',
+    rating: 4.9,
+    reviews: 189,
+    price: '$40/hour',
+    description: 'Native Spanish speaker with a degree in Linguistics. Makes learning Spanish fun and interactive.',
+    availability: 'Available today',
+    verified: true,
+    avatar: '👩‍🎓'
+  },
+  {
+    id: 4,
+    name: 'Dr. James Wilson',
+    subject: 'Physics',
+    experience: '12 years',
+    rating: 4.7,
+    reviews: 134,
+    price: '$55/hour',
+    description: 'University professor with extensive research background. Simplifies complex physics concepts for students.',
+    availability: 'Available in 2 hours',
+    verified: true,
+    avatar: '👨‍🔬'
+  },
+  {
+    id: 5,
+    name: 'Lisa Thompson',
+    subject: 'English Literature',
+    experience: '7 years',
+    rating: 4.8,
+    reviews: 167,
+    price: '$45/hour',
+    description: 'Published author and English teacher. Passionate about helping students develop writing and analytical skills.',
+    availability: 'Available today',
+    verified: true,
+    avatar: '👩‍📚'
+  },
+  {
+    id: 6,
+    name: 'David Park',
+    subject: 'Music',
+    experience: '9 years',
+    rating: 4.6,
+    reviews: 98,
+    price: '$50/hour',
+    description: 'Professional pianist and music teacher. Teaches piano, music theory, and composition to all skill levels.',
+    availability: 'Available tomorrow',
+    verified: true,
+    avatar: '👨‍🎵'
+  }
+]
+
+const subjects = ['All Subjects', 'Mathematics', 'Computer Science', 'Spanish', 'Physics', 'English Literature', 'Music']
+
+export default function Tutors() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-3xl font-bold text-gray-900">Find Expert Tutors</h1>
+          <p className="text-gray-600 mt-2">
+            Connect with qualified tutors for personalized learning experiences
+          </p>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Search and Filters */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="grid md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Search Tutors</label>
+              <input
+                type="text"
+                placeholder="Enter tutor name or subject..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                {subjects.map((subject) => (
+                  <option key={subject} value={subject}>{subject}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <option>Any Price</option>
+                <option>$20 - $40</option>
+                <option>$40 - $60</option>
+                <option>$60+</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Availability</label>
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <option>Any Time</option>
+                <option>Available Now</option>
+                <option>Available Today</option>
+                <option>Available This Week</option>
+              </select>
+            </div>
+          </div>
+          <button className="mt-4 btn-primary">
+            Search Tutors
+          </button>
+        </div>
+
+        {/* Tutors Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tutors.map((tutor) => (
+            <div key={tutor.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-200">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center">
+                  <div className="text-4xl mr-4">{tutor.avatar}</div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                      {tutor.name}
+                      {tutor.verified && (
+                        <span className="ml-2 text-green-500" title="Verified Tutor">
+                          ✓
+                        </span>
+                      )}
+                    </h3>
+                    <p className="text-primary-600 font-medium">{tutor.subject}</p>
+                    <p className="text-sm text-gray-500">{tutor.experience} experience</p>
+                  </div>
+                </div>
+                <span className="text-lg font-bold text-primary-600">{tutor.price}</span>
+              </div>
+              
+              <p className="text-gray-600 text-sm mb-4">{tutor.description}</p>
+              
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center">
+                  <span className="text-yellow-400">★</span>
+                  <span className="text-sm text-gray-600 ml-1">{tutor.rating}</span>
+                  <span className="text-sm text-gray-500 ml-2">({tutor.reviews} reviews)</span>
+                </div>
+                <span className="text-sm text-green-600">{tutor.availability}</span>
+              </div>
+              
+              <div className="flex space-x-3">
+                <Link 
+                  href={`/tutors/${tutor.id}`}
+                  className="flex-1 bg-primary-600 text-white text-center py-2 px-4 rounded-lg hover:bg-primary-700 transition duration-200 text-sm font-medium"
+                >
+                  View Profile
+                </Link>
+                <button className="px-4 py-2 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition duration-200 text-sm font-medium">
+                  Message
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Load More */}
+        <div className="text-center mt-12">
+          <button className="btn-secondary">
+            Load More Tutors
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
