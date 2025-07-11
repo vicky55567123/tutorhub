@@ -11,6 +11,19 @@ const nextConfig = {
       },
     ],
   },
+  // Fix CSS optimization issues in production builds
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      // Optimize CSS for production builds
+      config.optimization = {
+        ...config.optimization,
+        minimize: true,
+      }
+    }
+    return config
+  },
+  // Ensure proper CSS handling
+  swcMinify: true,
 }
 
 module.exports = nextConfig
