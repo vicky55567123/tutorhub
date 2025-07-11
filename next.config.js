@@ -22,8 +22,6 @@ const nextConfig = {
     }
     return config
   },
-  // Ensure proper CSS handling
-  swcMinify: true,
 }
 
 module.exports = nextConfig
