@@ -1,0 +1,8 @@
+version: 2
+
+build:
+  os: ubuntu-18.04
+  tools:
+    node: 18
+
+run: npm start
