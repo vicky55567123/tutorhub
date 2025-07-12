@@ -112,6 +112,19 @@ const courses = [
   },
   {
     id: 8,
+    title: 'English Literature & Writing',
+    description: 'Improve your writing skills and explore classic and modern literature.',
+    price: '$45/hour',
+    rating: 4.7,
+    students: 120,
+    image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=300&fit=crop',
+    category: 'English',
+    duration: '10 weeks',
+    level: 'Intermediate',
+    instructor: 'Lisa Thompson'
+  },
+  {
+    id: 9,
     title: 'Physics & Chemistry',
     description: 'Understand the fundamental principles of physics and chemistry with hands-on examples.',
     price: '$55/hour',
@@ -124,7 +137,7 @@ const courses = [
     instructor: 'Dr. James Wilson'
   },
   {
-    id: 5,
+    id: 10,
     title: 'Spanish Language Learning',
     description: 'Become fluent in Spanish with interactive lessons and conversation practice.',
     price: '$40/hour',
@@ -137,7 +150,7 @@ const courses = [
     instructor: 'Emma Rodriguez'
   },
   {
-    id: 6,
+    id: 11,
     title: 'Music Theory & Piano',
     description: 'Learn music theory and piano playing techniques from professional musicians.',
     price: '$50/hour',
