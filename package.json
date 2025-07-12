@@ -6,14 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "export": "next build && next export",
-    "deploy": "npm run export",
-    "deploy-github": "npm run export && gh-pages -d out",
-    "deploy-netlify": "npm run build",
-    "deploy-surge": "npm run export && surge out/",
-    "deploy-railway": "npm run build",
-    "deploy-render": "npm run build"
+    "lint": "next lint"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
