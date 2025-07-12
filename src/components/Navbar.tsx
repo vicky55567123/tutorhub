@@ -9,6 +9,7 @@ import LoginModal from './LoginModal'
 import SignupModal from './SignupModal'
 
 const navigationItems = [
+  { name: 'GCSE Tutoring', href: '/courses?category=GCSE' },
   { name: 'Courses', href: '/courses' },
   { name: 'Find Tutors', href: '/tutors' },
   { name: 'How It Works', href: '/how-it-works' },

@@ -24,9 +24,11 @@ interface CourseCardProps {
     students: number
     image: string
     category: string
+    subject?: string
     duration: string
     level: string
     instructor: string
+    examBoard?: string
     thumbnailVideo?: string
   }
   index: number
@@ -145,6 +147,7 @@ export default function CourseCard({ course, index }: CourseCardProps) {
               <span className={`text-xs font-medium px-2 py-1 rounded-full ${
                 course.level === 'Beginner' ? 'bg-green-100 text-green-800' :
                 course.level === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
+                course.level === 'GCSE' ? 'bg-indigo-100 text-indigo-800' :
                 'bg-red-100 text-red-800'
               }`}>
                 {course.level}
@@ -182,6 +185,15 @@ export default function CourseCard({ course, index }: CourseCardProps) {
                 <span>{course.students} students</span>
               </div>
             </div>
+
+            {/* GCSE Exam Board Info */}
+            {course.examBoard && (
+              <div className="mb-4">
+                <span className="text-xs bg-primary-50 text-primary-700 px-2 py-1 rounded-full">
+                  Exam Boards: {course.examBoard}
+                </span>
+              </div>
+            )}
 
             {/* Instructor */}
             <div className="flex items-center justify-between">

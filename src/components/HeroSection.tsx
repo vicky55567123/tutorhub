@@ -129,7 +129,8 @@ export default function HeroSection() {
               transition={{ delay: 0.6, duration: 0.6 }}
               className="text-xl text-gray-600 mb-10 leading-relaxed max-w-lg"
             >
-              Connect with expert tutors worldwide for personalized 1-on-1 lessons. Master any subject with our proven learning platform.
+              Expert GCSE tutoring in Maths, Physics, Chemistry, Biology & Computer Science. 
+              Achieve grades 4-9 with our qualified tutors and proven exam strategies.
             </motion.p>
 
             <motion.div

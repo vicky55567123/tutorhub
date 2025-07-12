@@ -7,8 +7,85 @@ import { LoadingCard } from '@/components/LoadingSpinner'
 import toast from 'react-hot-toast'
 
 const courses = [
+  // GCSE Courses
   {
     id: 1,
+    title: 'GCSE Mathematics (Grades 4-9)',
+    description: 'Complete GCSE Maths preparation covering Number, Algebra, Geometry, Statistics and Probability.',
+    price: '£35/hour',
+    rating: 4.9,
+    students: 250,
+    image: 'https://images.unsplash.com/photo-1509228627152-72ae4c67b5bf?w=400&h=300&fit=crop',
+    category: 'GCSE',
+    subject: 'Mathematics',
+    duration: '20 weeks',
+    level: 'GCSE',
+    instructor: 'Dr. Sarah Johnson',
+    examBoard: 'AQA, Edexcel, OCR'
+  },
+  {
+    id: 2,
+    title: 'GCSE Physics (Grades 4-9)',
+    description: 'Master GCSE Physics topics including Forces, Energy, Waves, Electricity and Particle Physics.',
+    price: '£40/hour',
+    rating: 4.8,
+    students: 180,
+    image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400&h=300&fit=crop',
+    category: 'GCSE',
+    subject: 'Physics',
+    duration: '20 weeks',
+    level: 'GCSE',
+    instructor: 'Prof. David Wilson',
+    examBoard: 'AQA, Edexcel, OCR'
+  },
+  {
+    id: 3,
+    title: 'GCSE Chemistry (Grades 4-9)',
+    description: 'Comprehensive GCSE Chemistry covering Atomic Structure, Bonding, Chemical Reactions and Analysis.',
+    price: '£38/hour',
+    rating: 4.9,
+    students: 160,
+    image: 'https://images.unsplash.com/photo-1554475901-4538ddfbccc2?w=400&h=300&fit=crop',
+    category: 'GCSE',
+    subject: 'Chemistry',
+    duration: '20 weeks',
+    level: 'GCSE',
+    instructor: 'Dr. Emily Roberts',
+    examBoard: 'AQA, Edexcel, OCR'
+  },
+  {
+    id: 4,
+    title: 'GCSE Biology (Grades 4-9)',
+    description: 'GCSE Biology essentials: Cell Biology, Human Biology, Genetics, Evolution and Ecology.',
+    price: '£36/hour',
+    rating: 4.7,
+    students: 200,
+    image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop',
+    category: 'GCSE',
+    subject: 'Biology',
+    duration: '20 weeks',
+    level: 'GCSE',
+    instructor: 'Dr. James Mitchell',
+    examBoard: 'AQA, Edexcel, OCR'
+  },
+  {
+    id: 5,
+    title: 'GCSE Computer Science (Grades 4-9)',
+    description: 'GCSE Computer Science: Programming, Algorithms, Data Structures and Computer Systems.',
+    price: '£42/hour',
+    rating: 4.8,
+    students: 140,
+    image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop',
+    category: 'GCSE',
+    subject: 'Computer Science',
+    duration: '20 weeks',
+    level: 'GCSE',
+    instructor: 'Mr. Alex Turner',
+    examBoard: 'AQA, Edexcel, OCR'
+  },
+  // Additional Courses
+  {
+    id: 6,
     title: 'Advanced Mathematics',
     description: 'Master calculus, algebra, and advanced mathematical concepts with expert guidance.',
     price: '$50/hour',
@@ -21,7 +98,7 @@ const courses = [
     instructor: 'Dr. Sarah Johnson'
   },
   {
-    id: 2,
+    id: 7,
     title: 'Computer Science Fundamentals',
     description: 'Learn programming, algorithms, and computer science principles from industry experts.',
     price: '$60/hour',
@@ -34,20 +111,7 @@ const courses = [
     instructor: 'Prof. Michael Chen'
   },
   {
-    id: 3,
-    title: 'English Literature & Writing',
-    description: 'Improve your writing skills and explore classic and modern literature.',
-    price: '$45/hour',
-    rating: 4.7,
-    students: 120,
-    image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=300&fit=crop',
-    category: 'English',
-    duration: '10 weeks',
-    level: 'Intermediate',
-    instructor: 'Lisa Thompson'
-  },
-  {
-    id: 4,
+    id: 8,
     title: 'Physics & Chemistry',
     description: 'Understand the fundamental principles of physics and chemistry with hands-on examples.',
     price: '$55/hour',
@@ -89,6 +153,7 @@ const courses = [
 
 const categories = [
   { name: 'All', color: 'from-gray-500 to-gray-600', icon: '📚' },
+  { name: 'GCSE', color: 'from-indigo-500 to-purple-600', icon: '🎓' },
   { name: 'Mathematics', color: 'from-blue-500 to-indigo-600', icon: '🧮' },
   { name: 'Programming', color: 'from-green-500 to-emerald-600', icon: '💻' },
   { name: 'English', color: 'from-purple-500 to-pink-600', icon: '📖' },

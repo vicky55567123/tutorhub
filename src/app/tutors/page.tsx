@@ -1,8 +1,90 @@
 import Link from 'next/link'
 
 const tutors = [
+  // GCSE Specialist Tutors
   {
     id: 1,
+    name: 'Dr. Sarah Johnson',
+    subject: 'GCSE Mathematics',
+    specialization: 'Mathematics (Grades 4-9)',
+    experience: '8 years',
+    rating: 4.9,
+    reviews: 156,
+    price: '£35/hour',
+    description: 'GCSE Mathematics specialist with 8 years experience. Helped 200+ students achieve grades 7-9. Expert in AQA, Edexcel & OCR.',
+    availability: 'Available today',
+    verified: true,
+    avatar: '👩‍🏫',
+    qualifications: ['PhD Mathematics', 'QTS', 'GCSE Examiner'],
+    examBoards: ['AQA', 'Edexcel', 'OCR']
+  },
+  {
+    id: 2,
+    name: 'Dr. David Wilson',
+    subject: 'GCSE Physics',
+    specialization: 'Physics (Grades 4-9)',
+    experience: '10 years',
+    rating: 4.8,
+    reviews: 143,
+    price: '£40/hour',
+    description: 'GCSE Physics expert and former examiner. Specializes in mechanics, electricity, and waves. 95% student success rate.',
+    availability: 'Available today',
+    verified: true,
+    avatar: '👨‍🔬',
+    qualifications: ['PhD Physics', 'QTS', 'Former AQA Examiner'],
+    examBoards: ['AQA', 'Edexcel', 'OCR']
+  },
+  {
+    id: 3,
+    name: 'Dr. Emily Roberts',
+    subject: 'GCSE Chemistry',
+    specialization: 'Chemistry (Grades 4-9)',
+    experience: '7 years',
+    rating: 4.9,
+    reviews: 128,
+    price: '£38/hour',
+    description: 'GCSE Chemistry specialist with focus on organic chemistry and chemical analysis. Interactive teaching methods.',
+    availability: 'Available tomorrow',
+    verified: true,
+    avatar: '👩‍⚗️',
+    qualifications: ['PhD Chemistry', 'QTS', 'RSC Member'],
+    examBoards: ['AQA', 'Edexcel', 'OCR']
+  },
+  {
+    id: 4,
+    name: 'Dr. James Mitchell',
+    subject: 'GCSE Biology',
+    specialization: 'Biology (Grades 4-9)',
+    experience: '9 years',
+    rating: 4.7,
+    reviews: 167,
+    price: '£36/hour',
+    description: 'GCSE Biology expert with expertise in genetics, ecology, and human biology. Makes complex topics easy to understand.',
+    availability: 'Available today',
+    verified: true,
+    avatar: '👨‍⚕️',
+    qualifications: ['PhD Biology', 'QTS', 'Medical Background'],
+    examBoards: ['AQA', 'Edexcel', 'OCR']
+  },
+  {
+    id: 5,
+    name: 'Mr. Alex Turner',
+    subject: 'GCSE Computer Science',
+    specialization: 'Computer Science (Grades 4-9)',
+    experience: '6 years',
+    rating: 4.8,
+    reviews: 112,
+    price: '£42/hour',
+    description: 'GCSE Computer Science teacher and software developer. Expert in Python programming and computational thinking.',
+    availability: 'Available today',
+    verified: true,
+    avatar: '👨‍💻',
+    qualifications: ['MSc Computer Science', 'QTS', 'Industry Experience'],
+    examBoards: ['AQA', 'Edexcel', 'OCR']
+  },
+  // General Subject Tutors
+  {
+    id: 6,
     name: 'Dr. Sarah Johnson',
     subject: 'Mathematics',
     experience: '8 years',
@@ -15,7 +97,7 @@ const tutors = [
     avatar: '👩‍🏫'
   },
   {
-    id: 2,
+    id: 7,
     name: 'Prof. Michael Chen',
     subject: 'Computer Science',
     experience: '10 years',
