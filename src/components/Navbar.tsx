@@ -101,7 +101,7 @@ export default function Navbar() {
                     className={`absolute bottom-0 left-0 w-full h-0.5 origin-left ${
                       index === 0 ? 'bg-gradient-to-r from-primary-600 to-secondary-600' :
                       index === 1 ? 'bg-gradient-to-r from-secondary-600 to-accent-600' :
-                      'bg-gradient-to-r from-accent-600 to-success-600'
+                      'bg-gradient-to-r from-accent-600 to-primary-600'
                     }`}
                     initial={{ scaleX: 0 }}
                     whileHover={{ scaleX: 1 }}

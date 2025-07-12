@@ -80,7 +80,7 @@ export default function HeroSection() {
             }}
           />
           <motion.div
-            className="absolute top-1/2 left-1/4 w-32 h-32 bg-gradient-to-br from-success-300 to-success-400 rounded-full opacity-15"
+            className="absolute top-1/2 left-1/4 w-32 h-32 bg-gradient-to-br from-primary-300 to-primary-400 rounded-full opacity-15"
             animate={{
               y: [0, -20, 0],
               x: [0, 10, 0],
@@ -106,7 +106,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-success-100 to-primary-100 text-primary-800 rounded-full text-sm font-semibold mb-8 border border-primary-200"
+              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-100 to-secondary-100 text-primary-800 rounded-full text-sm font-semibold mb-8 border border-primary-200"
             >
               🎉 Over 10,000 successful learning sessions completed
             </motion.div>
@@ -181,7 +181,7 @@ export default function HeroSection() {
                   className="text-center p-4 bg-white/70 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 >
                   <div className={`flex justify-center mb-3 ${
-                    index === 0 ? 'text-success-600' : 
+                    index === 0 ? 'text-primary-600' : 
                     index === 1 ? 'text-accent-600' : 
                     'text-secondary-600'
                   }`}>
@@ -204,7 +204,7 @@ export default function HeroSection() {
             <div className="bg-gradient-to-br from-white via-primary-50 to-secondary-50 rounded-3xl shadow-2xl p-8 border border-gray-100 relative overflow-hidden">
               {/* Decorative elements */}
               <div className="absolute top-4 right-4 w-12 h-12 bg-gradient-to-br from-accent-400 to-warning-400 rounded-full opacity-20"></div>
-              <div className="absolute bottom-4 left-4 w-8 h-8 bg-gradient-to-br from-success-400 to-primary-400 rounded-full opacity-20"></div>
+              <div className="absolute bottom-4 left-4 w-8 h-8 bg-gradient-to-br from-primary-400 to-secondary-400 rounded-full opacity-20"></div>
               
               <motion.div
                 key={currentTestimonial}
@@ -262,7 +262,7 @@ export default function HeroSection() {
                 </motion.div>
 
                 <motion.div
-                  className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-success-300 to-primary-400 rounded-full flex items-center justify-center text-xl shadow-lg"
+                  className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-primary-300 to-secondary-400 rounded-full flex items-center justify-center text-xl shadow-lg"
                   animate={{
                     y: [0, 10, 0],
                     rotate: [0, -5, 0],
