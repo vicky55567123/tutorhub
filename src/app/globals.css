@@ -72,7 +72,3 @@ body {
 .animate-glow {
   animation: glow 2s ease-in-out infinite !important;
 }
-
-.animate-glow {
-  animation: glow 2s ease-in-out infinite;
-}
