@@ -2,57 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom CSS for enhanced styling */
+/* Custom CSS for enhanced styling - Production Safe */
 body {
-  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif !important;
 }
 
-/* Enhanced button styles */
+/* Enhanced button styles - Production Safe */
 .btn-primary {
-  background: linear-gradient(135deg, #2563eb, #7c3aed, #c026d3);
-  color: white;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.75rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
-  border: none;
-  cursor: pointer;
+  background: linear-gradient(135deg, #2563eb, #7c3aed, #c026d3) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 0.75rem !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3) !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: inline-block !important;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(37, 99, 235, 0.4);
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 30px rgba(37, 99, 235, 0.4) !important;
 }
 
 .btn-secondary {
-  background: white;
-  color: #374151;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.75rem;
-  border: 2px solid #e5e7eb;
-  transition: all 0.3s ease;
-  cursor: pointer;
+  background: white !important;
+  color: #374151 !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 0.75rem !important;
+  border: 2px solid #e5e7eb !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+  display: inline-block !important;
 }
 
 .btn-secondary:hover {
-  border-color: #3b82f6;
-  background: #f0f9ff;
-  transform: translateY(-1px);
+  border-color: #3b82f6 !important;
+  background: #f0f9ff !important;
+  transform: translateY(-1px) !important;
 }
 
-/* Card styling */
+/* Card styling - Production Safe */
 .card-hover {
-  transition: all 0.3s ease;
+  transition: all 0.3s ease !important;
 }
 
 .card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Animations */
+/* Animations - Production Safe */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
@@ -64,7 +66,11 @@ body {
 }
 
 .animate-float {
-  animation: float 3s ease-in-out infinite;
+  animation: float 3s ease-in-out infinite !important;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite !important;
 }
 
 .animate-glow {
