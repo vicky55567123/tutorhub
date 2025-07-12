@@ -1,5 +1,7 @@
 # TutorHub - Online Tutoring Platform
 
+<!-- Updated: Webpack runtime error fixed and deployment verified -->
+
 A modern, responsive online tutoring platform built with Next.js 15, TypeScript, and Tailwind CSS.
 
 ## 🌟 Features
