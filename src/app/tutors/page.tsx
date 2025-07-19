@@ -110,7 +110,7 @@ const tutors = [
     avatar: '👨‍💻'
   },
   {
-    id: 3,
+    id: 8,
     name: 'Emma Rodriguez',
     subject: 'Spanish',
     experience: '6 years',
@@ -123,7 +123,7 @@ const tutors = [
     avatar: '👩‍🎓'
   },
   {
-    id: 4,
+    id: 9,
     name: 'Dr. James Wilson',
     subject: 'Physics',
     experience: '12 years',
@@ -136,7 +136,7 @@ const tutors = [
     avatar: '👨‍🔬'
   },
   {
-    id: 5,
+    id: 10,
     name: 'Lisa Thompson',
     subject: 'English Literature',
     experience: '7 years',
@@ -149,7 +149,7 @@ const tutors = [
     avatar: '👩‍📚'
   },
   {
-    id: 6,
+    id: 11,
     name: 'David Park',
     subject: 'Music',
     experience: '9 years',

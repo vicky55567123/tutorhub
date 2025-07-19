@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { EyeIcon, EyeSlashIcon, CheckIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import Modal from './Modal'
+import { useAuth } from './AuthContext'
 
 interface SignupModalProps {
   isOpen: boolean
@@ -14,6 +15,7 @@ interface SignupModalProps {
 }
 
 export default function SignupModal({ isOpen, onClose, onSwitchToLogin, onDemoLogin }: SignupModalProps) {
+  const { login, signInWithGoogle, signInWithFacebook, signInWithGitHub } = useAuth()
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -58,40 +60,92 @@ export default function SignupModal({ isOpen, onClose, onSwitchToLogin, onDemoLo
     
     setIsLoading(true)
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    toast.success('Account created successfully! 🎉', {
-      style: {
-        borderRadius: '10px',
-        background: '#10B981',
-        color: '#fff',
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Create user object
+      const newUser = {
+        id: Date.now().toString(), // Simple ID generation for demo
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        type: userType,
+        avatar: userType === 'student' 
+          ? 'https://images.unsplash.com/photo-1494790108755-2616b612b3dd?w=400&h=400&fit=crop&crop=face'
+          : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face'
       }
-    })
-    
-    setIsLoading(false)
-    onClose()
-    
-    // Reset form
-    setFormData({
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      confirmPassword: ''
-    })
-    setAgreeToTerms(false)
+      
+      // Log the user in
+      login(newUser)
+      
+      toast.success(`Welcome ${newUser.name}! Account created successfully! 🎉`, {
+        style: {
+          borderRadius: '10px',
+          background: '#10B981',
+          color: '#fff',
+        }
+      })
+      
+      setIsLoading(false)
+      onClose()
+      
+      // Reset form
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+      })
+      setAgreeToTerms(false)
+      
+    } catch (error) {
+      setIsLoading(false)
+      toast.error('Failed to create account. Please try again.')
+    }
   }
 
-  const handleSocialSignup = (provider: string) => {
-    toast(`${provider} signup coming soon!`, {
-      icon: '🚀',
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
+  const handleSocialSignup = async (provider: string) => {
+    setIsLoading(true)
+    
+    try {
+      if (provider === 'Google') {
+        await signInWithGoogle()
+        toast.success('Successfully signed up with Google! 🎉', {
+          style: {
+            borderRadius: '10px',
+            background: '#10B981',
+            color: '#fff',
+          }
+        })
+      } else if (provider === 'Facebook') {
+        await signInWithFacebook()
+        toast.success('Successfully signed up with Facebook! 🎉', {
+          style: {
+            borderRadius: '10px',
+            background: '#10B981',
+            color: '#fff',
+          }
+        })
+      } else if (provider === 'GitHub') {
+        await signInWithGitHub()
+        toast.success('Successfully signed up with GitHub! 🎉', {
+          style: {
+            borderRadius: '10px',
+            background: '#10B981',
+            color: '#fff',
+          }
+        })
       }
-    })
+      
+      setIsLoading(false)
+      onClose()
+      
+    } catch (error) {
+      setIsLoading(false)
+      console.error(`${provider} signup error:`, error)
+      toast.error(`Failed to sign up with ${provider}. Please try again.`)
+    }
   }
 
   return (

@@ -15,6 +15,9 @@ interface AuthContextType {
   login: (userData: User) => void
   logout: () => void
   isLoading: boolean
+  signInWithGoogle: () => Promise<void>
+  signInWithFacebook: () => Promise<void>
+  signInWithGitHub: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -47,8 +50,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('user')
   }
 
+  const signInWithGoogle = async () => {
+    // Demo Google authentication
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    const demoUser: User = {
+      id: Date.now().toString(),
+      name: 'Google Demo User',
+      email: 'demo@google.com',
+      type: 'student',
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b3dd?w=400&h=400&fit=crop&crop=face'
+    }
+    
+    login(demoUser)
+    return Promise.resolve()
+  }
+
+  const signInWithFacebook = async () => {
+    // Demo Facebook authentication
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    const demoUser: User = {
+      id: Date.now().toString(),
+      name: 'Facebook Demo User',
+      email: 'demo@facebook.com',
+      type: 'student',
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b3dd?w=400&h=400&fit=crop&crop=face'
+    }
+    
+    login(demoUser)
+    return Promise.resolve()
+  }
+
+  const signInWithGitHub = async () => {
+    // Demo GitHub authentication
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    const demoUser: User = {
+      id: Date.now().toString(),
+      name: 'GitHub Demo User',
+      email: 'demo@github.com',
+      type: 'student',
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b3dd?w=400&h=400&fit=crop&crop=face'
+    }
+    
+    login(demoUser)
+    return Promise.resolve()
+  }
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      logout, 
+      isLoading, 
+      signInWithGoogle, 
+      signInWithFacebook, 
+      signInWithGitHub 
+    }}>
       {children}
     </AuthContext.Provider>
   )

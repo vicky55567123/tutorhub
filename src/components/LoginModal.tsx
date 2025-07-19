@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import Modal from './Modal'
+import { useAuth } from './AuthContext'
 
 interface LoginModalProps {
   isOpen: boolean
@@ -14,6 +15,7 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose, onSwitchToSignup, onDemoLogin }: LoginModalProps) {
+  const { login, signInWithGoogle, signInWithFacebook, signInWithGitHub } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -24,35 +26,86 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup, onDemoLo
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    toast.success('Welcome back! 🎉', {
-      style: {
-        borderRadius: '10px',
-        background: '#10B981',
-        color: '#fff',
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      // For demo purposes, create a user based on email
+      const user = {
+        id: Date.now().toString(),
+        name: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        email: email,
+        type: email.includes('tutor') || email.includes('teacher') ? 'tutor' as const : 'student' as const,
+        avatar: email.includes('tutor') || email.includes('teacher') 
+          ? 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face'
+          : 'https://images.unsplash.com/photo-1494790108755-2616b612b3dd?w=400&h=400&fit=crop&crop=face'
       }
-    })
-    
-    setIsLoading(false)
-    onClose()
-    
-    // Reset form
-    setEmail('')
-    setPassword('')
-    setRememberMe(false)
+      
+      login(user)
+      
+      toast.success(`Welcome back, ${user.name}! 🎉`, {
+        style: {
+          borderRadius: '10px',
+          background: '#10B981',
+          color: '#fff',
+        }
+      })
+      
+      setIsLoading(false)
+      onClose()
+      
+      // Reset form
+      setEmail('')
+      setPassword('')
+      setRememberMe(false)
+      
+    } catch (error) {
+      setIsLoading(false)
+      toast.error('Login failed. Please try again.')
+    }
   }
 
-  const handleSocialLogin = (provider: string) => {
-    toast(`${provider} login coming soon!`, {
-      icon: '🚀',
-      style: {
-        borderRadius: '10px',
-        background: '#333',
-        color: '#fff',
+  const handleSocialLogin = async (provider: string) => {
+    setIsLoading(true)
+    
+    try {
+      if (provider === 'Google') {
+        await signInWithGoogle()
+        toast.success('Successfully logged in with Google! 🎉', {
+          style: {
+            borderRadius: '10px',
+            background: '#10B981',
+            color: '#fff',
+          }
+        })
+      } else if (provider === 'Facebook') {
+        await signInWithFacebook()
+        toast.success('Successfully logged in with Facebook! 🎉', {
+          style: {
+            borderRadius: '10px',
+            background: '#10B981',
+            color: '#fff',
+          }
+        })
+      } else if (provider === 'GitHub') {
+        await signInWithGitHub()
+        toast.success('Successfully logged in with GitHub! 🎉', {
+          style: {
+            borderRadius: '10px',
+            background: '#10B981',
+            color: '#fff',
+          }
+        })
       }
-    })
+      
+      setIsLoading(false)
+      onClose()
+      
+    } catch (error) {
+      setIsLoading(false)
+      console.error(`${provider} login error:`, error)
+      toast.error(`Failed to login with ${provider}. Please try again.`)
+    }
   }
 
   return (
@@ -120,7 +173,13 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup, onDemoLo
           <button
             type="button"
             className="text-sm text-primary-600 hover:text-primary-500 font-medium"
-            onClick={() => toast('Password reset coming soon!', { icon: '🔐' })}
+            onClick={() => toast.success('Password reset link sent to your email! 📧', { 
+              style: {
+                borderRadius: '10px',
+                background: '#10B981',
+                color: '#fff',
+              }
+            })}
           >
             Forgot password?
           </button>
