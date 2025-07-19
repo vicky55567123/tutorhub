@@ -192,7 +192,9 @@ export default function Tutors() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+              <select 
+                aria-label="Select subject"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
                 {subjects.map((subject) => (
                   <option key={subject} value={subject}>{subject}</option>
                 ))}
@@ -200,7 +202,9 @@ export default function Tutors() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+              <select 
+                aria-label="Select price range"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <option>Any Price</option>
                 <option>$20 - $40</option>
                 <option>$40 - $60</option>
@@ -209,7 +213,9 @@ export default function Tutors() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Availability</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
+              <select 
+                aria-label="Select availability"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500">
                 <option>Any Time</option>
                 <option>Available Now</option>
                 <option>Available Today</option>
