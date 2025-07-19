@@ -4,14 +4,13 @@ import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { StarIcon, PlayIcon, HeartIcon } from '@heroicons/react/24/solid'
 import { ChatBubbleLeftIcon, VideoCameraIcon } from '@heroicons/react/24/outline'
-import Image from 'next/image'
 
 const featuredTutors = [
   {
     id: 1,
     name: 'Elena Rodriguez',
     subject: 'Spanish',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+    avatar: '👩‍🎓',
     rating: 4.9,
     reviews: 312,
     hourlyRate: 25,
@@ -25,7 +24,7 @@ const featuredTutors = [
     id: 2,
     name: 'David Chen',
     subject: 'Mathematics',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
+    avatar: '👨‍🏫',
     rating: 4.8,
     reviews: 287,
     hourlyRate: 30,
@@ -39,7 +38,7 @@ const featuredTutors = [
     id: 3,
     name: 'Sophie Martin',
     subject: 'French',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
+    avatar: '👩‍🏫',
     rating: 4.9,
     reviews: 198,
     hourlyRate: 28,
@@ -53,7 +52,7 @@ const featuredTutors = [
     id: 4,
     name: 'Alex Johnson',
     subject: 'Programming',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+    avatar: '👨‍💻',
     rating: 4.7,
     reviews: 156,
     hourlyRate: 45,
@@ -126,14 +125,8 @@ export default function TutorShowcase() {
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${tutorItem.backgroundColor} rounded-3xl opacity-90`}></div>
                 <div className="relative z-10 text-center">
-                  <div className="w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden border-4 border-white/30">
-                    <Image 
-                      src={tutorItem.avatar} 
-                      alt={tutorItem.name}
-                      width={64}
-                      height={64}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden border-4 border-white/30 bg-white flex items-center justify-center">
+                    <span className="text-4xl">{tutorItem.avatar}</span>
                   </div>
                   <h3 className="text-white font-bold text-lg mb-1">{tutorItem.name}</h3>
                   <p className="text-white/90 text-sm mb-2">{tutorItem.subject}</p>
@@ -166,14 +159,8 @@ export default function TutorShowcase() {
             className="space-y-6"
           >
             <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-gray-200">
-                <Image 
-                  src={tutor.avatar} 
-                  alt={tutor.name}
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
-                />
+              <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-gray-200 bg-gray-100 flex items-center justify-center">
+                <span className="text-5xl">{tutor.avatar}</span>
               </div>
               <div>
                 <h3 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
