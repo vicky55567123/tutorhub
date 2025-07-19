@@ -61,6 +61,20 @@ const featuredTutors = [
     videoIntro: true,
     backgroundColor: 'from-green-400 to-emerald-500',
     flag: '🇬🇧'
+  },
+  {
+    id: 5,
+    name: 'Ahmed Waqar',
+    subject: 'GCSE Sciences & Maths',
+    avatar: '🎓',
+    rating: 4.9,
+    reviews: 284,
+    hourlyRate: 45,
+    languages: ['English (Fluent)', 'Urdu (Native)', 'Arabic (Basic)'],
+    specialties: ['GCSE Mathematics', 'GCSE Physics', 'GCSE Chemistry', 'Multi-Subject Teaching'],
+    videoIntro: true,
+    backgroundColor: 'from-yellow-400 to-orange-500',
+    flag: '🇬🇧'
   }
 ]
 

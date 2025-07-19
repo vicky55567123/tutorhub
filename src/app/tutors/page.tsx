@@ -3,6 +3,23 @@ import Link from 'next/link'
 const tutors = [
   // GCSE Specialist Tutors
   {
+    id: 12,
+    name: 'Ahmed Waqar',
+    subject: 'GCSE Maths, Physics & Chemistry',
+    specialization: 'Multi-Subject GCSE Expert (Grades 4-9)',
+    experience: '12 years',
+    rating: 4.9,
+    reviews: 284,
+    price: '£45/hour',
+    description: 'Triple Science GCSE specialist with 12 years experience. Expert in Maths, Physics & Chemistry across all exam boards. Achieved 98% grade 7+ success rate with 500+ students.',
+    availability: 'Available today',
+    verified: true,
+    avatar: '🎓',
+    qualifications: ['MSc Physics', 'BSc Mathematics', 'QTS', 'GCSE Lead Examiner'],
+    examBoards: ['AQA', 'Edexcel', 'OCR', 'WJEC'],
+    specialFeatures: ['Multi-subject expertise', 'Former examiner', 'Proven track record']
+  },
+  {
     id: 1,
     name: 'Dr. Sarah Johnson',
     subject: 'GCSE Mathematics',
@@ -231,24 +248,45 @@ export default function Tutors() {
         {/* Tutors Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tutors.map((tutor) => (
-            <div key={tutor.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-200">
+            <div key={tutor.id} className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-200 ${
+              tutor.id === 12 ? 'ring-2 ring-yellow-400 bg-gradient-to-br from-yellow-50 to-orange-50 relative' : ''
+            }`}>
+              {tutor.id === 12 && (
+                <div className="absolute -top-3 -right-3 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold">
+                  ⭐ FEATURED
+                </div>
+              )}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center">
-                  <div className="text-4xl mr-4">{tutor.avatar}</div>
+                  <div className={`text-4xl mr-4 ${tutor.id === 12 ? 'animate-pulse' : ''}`}>{tutor.avatar}</div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <h3 className={`text-lg font-semibold ${tutor.id === 12 ? 'text-yellow-900' : 'text-gray-900'} flex items-center`}>
                       {tutor.name}
                       {tutor.verified && (
                         <span className="ml-2 text-green-500" title="Verified Tutor">
                           ✓
                         </span>
                       )}
+                      {tutor.id === 12 && (
+                        <span className="ml-2 text-yellow-600" title="Multi-Subject Expert">
+                          🏆
+                        </span>
+                      )}
                     </h3>
-                    <p className="text-primary-600 font-medium">{tutor.subject}</p>
+                    <p className={`font-medium ${tutor.id === 12 ? 'text-yellow-700' : 'text-primary-600'}`}>{tutor.subject}</p>
                     <p className="text-sm text-gray-500">{tutor.experience} experience</p>
+                    {tutor.specialFeatures && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {tutor.specialFeatures.map((feature, index) => (
+                          <span key={index} className="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full">
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
-                <span className="text-lg font-bold text-primary-600">{tutor.price}</span>
+                <span className={`text-lg font-bold ${tutor.id === 12 ? 'text-yellow-700' : 'text-primary-600'}`}>{tutor.price}</span>
               </div>
               
               <p className="text-gray-600 text-sm mb-4">{tutor.description}</p>
@@ -265,11 +303,19 @@ export default function Tutors() {
               <div className="flex space-x-3">
                 <Link 
                   href={`/tutors/${tutor.id}`}
-                  className="flex-1 bg-primary-600 text-white text-center py-2 px-4 rounded-lg hover:bg-primary-700 transition duration-200 text-sm font-medium"
+                  className={`flex-1 text-white text-center py-2 px-4 rounded-lg transition duration-200 text-sm font-medium ${
+                    tutor.id === 12 
+                      ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600' 
+                      : 'bg-primary-600 hover:bg-primary-700'
+                  }`}
                 >
                   View Profile
                 </Link>
-                <button className="px-4 py-2 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition duration-200 text-sm font-medium">
+                <button className={`px-4 py-2 border rounded-lg transition duration-200 text-sm font-medium ${
+                  tutor.id === 12
+                    ? 'border-yellow-500 text-yellow-700 hover:bg-yellow-100'
+                    : 'border-primary-600 text-primary-600 hover:bg-primary-50'
+                }`}>
                   Message
                 </button>
               </div>
