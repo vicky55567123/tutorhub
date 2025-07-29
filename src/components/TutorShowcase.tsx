@@ -8,7 +8,7 @@ import { ChatBubbleLeftIcon, VideoCameraIcon } from '@heroicons/react/24/outline
 const featuredTutors = [
   {
     id: 1,
-    name: 'Elena Rodriguez',
+    name: 'Ahmed Waqar',
     subject: 'Spanish',
     avatar: '👩‍�',
     rating: 4.9,
@@ -22,7 +22,7 @@ const featuredTutors = [
   },
   {
     id: 2,
-    name: 'David Chen',
+    name: 'Farhana Kiran',
     subject: 'Mathematics',
     avatar: '👨‍🏫',
     rating: 4.8,
@@ -36,7 +36,7 @@ const featuredTutors = [
   },
   {
     id: 3,
-    name: 'Sophie Martin',
+    name: 'Zain ul Abedin',
     subject: 'French',
     avatar: '👩‍🏫',
     rating: 4.9,
@@ -50,7 +50,7 @@ const featuredTutors = [
   },
   {
     id: 4,
-    name: 'Alex Johnson',
+    name: 'Ali Zia',
     subject: 'Programming',
     avatar: '👨‍🎓',
     rating: 4.7,
@@ -64,7 +64,7 @@ const featuredTutors = [
   },
   {
     id: 5,
-    name: 'Ahmed Waqar',
+    name: 'Fahad Noor',
     subject: 'GCSE Sciences & Maths',
     avatar: '🎓',
     rating: 4.9,
@@ -74,6 +74,34 @@ const featuredTutors = [
     specialties: ['GCSE Mathematics', 'GCSE Physics', 'GCSE Chemistry', 'Multi-Subject Teaching'],
     videoIntro: true,
     backgroundColor: 'from-yellow-400 to-orange-500',
+    flag: '🇬🇧'
+  },
+  {
+    id: 6,
+    name: 'Bilal K Abbasi',
+    subject: 'Biology',
+    avatar: '👨‍⚕️',
+    rating: 4.9,
+    reviews: 203,
+    hourlyRate: 35,
+    languages: ['English (Fluent)', 'Urdu (Native)'],
+    specialties: ['GCSE Biology', 'Cell Biology', 'Genetics'],
+    videoIntro: true,
+    backgroundColor: 'from-teal-400 to-green-500',
+    flag: '🇬🇧'
+  },
+  {
+    id: 7,
+    name: 'Abdul Hanan',
+    subject: 'English Literature',
+    avatar: '👨‍📚',
+    rating: 4.8,
+    reviews: 142,
+    hourlyRate: 28,
+    languages: ['English (Native)', 'Urdu (Fluent)'],
+    specialties: ['GCSE English', 'Literature Analysis', 'Creative Writing'],
+    videoIntro: true,
+    backgroundColor: 'from-rose-400 to-red-500',
     flag: '🇬🇧'
   }
 ]

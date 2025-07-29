@@ -24,7 +24,7 @@ const tutors = [
   },
   {
     id: 1,
-    name: 'Dr. Sarah Johnson',
+    name: 'Farhana Kiran',
     subject: 'GCSE Mathematics',
     specialization: 'Mathematics (Grades 4-9)',
     experience: '8 years',
@@ -40,7 +40,7 @@ const tutors = [
   },
   {
     id: 2,
-    name: 'Dr. David Wilson',
+    name: 'Zain ul Abedin',
     subject: 'GCSE Physics',
     specialization: 'Physics (Grades 4-9)',
     experience: '10 years',
@@ -56,7 +56,7 @@ const tutors = [
   },
   {
     id: 3,
-    name: 'Dr. Emily Roberts',
+    name: 'Ali Zia',
     subject: 'GCSE Chemistry',
     specialization: 'Chemistry (Grades 4-9)',
     experience: '7 years',
@@ -72,7 +72,7 @@ const tutors = [
   },
   {
     id: 4,
-    name: 'Dr. James Mitchell',
+    name: 'Bilal K Abbasi',
     subject: 'GCSE Biology',
     specialization: 'Biology (Grades 4-9)',
     experience: '9 years',
@@ -88,7 +88,7 @@ const tutors = [
   },
   {
     id: 5,
-    name: 'Mr. Alex Turner',
+    name: 'Fahad Noor',
     subject: 'GCSE Computer Science',
     specialization: 'Computer Science (Grades 4-9)',
     experience: '6 years',
@@ -117,22 +117,9 @@ const tutors = [
     avatar: '👩‍🏫'
   },
   {
-    id: 7,
-    name: 'Prof. Michael Chen',
-    subject: 'Computer Science',
-    experience: '10 years',
-    rating: 4.8,
-    reviews: 203,
-    price: '$65/hour',
-    description: 'Former Google engineer teaching programming, algorithms, and software development. Specializes in Python and JavaScript.',
-    availability: 'Available tomorrow',
-    verified: true,
-    avatar: '👨‍💻'
-  },
-  {
     id: 8,
-    name: 'Emma Rodriguez',
-    subject: 'Spanish',
+    name: 'Abdul Hanan',
+    subject: 'English Literature',
     experience: '6 years',
     rating: 4.9,
     reviews: 189,
@@ -154,36 +141,10 @@ const tutors = [
     availability: 'Available in 2 hours',
     verified: true,
     avatar: '👨‍🔬'
-  },
-  {
-    id: 10,
-    name: 'Lisa Thompson',
-    subject: 'English Literature',
-    experience: '7 years',
-    rating: 4.8,
-    reviews: 167,
-    price: '$45/hour',
-    description: 'Published author and English teacher. Passionate about helping students develop writing and analytical skills.',
-    availability: 'Available today',
-    verified: true,
-    avatar: '👩‍📚'
-  },
-  {
-    id: 11,
-    name: 'David Park',
-    subject: 'Music',
-    experience: '9 years',
-    rating: 4.6,
-    reviews: 98,
-    price: '$50/hour',
-    description: 'Professional pianist and music teacher. Teaches piano, music theory, and composition to all skill levels.',
-    availability: 'Available tomorrow',
-    verified: true,
-    avatar: '👨‍🎵'
   }
 ]
 
-const subjects = ['All Subjects', 'Mathematics', 'Computer Science', 'Spanish', 'Physics', 'English Literature', 'Music']
+const subjects = ['All Subjects', 'Mathematics', 'Computer Science', 'Physics', 'Chemistry', 'Biology', 'English Literature']
 
 export default function Tutors() {
   return (
