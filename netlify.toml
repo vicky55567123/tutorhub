@@ -1,6 +1,6 @@
 [build]
   command = "npm run build"
-  publish = "out"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -11,12 +11,6 @@
   
 [context.branch-deploy]  
   command = "npm run build"
-
-# Next.js redirects
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
 
 # Headers for static assets
 [[headers]]
