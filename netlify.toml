@@ -9,12 +9,14 @@
 [context.production]
   command = "npm run build"
   
-[context.branch-deploy]
+[context.branch-deploy]  
   command = "npm run build"
 
-# Next.js specific configuration
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+# Static site redirects
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 # Headers for static assets
 [[headers]]
