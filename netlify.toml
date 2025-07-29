@@ -1,6 +1,6 @@
 [build]
   command = "npm run build"
-  publish = ".next"
+  publish = "out"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -12,7 +12,7 @@
 [context.branch-deploy]  
   command = "npm run build"
 
-# Static site redirects
+# Next.js redirects
 [[redirects]]
   from = "/*"
   to = "/index.html"
