@@ -1,8 +1,5 @@
 import Link from 'next/link'
-import deploymentStatus from '@/lib/deployment-status'
 
-// Ahmed Waqar featured profile - Force deployment update - Build: 2025-07-19 15:45
-// Deployment Status: Profile should be ENABLED and visible as first tutor
 const tutors = [
   // GCSE Specialist Tutors
   {
