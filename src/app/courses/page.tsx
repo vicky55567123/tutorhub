@@ -20,7 +20,7 @@ const courses = [
     subject: 'Mathematics',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Dr. Sarah Johnson',
+    instructor: 'Farhana Kiran',
     examBoard: 'AQA, Edexcel, OCR'
   },
   {
@@ -35,7 +35,7 @@ const courses = [
     subject: 'Physics',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Prof. David Wilson',
+    instructor: 'Zain ul Abedin',
     examBoard: 'AQA, Edexcel, OCR'
   },
   {
@@ -50,7 +50,7 @@ const courses = [
     subject: 'Chemistry',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Dr. Emily Roberts',
+    instructor: 'Ali Zia',
     examBoard: 'AQA, Edexcel, OCR'
   },
   {
@@ -65,7 +65,7 @@ const courses = [
     subject: 'Biology',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Dr. James Mitchell',
+    instructor: 'Bilal K Abbasi',
     examBoard: 'AQA, Edexcel, OCR'
   },
   {
@@ -80,7 +80,7 @@ const courses = [
     subject: 'Computer Science',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Mr. Alex Turner',
+    instructor: 'Fahad Noor',
     examBoard: 'AQA, Edexcel, OCR'
   },
   // Additional Courses
@@ -121,7 +121,7 @@ const courses = [
     category: 'English',
     duration: '10 weeks',
     level: 'Intermediate',
-    instructor: 'Lisa Thompson'
+    instructor: 'Abdul Hanan'
   },
   {
     id: 9,
@@ -135,32 +135,6 @@ const courses = [
     duration: '14 weeks',
     level: 'Intermediate',
     instructor: 'Dr. James Wilson'
-  },
-  {
-    id: 10,
-    title: 'Spanish Language Learning',
-    description: 'Become fluent in Spanish with interactive lessons and conversation practice.',
-    price: '$40/hour',
-    rating: 4.9,
-    students: 180,
-    image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&h=300&fit=crop',
-    category: 'Languages',
-    duration: '8 weeks',
-    level: 'Beginner',
-    instructor: 'Emma Rodriguez'
-  },
-  {
-    id: 11,
-    title: 'Music Theory & Piano',
-    description: 'Learn music theory and piano playing techniques from professional musicians.',
-    price: '$50/hour',
-    rating: 4.6,
-    students: 75,
-    image: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=400&h=300&fit=crop',
-    category: 'Music',
-    duration: '12 weeks',
-    level: 'Beginner',
-    instructor: 'David Park'
   }
 ]
 
@@ -170,9 +144,7 @@ const categories = [
   { name: 'Mathematics', color: 'from-blue-500 to-indigo-600', icon: '🧮' },
   { name: 'Programming', color: 'from-green-500 to-emerald-600', icon: '💻' },
   { name: 'English', color: 'from-purple-500 to-pink-600', icon: '📖' },
-  { name: 'Science', color: 'from-orange-500 to-red-600', icon: '🔬' },
-  { name: 'Languages', color: 'from-pink-500 to-rose-600', icon: '🌍' },
-  { name: 'Music', color: 'from-yellow-500 to-amber-600', icon: '🎵' }
+  { name: 'Science', color: 'from-orange-500 to-red-600', icon: '🔬' }
 ]
 
 export default function Courses() {

@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import { PhoneIcon, EnvelopeIcon } from '@heroicons/react/24/outline'
 
 export default function Footer() {
   return (
@@ -12,6 +13,26 @@ export default function Footer() {
               Empowering learners worldwide through quality education. 
               Connect with expert tutors and achieve your learning goals.
             </p>
+            <div className="space-y-3">
+              <div className="flex items-center">
+                <PhoneIcon className="h-5 w-5 text-blue-400 mr-2" />
+                <a 
+                  href="tel:+447446255033" 
+                  className="text-blue-400 hover:text-blue-300 transition duration-150 font-medium"
+                >
+                  +44 7446 255033
+                </a>
+              </div>
+              <div className="flex items-center">
+                <EnvelopeIcon className="h-5 w-5 text-blue-400 mr-2" />
+                <a 
+                  href="mailto:contact@tutorhub.com" 
+                  className="text-blue-400 hover:text-blue-300 transition duration-150"
+                >
+                  contact@tutorhub.com
+                </a>
+              </div>
+            </div>
           </div>
           
           <div>

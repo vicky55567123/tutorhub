@@ -5,7 +5,9 @@ import TopMenu from '@/components/TopMenu'
 import AuthNavbar from '@/components/AuthNavbar'
 import Footer from '@/components/Footer'
 import ToastProvider from '@/components/ToastProvider'
+import FloatingContactButton from '@/components/FloatingContactButton'
 import { AuthProvider } from '@/components/AuthContext'
+import NextAuthProvider from '@/components/NextAuthProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,17 +25,20 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
-        <AuthProvider>
-          <div className="min-h-screen flex flex-col">
-            <TopMenu />
-            <AuthNavbar />
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
-          </div>
-          <ToastProvider />
-        </AuthProvider>
+        <NextAuthProvider>
+          <AuthProvider>
+            <div className="min-h-screen flex flex-col">
+              <TopMenu />
+              <AuthNavbar />
+              <main className="flex-grow">
+                {children}
+              </main>
+              <Footer />
+            </div>
+            <ToastProvider />
+            <FloatingContactButton />
+          </AuthProvider>
+        </NextAuthProvider>
       </body>
     </html>
   )

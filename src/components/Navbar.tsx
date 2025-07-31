@@ -115,6 +115,13 @@ export default function Navbar() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            {/* Contact Number */}
+            <a 
+              href="tel:+447446255033" 
+              className="flex items-center text-blue-600 hover:text-blue-700 px-3 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-blue-50 border border-blue-200 hover:border-blue-300"
+            >
+              📞 +44 7446 255033
+            </a>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -179,6 +186,20 @@ export default function Navbar() {
               ))}
               
               <div className="pt-4 border-t border-gray-200 space-y-3">
+                {/* Contact Number */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <a 
+                    href="tel:+447446255033" 
+                    className="flex items-center justify-center bg-blue-100 text-blue-700 hover:bg-blue-200 py-3 px-4 rounded-lg text-base font-medium transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    📞 Call Us: +44 7446 255033
+                  </a>
+                </motion.div>
                 <motion.button
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}

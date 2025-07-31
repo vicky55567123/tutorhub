@@ -166,6 +166,21 @@ export default function HeroSection() {
               </Link>
             </motion.div>
 
+            {/* Contact CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.6 }}
+              className="mb-8"
+            >
+              <a 
+                href="tel:+447446255033" 
+                className="inline-flex items-center gap-3 px-6 py-3 bg-green-100 text-green-800 rounded-xl font-medium text-lg hover:bg-green-200 transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg border border-green-200"
+              >
+                📞 Need Help? Call Us: +44 7446 255033
+              </a>
+            </motion.div>
+
             {/* Stats */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}

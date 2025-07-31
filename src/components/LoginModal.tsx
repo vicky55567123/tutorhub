@@ -15,7 +15,7 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose, onSwitchToSignup, onDemoLogin }: LoginModalProps) {
-  const { login, signInWithGoogle, signInWithFacebook, signInWithGitHub } = useAuth()
+  const { loginWithEmailPassword, signInWithGoogle, signInWithFacebook, signInWithGitHub } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -27,21 +27,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup, onDemoLo
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      // For demo purposes, create a user based on email
-      const user = {
-        id: Date.now().toString(),
-        name: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        email: email,
-        type: email.includes('tutor') || email.includes('teacher') ? 'tutor' as const : 'student' as const,
-        avatar: email.includes('tutor') || email.includes('teacher') 
-          ? 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face'
-          : 'https://images.unsplash.com/photo-1494790108755-2616b612b3dd?w=400&h=400&fit=crop&crop=face'
-      }
-      
-      login(user)
+      const user = await loginWithEmailPassword(email, password)
       
       toast.success(`Welcome back, ${user.name}! 🎉`, {
         style: {
@@ -59,9 +45,12 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup, onDemoLo
       setPassword('')
       setRememberMe(false)
       
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
-      toast.error('Login failed. Please try again.')
+      const errorMessage = error.message === 'Invalid email or password' 
+        ? 'Invalid email or password. Please check your credentials.'
+        : 'Failed to sign in. Please try again.'
+      toast.error(errorMessage)
     }
   }
 

@@ -15,7 +15,7 @@ interface SignupModalProps {
 }
 
 export default function SignupModal({ isOpen, onClose, onSwitchToLogin, onDemoLogin }: SignupModalProps) {
-  const { login, signInWithGoogle, signInWithFacebook, signInWithGitHub } = useAuth()
+  const { registerUser, signInWithGoogle, signInWithFacebook, signInWithGitHub } = useAuth()
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -61,22 +61,14 @@ export default function SignupModal({ isOpen, onClose, onSwitchToLogin, onDemoLo
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Create user object
-      const newUser = {
-        id: Date.now().toString(), // Simple ID generation for demo
-        name: `${formData.firstName} ${formData.lastName}`,
+      // Register user with real database backend
+      const newUser = await registerUser({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
-        type: userType,
-        avatar: userType === 'student' 
-          ? 'https://images.unsplash.com/photo-1494790108755-2616b612b3dd?w=400&h=400&fit=crop&crop=face'
-          : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face'
-      }
-      
-      // Log the user in
-      login(newUser)
+        password: formData.password,
+        userType: userType
+      })
       
       toast.success(`Welcome ${newUser.name}! Account created successfully! 🎉`, {
         style: {
@@ -99,9 +91,12 @@ export default function SignupModal({ isOpen, onClose, onSwitchToLogin, onDemoLo
       })
       setAgreeToTerms(false)
       
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
-      toast.error('Failed to create account. Please try again.')
+      const errorMessage = error.message === 'Email already exists' 
+        ? 'An account with this email already exists. Please try logging in instead.'
+        : 'Failed to create account. Please try again.'
+      toast.error(errorMessage)
     }
   }
 

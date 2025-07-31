@@ -4,6 +4,7 @@ import { Fragment, useState } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import {
   UserCircleIcon,
   Cog6ToothIcon,
@@ -11,7 +12,8 @@ import {
   HeartIcon,
   CreditCardIcon,
   ArrowRightOnRectangleIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  ChartBarIcon
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 
@@ -26,25 +28,27 @@ interface UserProfileDropdownProps {
 }
 
 export default function UserProfileDropdown({ user, onLogout }: UserProfileDropdownProps) {
+  const router = useRouter()
+  
   const handleMenuClick = (action: string) => {
     switch (action) {
       case 'profile':
-        toast('Profile page coming soon!', { icon: '👤' })
+        router.push('/profile')
         break
       case 'dashboard':
-        toast(`${user.type === 'tutor' ? 'Tutor' : 'Student'} dashboard coming soon!`, { icon: '📊' })
+        router.push('/dashboard')
         break
       case 'courses':
-        toast('My courses coming soon!', { icon: '📚' })
+        router.push('/my-courses')
         break
       case 'favorites':
-        toast('Favorites coming soon!', { icon: '❤️' })
+        router.push('/favorites')
         break
       case 'billing':
-        toast('Billing & payments coming soon!', { icon: '💳' })
+        router.push('/billing')
         break
       case 'settings':
-        toast('Settings coming soon!', { icon: '⚙️' })
+        router.push('/settings')
         break
       case 'logout':
         onLogout()
@@ -76,6 +80,12 @@ export default function UserProfileDropdown({ user, onLogout }: UserProfileDropd
                   alt={user.name}
                   fill
                   className="object-cover"
+                  unoptimized
+                  onError={(e) => {
+                    console.log('Avatar failed to load:', user.avatar)
+                    // Hide the image and show fallback
+                    e.currentTarget.style.display = 'none'
+                  }}
                 />
               </div>
             ) : (
@@ -108,6 +118,12 @@ export default function UserProfileDropdown({ user, onLogout }: UserProfileDropd
                       alt={user.name}
                       fill
                       className="object-cover"
+                      unoptimized
+                      onError={(e) => {
+                        console.log('Avatar failed to load:', user.avatar)
+                        // Hide the image and show fallback
+                        e.currentTarget.style.display = 'none'
+                      }}
                     />
                   </div>
                 ) : (
@@ -147,7 +163,7 @@ export default function UserProfileDropdown({ user, onLogout }: UserProfileDropd
                       active ? 'bg-gray-50 text-gray-900' : 'text-gray-700'
                     } group flex w-full items-center px-4 py-2 text-sm transition-colors`}
                   >
-                    <BookOpenIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
+                    <ChartBarIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
                     {user.type === 'tutor' ? 'Teaching Dashboard' : 'Learning Dashboard'}
                   </button>
                 )}

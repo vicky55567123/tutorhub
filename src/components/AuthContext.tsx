@@ -1,6 +1,8 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { useSession, signIn, signOut } from 'next-auth/react'
+import { localStorageDB, UserProfile } from '../lib/supabase'
 
 interface User {
   id: string
@@ -13,6 +15,14 @@ interface User {
 interface AuthContextType {
   user: User | null
   login: (userData: User) => void
+  loginWithEmailPassword: (email: string, password: string) => Promise<User>
+  registerUser: (userData: {
+    firstName: string
+    lastName: string
+    email: string
+    password: string
+    userType: 'student' | 'tutor'
+  }) => Promise<User>
   logout: () => void
   isLoading: boolean
   signInWithGoogle: () => Promise<void>
@@ -25,77 +35,172 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const { data: session, status } = useSession()
 
   useEffect(() => {
-    // Check if user is stored in localStorage
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser))
-      } catch (error) {
-        console.error('Error parsing stored user:', error)
-        localStorage.removeItem('user')
+    if (status === 'loading') {
+      setIsLoading(true)
+      return
+    }
+
+    if (session?.user) {
+      // Convert NextAuth session to our User format
+      const sessionUser = session.user as any
+      const nextAuthUser: User = {
+        id: sessionUser.id || session.user.email || Date.now().toString(),
+        name: session.user.name || '',
+        email: session.user.email || '',
+        avatar: session.user.image || undefined,
+        type: sessionUser.userType || 'student'
+      }
+      setUser(nextAuthUser)
+      
+      // Also save to localStorage for consistency
+      localStorage.setItem('current_user', JSON.stringify(nextAuthUser))
+    } else {
+      // Check localStorage for regular email/password users
+      const storedUser = localStorage.getItem('current_user')
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser)
+          // Only use localStorage user if it's not from OAuth (has no image)
+          if (!parsedUser.avatar || !parsedUser.avatar.includes('googleusercontent')) {
+            setUser(parsedUser)
+          }
+        } catch (error) {
+          console.error('Error parsing stored user:', error)
+          localStorage.removeItem('current_user')
+        }
       }
     }
+    
     setIsLoading(false)
-  }, [])
+  }, [session, status])
 
   const login = (userData: User) => {
     setUser(userData)
-    localStorage.setItem('user', JSON.stringify(userData))
+    localStorage.setItem('current_user', JSON.stringify(userData))
   }
 
-  const logout = () => {
+  const logout = async () => {
+    // Sign out from NextAuth if user is OAuth user
+    if (session) {
+      await signOut({ redirect: false })
+    }
+    
+    // Clear local state and storage
     setUser(null)
-    localStorage.removeItem('user')
+    localStorage.removeItem('current_user')
+  }
+
+  // Convert UserProfile to User type
+  const convertProfileToUser = (profile: UserProfile): User => ({
+    id: profile.id,
+    name: profile.full_name,
+    email: profile.email,
+    avatar: profile.avatar_url,
+    type: profile.user_type
+  })
+
+  const registerUser = async (userData: {
+    firstName: string
+    lastName: string
+    email: string
+    password: string
+    userType: 'student' | 'tutor'
+  }): Promise<User> => {
+    try {
+      const profile = await localStorageDB.createUser({
+        email: userData.email,
+        full_name: `${userData.firstName} ${userData.lastName}`,
+        user_type: userData.userType,
+        password: userData.password
+      })
+
+      const user = convertProfileToUser(profile)
+      login(user)
+      return user
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const loginWithEmailPassword = async (email: string, password: string): Promise<User> => {
+    try {
+      const profile = await localStorageDB.loginUser(email, password)
+      const user = convertProfileToUser(profile)
+      login(user)
+      return user
+    } catch (error) {
+      throw error
+    }
   }
 
   const signInWithGoogle = async () => {
-    // Demo Google authentication
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    const demoUser: User = {
-      id: Date.now().toString(),
-      name: 'Google Demo User',
-      email: 'demo@google.com',
-      type: 'student',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b3dd?w=400&h=400&fit=crop&crop=face'
+    try {
+      // Use NextAuth to sign in with Google - this will open the real Google OAuth popup
+      const result = await signIn('google', { 
+        redirect: false,
+        callbackUrl: '/'
+      })
+      
+      if (result?.error) {
+        if (result.error.includes('invalid_client') || result.error.includes('401')) {
+          throw new Error('Google OAuth credentials are not configured properly. Please set up your Google OAuth app in Google Cloud Console and update your .env.local file with the correct GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.')
+        }
+        throw new Error(`Google sign-in failed: ${result.error}`)
+      }
+      
+      // NextAuth will handle the OAuth flow and session management
+      return Promise.resolve()
+    } catch (error) {
+      console.error('Google sign-in error:', error)
+      throw error
     }
-    
-    login(demoUser)
-    return Promise.resolve()
   }
 
   const signInWithFacebook = async () => {
-    // Demo Facebook authentication
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    const demoUser: User = {
-      id: Date.now().toString(),
-      name: 'Facebook Demo User',
-      email: 'demo@facebook.com',
-      type: 'student',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b3dd?w=400&h=400&fit=crop&crop=face'
+    try {
+      // Use NextAuth to sign in with Facebook
+      const result = await signIn('facebook', { 
+        redirect: false,
+        callbackUrl: '/'
+      })
+      
+      if (result?.error) {
+        if (result.error.includes('invalid_client') || result.error.includes('401')) {
+          throw new Error('Facebook OAuth credentials are not configured properly. Please set up your Facebook OAuth app and update your .env.local file.')
+        }
+        throw new Error(`Facebook sign-in failed: ${result.error}`)
+      }
+      
+      return Promise.resolve()
+    } catch (error) {
+      console.error('Facebook sign-in error:', error)
+      throw error
     }
-    
-    login(demoUser)
-    return Promise.resolve()
   }
 
   const signInWithGitHub = async () => {
-    // Demo GitHub authentication
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    const demoUser: User = {
-      id: Date.now().toString(),
-      name: 'GitHub Demo User',
-      email: 'demo@github.com',
-      type: 'student',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b3dd?w=400&h=400&fit=crop&crop=face'
+    try {
+      // Use NextAuth to sign in with GitHub
+      const result = await signIn('github', { 
+        redirect: false,
+        callbackUrl: '/'
+      })
+      
+      if (result?.error) {
+        if (result.error.includes('invalid_client') || result.error.includes('401')) {
+          throw new Error('GitHub OAuth credentials are not configured properly. Please set up your GitHub OAuth app and update your .env.local file.')
+        }
+        throw new Error(`GitHub sign-in failed: ${result.error}`)
+      }
+      
+      return Promise.resolve()
+    } catch (error) {
+      console.error('GitHub sign-in error:', error)
+      throw error
     }
-    
-    login(demoUser)
-    return Promise.resolve()
   }
 
   return (
@@ -103,6 +208,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user, 
       login, 
       logout, 
+      registerUser,
+      loginWithEmailPassword,
       isLoading, 
       signInWithGoogle, 
       signInWithFacebook, 
