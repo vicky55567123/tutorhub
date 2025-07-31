@@ -171,13 +171,21 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9, duration: 0.6 }}
-              className="mb-8"
+              className="mb-8 flex flex-col sm:flex-row gap-4 items-center justify-center"
             >
               <a 
                 href="tel:+447446255033" 
+                className="inline-flex items-center gap-3 px-6 py-3 bg-blue-100 text-blue-800 rounded-xl font-medium text-lg hover:bg-blue-200 transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg border border-blue-200"
+              >
+                📞 Call Us: +44 7446 255033
+              </a>
+              <a 
+                href="https://wa.me/447446255033" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 px-6 py-3 bg-green-100 text-green-800 rounded-xl font-medium text-lg hover:bg-green-200 transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg border border-green-200"
               >
-                📞 Need Help? Call Us: +44 7446 255033
+                � WhatsApp: +44 7446 255033
               </a>
             </motion.div>
 

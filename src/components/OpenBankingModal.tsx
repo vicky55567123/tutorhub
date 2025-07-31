@@ -114,12 +114,23 @@ export default function OpenBankingModal({
           <div className="text-center">
             <p>Bank verification is not available yet.</p>
             <p className="mt-2 font-medium">Contact us for help:</p>
-            <a 
-              href="tel:+447446255033" 
-              className="text-blue-600 hover:text-blue-700 underline font-bold"
-            >
-              📞 +44 7446 255033
-            </a>
+            <div className="flex gap-2 justify-center mt-2">
+              <a 
+                href="tel:+447446255033" 
+                className="text-blue-600 hover:text-blue-700 underline font-bold"
+              >
+                📞 Call
+              </a>
+              <span className="text-gray-500">|</span>
+              <a 
+                href="https://wa.me/447446255033" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-green-600 hover:text-green-700 underline font-bold"
+              >
+                💬 WhatsApp
+              </a>
+            </div>
           </div>, 
           {
             duration: 8000,
@@ -132,7 +143,32 @@ export default function OpenBankingModal({
       }
     } catch (error) {
       console.error('Open Banking consent creation failed:', error)
-      toast.error(`Failed to connect to ${provider.displayName}. Please try again or contact support.`)
+      toast.error(
+        <div className="text-center">
+          <p>Failed to connect to {provider.displayName}. Please try again.</p>
+          <p className="mt-2 font-medium">Need help?</p>
+          <div className="flex gap-2 justify-center mt-2">
+            <a 
+              href="tel:+447446255033" 
+              className="text-blue-600 hover:text-blue-700 underline font-bold"
+            >
+              📞 Call
+            </a>
+            <span className="text-gray-500">|</span>
+            <a 
+              href="https://wa.me/447446255033" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-green-600 hover:text-green-700 underline font-bold"
+            >
+              💬 WhatsApp
+            </a>
+          </div>
+        </div>,
+        {
+          duration: 6000
+        }
+      )
       setStep('provider')
     } finally {
       setIsLoading(false)

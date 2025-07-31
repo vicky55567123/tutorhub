@@ -48,11 +48,13 @@ export default function FloatingContactButton() {
             </a>
             
             <a
-              href="sms:+447446255033"
+              href="https://wa.me/447446255033"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-3 w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-xl transition-colors font-medium"
               onClick={() => setIsExpanded(false)}
             >
-              💬 Text Us: +44 7446 255033
+              💬 WhatsApp: +44 7446 255033
             </a>
             
             <a

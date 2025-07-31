@@ -115,13 +115,23 @@ export default function Navbar() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Contact Number */}
-            <a 
-              href="tel:+447446255033" 
-              className="flex items-center text-blue-600 hover:text-blue-700 px-3 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-blue-50 border border-blue-200 hover:border-blue-300"
-            >
-              📞 +44 7446 255033
-            </a>
+            {/* Contact Options */}
+            <div className="flex items-center space-x-2">
+              <a 
+                href="tel:+447446255033" 
+                className="flex items-center text-blue-600 hover:text-blue-700 px-3 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-blue-50 border border-blue-200 hover:border-blue-300"
+              >
+                📞 Call
+              </a>
+              <a 
+                href="https://wa.me/447446255033" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center text-green-600 hover:text-green-700 px-3 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-green-50 border border-green-200 hover:border-green-300"
+              >
+                💬 WhatsApp
+              </a>
+            </div>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -186,11 +196,12 @@ export default function Navbar() {
               ))}
               
               <div className="pt-4 border-t border-gray-200 space-y-3">
-                {/* Contact Number */}
+                {/* Contact Options */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
+                  className="space-y-2"
                 >
                   <a 
                     href="tel:+447446255033" 
@@ -198,6 +209,15 @@ export default function Navbar() {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     📞 Call Us: +44 7446 255033
+                  </a>
+                  <a 
+                    href="https://wa.me/447446255033" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center bg-green-100 text-green-700 hover:bg-green-200 py-3 px-4 rounded-lg text-base font-medium transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    💬 WhatsApp: +44 7446 255033
                   </a>
                 </motion.div>
                 <motion.button

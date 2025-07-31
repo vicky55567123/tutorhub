@@ -37,6 +37,26 @@ export default function NotFound() {
               Find Tutors
             </Link>
           </div>
+          
+          <div className="mt-8 pt-6 border-t border-gray-200">
+            <p className="text-sm text-gray-600 mb-3">Need help? Contact us:</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <a
+                href="tel:+447446255033"
+                className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                📞 Call: +44 7446 255033
+              </a>
+              <a
+                href="https://wa.me/447446255033"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+              >
+                💬 WhatsApp
+              </a>
+            </div>
+          </div>
         </div>
         
         <div className="mt-12 text-xs text-gray-400">

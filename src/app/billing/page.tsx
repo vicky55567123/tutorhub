@@ -387,11 +387,27 @@ export default function BillingPage() {
                   <p className="text-sm text-gray-600">Download receipts and invoices</p>
                 </button>
                 
-                <button className="p-4 border border-gray-200 rounded-lg hover:border-yellow-300 hover:bg-yellow-50 transition-colors text-left">
+                <div className="p-4 border border-gray-200 rounded-lg hover:border-yellow-300 hover:bg-yellow-50 transition-colors">
                   <ReceiptRefundIcon className="h-6 w-6 text-yellow-600 mb-2" />
-                  <p className="font-medium text-gray-900">Get Support</p>
-                  <p className="text-sm text-gray-600">Billing questions and refunds</p>
-                </button>
+                  <p className="font-medium text-gray-900 mb-2">Get Support</p>
+                  <p className="text-sm text-gray-600 mb-3">Billing questions and refunds</p>
+                  <div className="flex gap-2">
+                    <a
+                      href="tel:+447446255033"
+                      className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700 transition-colors"
+                    >
+                      📞 Call
+                    </a>
+                    <a
+                      href="https://wa.me/447446255033"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-3 py-1 bg-green-600 text-white text-xs rounded-md hover:bg-green-700 transition-colors"
+                    >
+                      💬 WhatsApp
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
 
