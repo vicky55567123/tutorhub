@@ -15,10 +15,11 @@ import toast from 'react-hot-toast'
 interface CreateMeetingModalProps {
   isOpen: boolean
   onClose: () => void
-  onCreateMeeting: (meetingData: any) => void
+  onSuccess: () => void
+  setupStatus?: any
 }
 
-export default function CreateMeetingModal({ isOpen, onClose, onCreateMeeting }: CreateMeetingModalProps) {
+export default function CreateMeetingModal({ isOpen, onClose, onSuccess, setupStatus }: CreateMeetingModalProps) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -29,7 +30,7 @@ export default function CreateMeetingModal({ isOpen, onClose, onCreateMeeting }:
     attendeeEmails: ['']
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!formData.title || !formData.startDate || !formData.startTime) {
@@ -48,7 +49,31 @@ export default function CreateMeetingModal({ isOpen, onClose, onCreateMeeting }:
       attendeeEmails: formData.attendeeEmails.filter(email => email.trim() !== '')
     }
     
-    onCreateMeeting(meetingData)
+    try {
+      const response = await fetch('/api/google-meet/create-meeting', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(meetingData)
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        toast.success('Video lesson scheduled successfully!')
+        onSuccess()
+        onClose()
+      } else if (data.requiresAuth) {
+        // Redirect to Google OAuth authorization
+        window.location.href = data.authUrl
+      } else {
+        toast.error(data.error || 'Failed to schedule lesson')
+      }
+    } catch (error) {
+      console.error('Error creating meeting:', error)
+      toast.error('Failed to schedule lesson')
+    }
   }
 
   const handleEmailChange = (index: number, value: string) => {
@@ -118,6 +143,7 @@ export default function CreateMeetingModal({ isOpen, onClose, onCreateMeeting }:
               type="button"
               className="rounded-md p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors"
               onClick={handleClose}
+              aria-label="Close modal"
             >
               <XMarkIcon className="h-5 w-5" />
             </button>
@@ -276,25 +302,46 @@ export default function CreateMeetingModal({ isOpen, onClose, onCreateMeeting }:
               </ul>
             </div>
 
-            {/* Setup Notice */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <div className="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <span className="text-yellow-600 text-xs">⚠️</span>
+            {/* Setup Notice - Only show if not configured */}
+            {setupStatus && !setupStatus.isConfigured && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <div className="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center">
+                      <span className="text-yellow-600 text-xs">⚠️</span>
+                    </div>
+                  </div>
+                  <div className="ml-3">
+                    <h4 className="font-medium text-yellow-900 mb-1">Setup Required</h4>
+                    <p className="text-sm text-yellow-800">
+                      Google Meet integration requires API configuration. Meeting will be scheduled but Google Meet link will be available once setup is complete.
+                    </p>
+                    <p className="text-xs text-yellow-700 mt-1">
+                      See GOOGLE_MEET_SETUP.md for detailed instructions.
+                    </p>
                   </div>
                 </div>
-                <div className="ml-3">
-                  <h4 className="font-medium text-yellow-900 mb-1">Setup Required</h4>
-                  <p className="text-sm text-yellow-800">
-                    Google Meet integration requires API configuration. Meeting will be scheduled but Google Meet link will be available once setup is complete.
-                  </p>
-                  <p className="text-xs text-yellow-700 mt-1">
-                    See GOOGLE_MEET_SETUP.md for detailed instructions.
-                  </p>
+              </div>
+            )}
+
+            {/* Ready Notice - Show when configured */}
+            {setupStatus && setupStatus.isConfigured && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 text-xs">✅</span>
+                    </div>
+                  </div>
+                  <div className="ml-3">
+                    <h4 className="font-medium text-green-900 mb-1">Google Meet Ready</h4>
+                    <p className="text-sm text-green-800">
+                      Real Google Meet links will be created automatically for your lesson.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex justify-end space-x-3 pt-4">

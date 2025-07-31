@@ -38,6 +38,17 @@ export default function VideoLessonsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past' | 'all'>('upcoming')
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [setupStatus, setSetupStatus] = useState<any>(null)
+
+  const checkSetupStatus = useCallback(async () => {
+    try {
+      const response = await fetch('/api/google-meet/setup-status')
+      const data = await response.json()
+      setSetupStatus(data)
+    } catch (error) {
+      console.error('Error checking setup status:', error)
+    }
+  }, [])
 
   const fetchMeetings = useCallback(async () => {
     try {
@@ -60,9 +71,10 @@ export default function VideoLessonsPage() {
 
   useEffect(() => {
     if (user) {
+      checkSetupStatus()
       fetchMeetings()
     }
-  }, [user, fetchMeetings])
+  }, [user, fetchMeetings, checkSetupStatus])
 
   const handleJoinMeeting = (meetingUrl: string, title: string) => {
     // Open Google Meet in a new tab
@@ -75,43 +87,6 @@ export default function VideoLessonsPage() {
         color: '#fff',
       }
     })
-  }
-
-  const handleCreateMeeting = async (meetingData: any) => {
-    try {
-      const response = await fetch('/api/google-meet/create-meeting', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(meetingData)
-      })
-      
-      const data = await response.json()
-      
-      if (data.success) {
-        if (data.requiresSetup) {
-          toast('Video lesson scheduled! Google Meet link will be available once API is configured.', {
-            icon: '📅',
-            duration: 5000,
-            style: {
-              borderRadius: '10px',
-              background: '#F59E0B',
-              color: '#fff',
-            }
-          })
-        } else {
-          toast.success('Video lesson scheduled successfully with Google Meet link!')
-        }
-        setIsCreateModalOpen(false)
-        fetchMeetings() // Refresh the meetings list
-      } else {
-        toast.error(data.message || 'Failed to create meeting')
-      }
-    } catch (error) {
-      console.error('Error creating meeting:', error)
-      toast.error('Failed to create video lesson')
-    }
   }
 
   const formatDate = (dateString: string) => {
@@ -210,6 +185,40 @@ export default function VideoLessonsPage() {
             </button>
           </div>
         </div>
+
+        {/* Setup Status Alert */}
+        {setupStatus && !setupStatus.isConfigured && (
+          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div className="flex items-start">
+              <ExclamationTriangleIcon className="h-5 w-5 text-amber-500 mt-0.5 mr-3" />
+              <div>
+                <h3 className="text-sm font-semibold text-amber-800 mb-1">
+                  Google Meet Setup Required
+                </h3>
+                <p className="text-sm text-amber-700 mb-3">
+                  To use HD Video Lessons, you need to configure Google Meet integration. 
+                  This requires setting up Google Cloud Console credentials.
+                </p>
+                <div className="text-sm text-amber-700">
+                  <p className="font-medium mb-1">Missing configuration:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    {setupStatus.missingVars?.map((varName: string) => (
+                      <li key={varName}>{varName}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="mt-3">
+                  <a 
+                    href="/GOOGLE_MEET_SETUP.md"
+                    className="text-sm font-medium text-amber-800 hover:text-amber-900 underline"
+                  >
+                    View Setup Instructions →
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Features Banner */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-200">
@@ -314,25 +323,46 @@ export default function VideoLessonsPage() {
                'Start by scheduling a video lesson with one of our expert tutors.'}
             </p>
             
-            {/* Setup Notice */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 max-w-md mx-auto">
-              <div className="flex items-start">
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-blue-600 text-sm">ℹ️</span>
+            {/* Setup Notice - Only show if not configured */}
+            {setupStatus && !setupStatus.isConfigured && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 max-w-md mx-auto">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 text-sm">ℹ️</span>
+                    </div>
+                  </div>
+                  <div className="ml-3 text-left">
+                    <h4 className="text-sm font-medium text-blue-800 mb-1">Google Meet Integration</h4>
+                    <p className="text-sm text-blue-700">
+                      Video lessons are powered by Google Meet. Real meeting links will be generated once Google Calendar API is configured.
+                    </p>
+                    <p className="text-xs text-blue-600 mt-2">
+                      See GOOGLE_MEET_SETUP.md for setup instructions.
+                    </p>
                   </div>
                 </div>
-                <div className="ml-3 text-left">
-                  <h4 className="text-sm font-medium text-blue-800 mb-1">Google Meet Integration</h4>
-                  <p className="text-sm text-blue-700">
-                    Video lessons are powered by Google Meet. Real meeting links will be generated once Google Calendar API is configured.
-                  </p>
-                  <p className="text-xs text-blue-600 mt-2">
-                    See GOOGLE_MEET_SETUP.md for setup instructions.
-                  </p>
+              </div>
+            )}
+
+            {/* Ready Status - Show when configured */}
+            {setupStatus && setupStatus.isConfigured && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 max-w-md mx-auto">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 text-sm">✅</span>
+                    </div>
+                  </div>
+                  <div className="ml-3 text-left">
+                    <h4 className="text-sm font-medium text-green-800 mb-1">Google Meet Ready</h4>
+                    <p className="text-sm text-green-700">
+                      Google Meet integration is configured and ready. Schedule lessons to create real Google Meet links!
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             
             <button
               onClick={() => setIsCreateModalOpen(true)}
@@ -421,7 +451,8 @@ export default function VideoLessonsPage() {
       <CreateMeetingModal 
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onCreateMeeting={handleCreateMeeting}
+        onSuccess={fetchMeetings}
+        setupStatus={setupStatus}
       />
     </div>
   )
