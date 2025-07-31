@@ -191,7 +191,15 @@ export default function FeaturesSection() {
                       ? `${colors.bg} ${colors.border} shadow-lg scale-105` 
                       : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
                   }`}
-                  onClick={() => setActiveFeature(feature.id)}
+                  onClick={() => {
+                    setActiveFeature(feature.id)
+                    if (feature.id === 'video') {
+                      // Navigate to video lessons page after a short delay
+                      setTimeout(() => {
+                        window.open('/video-lessons', '_blank')
+                      }, 200)
+                    }
+                  }}
                   onMouseEnter={() => setHoveredFeature(feature.id)}
                   onMouseLeave={() => setHoveredFeature(null)}
                   whileHover={{ scale: isActive ? 1.05 : 1.02 }}
@@ -284,9 +292,14 @@ export default function FeaturesSection() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      if (activeFeatureData.id === 'video') {
+                        window.open('/video-lessons', '_blank')
+                      }
+                    }}
                     className={`w-full mt-8 py-3 px-6 ${colorClasses[activeFeatureData.color as keyof typeof colorClasses].accent} text-white rounded-xl font-semibold transition-all duration-300 hover:shadow-lg`}
                   >
-                    Learn More
+                    {activeFeatureData.id === 'video' ? 'Try HD Video Lessons' : 'Learn More'}
                   </motion.button>
                 </>
               )}

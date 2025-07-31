@@ -683,9 +683,17 @@ export default function CoursePage({ params }: CoursePageProps) {
 
                     <button
                       onClick={handleEnroll}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 mb-4"
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 mb-3"
                     >
                       Enroll Now
+                    </button>
+
+                    <button
+                      onClick={() => window.open('/video-lessons', '_blank')}
+                      className="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-green-700 hover:to-blue-700 transition-all duration-300 mb-4 flex items-center justify-center gap-2"
+                    >
+                      <PlayCircleIcon className="h-5 w-5" />
+                      Schedule HD Video Lesson
                     </button>
 
                     <div className="space-y-3 text-sm">

@@ -12,6 +12,7 @@ const navigationItems = [
   { name: 'GCSE Tutoring', href: '/courses?category=GCSE' },
   { name: 'Courses', href: '/courses' },
   { name: 'Find Tutors', href: '/tutors' },
+  { name: 'Video Lessons', href: '/video-lessons' },
   { name: 'How It Works', href: '/how-it-works' },
 ]
 

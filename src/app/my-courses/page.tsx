@@ -13,7 +13,8 @@ import {
   CalendarIcon,
   AcademicCapIcon,
   PlusIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  VideoCameraIcon
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 
@@ -87,6 +88,19 @@ export default function MyCoursesPage() {
   const handleViewCertificate = (courseId: number) => {
     toast.success('Certificate downloaded!', {
       icon: '🏆',
+      style: {
+        borderRadius: '10px',
+        background: '#10B981',
+        color: '#fff',
+      }
+    })
+  }
+
+  const handleScheduleVideoLesson = (courseId: number) => {
+    // Open video lessons page in new tab
+    window.open('/video-lessons', '_blank')
+    toast.success('Opening video lesson scheduler...', {
+      icon: '🎥',
       style: {
         borderRadius: '10px',
         background: '#10B981',
@@ -305,13 +319,22 @@ export default function MyCoursesPage() {
 
                   {/* Action Buttons */}
                   {course.status === 'active' && (
-                    <button
-                      onClick={() => handleStartLesson(course.id)}
-                      className="w-full flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-                    >
-                      <PlayIcon className="h-4 w-4 mr-2" />
-                      {course.progress > 0 ? 'Continue Learning' : 'Start Course'}
-                    </button>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => handleStartLesson(course.id)}
+                        className="w-full flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                      >
+                        <PlayIcon className="h-4 w-4 mr-2" />
+                        {course.progress > 0 ? 'Continue Learning' : 'Start Course'}
+                      </button>
+                      <button
+                        onClick={() => handleScheduleVideoLesson(course.id)}
+                        className="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        <VideoCameraIcon className="h-4 w-4 mr-2" />
+                        Schedule HD Video Lesson
+                      </button>
+                    </div>
                   )}
 
                   {course.status === 'completed' && (
