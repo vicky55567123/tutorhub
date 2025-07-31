@@ -137,22 +137,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
+      setIsLoading(true)
+      console.log('Starting Google sign-in process...')
+      
       // Use NextAuth to sign in with Google - this will open the real Google OAuth popup
       const result = await signIn('google', { 
         redirect: false,
         callbackUrl: '/'
       })
       
+      console.log('Google sign-in result:', result)
+      
       if (result?.error) {
+        console.error('Google sign-in error:', result.error)
+        
         if (result.error.includes('invalid_client') || result.error.includes('401')) {
           throw new Error('Google OAuth credentials are not configured properly. Please set up your Google OAuth app in Google Cloud Console and update your .env.local file with the correct GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.')
+        }
+        if (result.error.includes('redirect_uri_mismatch')) {
+          throw new Error('Redirect URI mismatch. Please add http://localhost:3002/api/auth/callback/google to your Google Cloud Console OAuth settings.')
         }
         throw new Error(`Google sign-in failed: ${result.error}`)
       }
       
       // NextAuth will handle the OAuth flow and session management
+      setIsLoading(false)
       return Promise.resolve()
     } catch (error) {
+      setIsLoading(false)
       console.error('Google sign-in error:', error)
       throw error
     }
