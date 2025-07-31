@@ -27,7 +27,6 @@ interface AuthContextType {
   isLoading: boolean
   signInWithGoogle: () => Promise<void>
   signInWithFacebook: () => Promise<void>
-  signInWithGitHub: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -181,28 +180,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signInWithGitHub = async () => {
-    try {
-      // Use NextAuth to sign in with GitHub
-      const result = await signIn('github', { 
-        redirect: false,
-        callbackUrl: '/'
-      })
-      
-      if (result?.error) {
-        if (result.error.includes('invalid_client') || result.error.includes('401')) {
-          throw new Error('GitHub OAuth credentials are not configured properly. Please set up your GitHub OAuth app and update your .env.local file.')
-        }
-        throw new Error(`GitHub sign-in failed: ${result.error}`)
-      }
-      
-      return Promise.resolve()
-    } catch (error) {
-      console.error('GitHub sign-in error:', error)
-      throw error
-    }
-  }
-
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -212,8 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loginWithEmailPassword,
       isLoading, 
       signInWithGoogle, 
-      signInWithFacebook, 
-      signInWithGitHub 
+      signInWithFacebook
     }}>
       {children}
     </AuthContext.Provider>

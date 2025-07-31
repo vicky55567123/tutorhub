@@ -13,6 +13,7 @@ import { useAuth, demoUsers } from './AuthContext'
 const navigationItems = [
   { name: 'Courses', href: '/courses' },
   { name: 'Find Tutors', href: '/tutors' },
+  { name: 'Video Lessons', href: '/video-lessons' },
   { name: 'How It Works', href: '/how-it-works' },
 ]
 
