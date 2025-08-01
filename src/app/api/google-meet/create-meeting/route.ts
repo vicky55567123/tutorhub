@@ -107,11 +107,18 @@ export async function POST(request: NextRequest) {
         calendarLink: htmlLink,
         status: 'scheduled',
         createdAt: new Date().toISOString(),
-        attendees: attendeeEmails?.filter((email: string) => email.trim()) || []
+        attendees: attendeeEmails?.filter((email: string) => email.trim()) || [],
+        userId: 'current_user' // TODO: Get actual user ID from session
       }
 
-      // TODO: Save to database
-      // await saveMeetingToDatabase(meeting)
+      // Save to simple in-memory storage (for demo purposes)
+      // In production, this would be saved to a real database
+      const globalThis = global as any
+      globalThis.meetings = globalThis.meetings || []
+      globalThis.meetings.push(meeting)
+
+      console.log('Meeting saved to global storage:', meeting.title)
+      console.log('Total meetings in storage:', globalThis.meetings.length)
 
       return NextResponse.json({
         success: true,

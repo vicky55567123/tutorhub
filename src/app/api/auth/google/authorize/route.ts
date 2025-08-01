@@ -19,10 +19,12 @@ export async function GET(request: NextRequest) {
       `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/google/callback`
     )
 
-    // Define required scopes
+    // Define required scopes for Calendar API
     const scopes = [
       'https://www.googleapis.com/auth/calendar',
-      'https://www.googleapis.com/auth/calendar.events'
+      'https://www.googleapis.com/auth/calendar.events',
+      'https://www.googleapis.com/auth/userinfo.email',
+      'https://www.googleapis.com/auth/userinfo.profile'
     ]
 
     // Generate authorization URL

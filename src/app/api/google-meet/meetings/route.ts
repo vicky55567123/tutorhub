@@ -12,19 +12,26 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // TODO: Replace with actual database query
-    // In a real implementation, you would:
-    // 1. Query your database for meetings associated with this user
-    // 2. Filter by status, date range, etc.
-    // 3. Return actual meeting data with real Google Meet links
+    // Get meetings from in-memory storage
+    const globalThis = global as any
+    const allMeetings = globalThis.meetings || []
     
-    // For now, return empty array - no fake data
-    const meetings: any[] = []
+    // Filter meetings for the current user (in a real app, you'd filter by actual user ID)
+    const userMeetings = allMeetings.filter((meeting: any) => {
+      // For now, return all meetings since we're using a demo user system
+      return meeting.userId === 'current_user' || true
+    })
+
+    // Sort by start time (newest first)
+    userMeetings.sort((a: any, b: any) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
+
+    console.log('Retrieved meetings for user:', userId)
+    console.log('Total meetings found:', userMeetings.length)
 
     return NextResponse.json({
       success: true,
-      meetings,
-      total: meetings.length
+      meetings: userMeetings,
+      total: userMeetings.length
     })
 
   } catch (error) {

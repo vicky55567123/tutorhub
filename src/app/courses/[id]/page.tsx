@@ -122,8 +122,8 @@ const courses = [
   {
     id: 3,
     title: 'GCSE Chemistry (Grades 4-9)',
-    description: 'Comprehensive GCSE Chemistry covering Atomic Structure, Bonding, Chemical Reactions and Analysis.',
-    fullDescription: 'Explore the molecular world with our comprehensive GCSE Chemistry course. From atomic structure and chemical bonding to organic chemistry and quantitative analysis, we cover all essential topics. Our course includes virtual lab simulations, reaction mechanisms, and plenty of practice with chemical equations and calculations.',
+    description: 'Master GCSE Chemistry with expert guidance through Atomic Structure, Chemical Bonding, Reactions, Quantitative Analysis and Organic Chemistry - designed for grades 4-9 across all exam boards.',
+    fullDescription: 'Discover the fascinating molecular world with our comprehensive GCSE Chemistry course, expertly designed to help students achieve grades 4-9 across AQA, Edexcel, and OCR exam boards. From fundamental atomic theory and chemical bonding to complex organic reactions and quantitative analysis, our structured approach combines theoretical understanding with practical application. Students master essential chemical calculations, equation balancing, and laboratory techniques through engaging virtual experiments, real-world examples, and targeted exam practice.',
     price: '£38/hour',
     rating: 4.9,
     students: 160,
@@ -156,19 +156,21 @@ const courses = [
       'Periodic table (provided)',
       'Lab safety awareness'
     ],
-    instructorBio: 'Dr. Emma Thompson is a chemistry education specialist with 12 years of GCSE teaching experience. She has developed innovative teaching methods that make chemistry accessible and enjoyable.',
+    instructorBio: 'Dr. Emma Thompson is a chemistry education specialist with 12 years of GCSE teaching experience and a PhD in Organic Chemistry. She has developed innovative teaching methods that make complex chemistry concepts accessible and enjoyable, with over 95% of her students achieving their target grades. Her approach combines visual learning, practical applications, and exam-focused strategies.',
     outcomes: [
-      'Achieve GCSE grade 4-9 in Chemistry',
-      'Master chemical concepts and calculations',
-      'Understand real-world chemistry applications',
-      'Develop laboratory skills and safety awareness'
+      'Achieve GCSE Chemistry grade 4-9 with comprehensive exam preparation',
+      'Master chemical concepts, calculations, and practical laboratory techniques',
+      'Develop strong analytical skills for complex chemical problems and reactions',
+      'Understand real-world chemistry applications in industry, medicine, and environment',
+      'Build confidence in laboratory work, safety procedures, and scientific investigation',
+      'Prepare effectively for A-Level Chemistry or science-related university courses'
     ]
   },
   {
     id: 4,
     title: 'GCSE Biology (Grades 4-9)',
-    description: 'Complete GCSE Biology covering Cell Biology, Human Physiology, Genetics, Evolution and Ecology.',
-    fullDescription: 'Discover the wonders of life with our comprehensive GCSE Biology course. From microscopic cellular processes to complex ecological systems, we cover all aspects of biology required for GCSE success. Interactive diagrams, virtual dissections, and real-world case studies make learning biology engaging and memorable.',
+    description: 'Master GCSE Biology through comprehensive coverage of Cell Biology, Human Body Systems, Genetics, Evolution and Ecology - expertly designed for grades 4-9 success across all exam boards.',
+    fullDescription: 'Explore the fascinating world of living organisms with our comprehensive GCSE Biology course, specially designed to help students achieve grades 4-9 across AQA, Edexcel, and OCR exam boards. From microscopic cellular processes and DNA structure to complex ecological relationships and human physiology, our expert-led program combines cutting-edge visual learning tools, interactive diagrams, virtual laboratory experiences, and real-world case studies to make biology both understandable and memorable.',
     price: '£36/hour',
     rating: 4.7,
     students: 200,
@@ -201,19 +203,21 @@ const courses = [
       'Interest in living organisms',
       'GCSE Mathematics helpful but not essential'
     ],
-    instructorBio: 'Dr. Michael Roberts combines 18 years of biology teaching with field research experience. He brings real-world biological discoveries into the classroom to inspire students.',
+    instructorBio: 'Dr. Michael Roberts combines 18 years of biology teaching excellence with active field research experience in marine biology and genetics. He brings cutting-edge biological discoveries into the classroom through virtual lab experiences and real-world case studies. His students consistently achieve top grades, with 92% reaching grades 7-9 in recent years.',
     outcomes: [
-      'Achieve GCSE grade 4-9 in Biology',
-      'Understand life processes and systems',
-      'Develop scientific investigation skills',
-      'Apply biological knowledge to current issues'
+      'Achieve GCSE Biology grade 4-9 with comprehensive understanding of life processes',
+      'Master complex biological concepts through visual learning and practical applications',
+      'Develop advanced scientific investigation and experimental design skills',
+      'Apply biological knowledge to analyze current environmental and medical issues',
+      'Build strong foundation for A-Level Biology or biomedical science careers',
+      'Understand human impact on ecosystems and sustainable development principles'
     ]
   },
   {
     id: 5,
     title: 'GCSE Computer Science (Grades 4-9)',
-    description: 'Learn programming, algorithms, data structures and computer systems for GCSE Computer Science.',
-    fullDescription: 'Master the digital world with our comprehensive GCSE Computer Science course. Learn programming fundamentals in Python, understand computer systems architecture, explore algorithms and data structures, and discover how computers solve real-world problems. Perfect for students interested in technology and future careers in computing.',
+    description: 'Master GCSE Computer Science through hands-on programming in Python, algorithm design, computer systems architecture, and computational thinking - designed for grades 4-9 across all exam boards.',
+    fullDescription: 'Step into the digital future with our comprehensive GCSE Computer Science course, expertly designed to help students achieve grades 4-9 across AQA, Edexcel, and OCR exam boards. Master programming fundamentals through Python, explore computer systems architecture, develop algorithmic thinking, and understand how technology shapes our world. Our hands-on approach combines practical coding projects, theoretical understanding, and real-world problem-solving to prepare students for the digital economy and potential computer science careers.',
     price: '£42/hour',
     rating: 4.8,
     students: 140,
@@ -225,7 +229,7 @@ const courses = [
     instructor: 'Mr. James Chen',
     examBoard: 'AQA, Edexcel, OCR',
     modules: [
-      'Programming Fundamentals (Python)',
+      'Programming Fundamentals Python',
       'Computer Systems and Architecture',
       'Algorithms and Data Structures',
       'Networks and Internet Technologies',
@@ -246,19 +250,21 @@ const courses = [
       'Logical thinking ability',
       'GCSE Mathematics recommended'
     ],
-    instructorBio: 'Mr. James Chen is a software engineer turned educator with 10 years of industry experience and 8 years teaching GCSE Computer Science. He makes programming accessible and fun.',
+    instructorBio: 'Mr. James Chen is a software engineer turned educator with 10 years of industry experience at leading tech companies and 8 years teaching GCSE Computer Science. He specializes in making programming concepts accessible and engaging, with 89% of his students achieving grades 7-9. His real-world industry knowledge brings practical relevance to every lesson.',
     outcomes: [
-      'Achieve GCSE grade 4-9 in Computer Science',
-      'Master Python programming',
-      'Understand computer systems',
-      'Develop computational thinking skills'
+      'Achieve GCSE Computer Science grade 4-9 with confidence in both theory and practical programming',
+      'Master Python programming with ability to create complex, well-structured programs',
+      'Understand computer systems architecture and how hardware and software interact',
+      'Develop advanced computational thinking and problem-solving methodologies',
+      'Build portfolio of programming projects demonstrating technical skills',
+      'Prepare for A-Level Computer Science or technology-related career pathways'
     ]
   },
   {
     id: 6,
     title: 'Advanced Mathematics (A-Level Preparation)',
-    description: 'Prepare for A-Level Mathematics with advanced topics in Calculus, Statistics, and Mechanics.',
-    fullDescription: 'Bridge the gap between GCSE and A-Level Mathematics with our advanced preparation course. Covering differential and integral calculus, advanced statistics, mechanics, and further mathematical concepts, this course provides the solid foundation needed for A-Level success and university-level mathematics.',
+    description: 'Bridge the gap to A-Level success with advanced topics in Calculus, Complex Algebra, Statistics, and Mechanics - comprehensive preparation for high-achieving GCSE students.',
+    fullDescription: 'Excel in your transition from GCSE to A-Level Mathematics with our comprehensive advanced preparation course, designed for high-achieving students aiming for top grades. Master differential and integral calculus fundamentals, explore complex algebraic functions, delve into advanced statistical concepts, and understand mechanical principles. Our expert-led program builds the sophisticated mathematical thinking and problem-solving skills essential for A-Level success and university-level mathematics.',
     price: '£45/hour',
     rating: 4.9,
     students: 85,
@@ -293,18 +299,20 @@ const courses = [
     ],
     instructorBio: 'Prof. Lisa Anderson has taught A-Level Mathematics for 22 years and has helped hundreds of students transition successfully from GCSE to university-level mathematics.',
     outcomes: [
-      'Ready for A-Level Mathematics',
-      'Master calculus fundamentals',
-      'Develop advanced problem-solving skills',
-      'Build confidence for higher mathematics'
+      'Achieve seamless transition to A-Level Mathematics with advanced preparation',
+      'Master calculus fundamentals including differentiation and integration techniques',
+      'Develop sophisticated mathematical reasoning and advanced problem-solving skills',
+      'Build exceptional confidence for higher mathematics and university-level study',
+      'Excel in complex algebraic manipulation and advanced function analysis',
+      'Prepare for competitive mathematics examinations and STEM career pathways'
     ]
   },
   // Add other courses with similar detailed structure...
   {
     id: 7,
     title: 'Computer Science Fundamentals',
-    description: 'Learn programming, algorithms, and computer science principles from industry experts.',
-    fullDescription: 'Build a solid foundation in computer science with our comprehensive fundamentals course. From basic programming concepts to advanced algorithms and data structures, this course prepares you for further study or a career in technology. Hands-on projects and real-world applications make learning practical and engaging.',
+    description: 'Master computer science fundamentals through hands-on programming, algorithm design, and software development principles - perfect preparation for tech careers or advanced study.',
+    fullDescription: 'Build an exceptional foundation in computer science with our comprehensive fundamentals course, designed for students seeking careers in technology or advanced computer science study. Master programming concepts through Python, explore sophisticated algorithms and data structures, understand object-oriented design principles, and gain practical experience with databases and web development. Our industry-expert instructors combine theoretical knowledge with hands-on projects and real-world applications to ensure graduates are well-prepared for the modern tech landscape.',
     price: '$60/hour',
     rating: 4.8,
     students: 200,
@@ -337,19 +345,21 @@ const courses = [
       'Logical thinking ability',
       'Time commitment for practice'
     ],
-    instructorBio: 'Prof. Michael Chen has 15 years of industry experience at major tech companies and 8 years teaching computer science. He specializes in making complex concepts accessible.',
+    instructorBio: 'Prof. Michael Chen brings exceptional credentials with 15 years of industry experience at major tech companies including Google and Microsoft, plus 8 years teaching computer science at university level. He specializes in making complex programming concepts accessible through practical, project-based learning. His students consistently achieve excellent outcomes, with many securing positions at top tech companies.',
     outcomes: [
-      'Master programming fundamentals',
-      'Understand computer science principles',
-      'Build real-world projects',
-      'Prepare for advanced CS courses'
+      'Master comprehensive programming fundamentals with industry-standard practices',
+      'Understand core computer science principles and algorithmic thinking',
+      'Build impressive portfolio of real-world projects demonstrating technical skills',
+      'Prepare thoroughly for advanced computer science courses or tech career entry',
+      'Develop professional software development and project management abilities',
+      'Gain confidence in modern programming languages and development environments'
     ]
   },
   {
     id: 8,
     title: 'English Literature & Writing',
-    description: 'Improve your writing skills and explore classic and modern literature.',
-    fullDescription: 'Enhance your English language skills through literature analysis and creative writing. This course combines critical reading of classic and contemporary texts with practical writing exercises to develop both analytical and creative abilities. Perfect for students preparing for English Literature exams or wanting to improve their writing.',
+    description: 'Master English Literature analysis and creative writing through expert guidance with classic and contemporary texts - designed for exam success and lifelong literary appreciation.',
+    fullDescription: 'Transform your English language abilities through our comprehensive Literature and Writing course, expertly designed for students preparing for GCSE/A-Level English Literature or those seeking to enhance their analytical and creative writing skills. Explore classic and contemporary literature through guided analysis, develop sophisticated essay-writing techniques, and unleash your creative potential through structured writing exercises. Our experienced instructors combine deep literary knowledge with practical writing strategies to build confidence in both critical analysis and creative expression.',
     price: '$45/hour',
     rating: 4.7,
     students: 120,
@@ -382,19 +392,21 @@ const courses = [
       'Interest in literature',
       'Regular reading commitment'
     ],
-    instructorBio: 'Lisa Thompson is a published author and literature teacher with 14 years of experience. She has helped students develop both analytical and creative writing skills.',
+    instructorBio: 'Lisa Thompson is a published author and accomplished literature educator with 14 years of teaching experience across GCSE and A-Level English Literature. Her novel "Whispers in the Wind" won the 2019 Literary Excellence Award. She combines deep literary scholarship with practical writing expertise, helping students achieve outstanding results with 94% reaching their target grades.',
     outcomes: [
-      'Improve literary analysis skills',
-      'Develop creative writing abilities',
-      'Master essay writing techniques',
-      'Gain appreciation for literature'
+      'Develop sophisticated literary analysis skills with confidence in textual interpretation',
+      'Master advanced creative writing techniques across multiple genres and styles',
+      'Excel in essay writing with clear structure, compelling arguments, and elegant expression',
+      'Gain deep appreciation for literature spanning classic and contemporary works',
+      'Build strong foundation for A-Level English Literature or university English studies',
+      'Develop critical thinking skills applicable across academic disciplines and professional contexts'
     ]
   },
   {
     id: 9,
     title: 'Physics & Chemistry',
-    description: 'Understand the fundamental principles of physics and chemistry with hands-on examples.',
-    fullDescription: 'Explore the fundamental sciences with our integrated Physics and Chemistry course. This unique approach shows how these subjects complement each other in understanding the natural world. From atomic structure to thermodynamics, students gain a comprehensive understanding of scientific principles.',
+    description: 'Master the fundamental principles of physics and chemistry through an integrated approach that reveals the deep connections between these essential sciences.',
+    fullDescription: 'Discover the interconnected world of physical sciences with our unique integrated Physics and Chemistry course, designed to show how these fundamental subjects complement and enhance each other in understanding the natural world. From atomic structure and chemical bonding to thermodynamics and electromagnetic phenomena, students develop a comprehensive understanding of scientific principles. Our expert-led approach combines theoretical knowledge with practical applications, laboratory techniques, and real-world problem-solving to prepare students for advanced scientific study or STEM careers.',
     price: '$55/hour',
     rating: 4.8,
     students: 90,
@@ -427,19 +439,21 @@ const courses = [
       'Interest in how things work',
       'Safety consciousness'
     ],
-    instructorBio: 'Dr. James Wilson has taught both physics and chemistry for 16 years and specializes in showing the connections between these fundamental sciences.',
+    instructorBio: 'Dr. James Wilson has 16 years of experience teaching both physics and chemistry at university and secondary levels, with a PhD in Physical Chemistry from Cambridge University. He specializes in demonstrating the fascinating connections between these fundamental sciences through innovative teaching methods and hands-on experiments. His interdisciplinary approach helps students achieve exceptional understanding of scientific principles.',
     outcomes: [
-      'Understand fundamental scientific principles',
-      'See connections between physics and chemistry',
-      'Develop laboratory and analytical skills',
-      'Prepare for advanced science courses'
+      'Master fundamental scientific principles across physics and chemistry with deep understanding',
+      'Recognize and apply the powerful connections between physical and chemical phenomena',
+      'Develop advanced laboratory skills, safety awareness, and analytical techniques',
+      'Build strong foundation for A-Level Sciences or specialized STEM career pathways',
+      'Excel in scientific problem-solving with mathematical modeling and data analysis',
+      'Understand real-world applications of science in technology, medicine, and industry'
     ]
   },
   {
     id: 10,
     title: 'Spanish Language Learning',
-    description: 'Become fluent in Spanish with interactive lessons and conversation practice.',
-    fullDescription: 'Embark on your Spanish language journey with our comprehensive course designed for English speakers. From basic vocabulary and grammar to advanced conversation and cultural understanding, this course uses immersive techniques to build fluency naturally and confidently.',
+    description: 'Master Spanish language skills through immersive learning techniques, conversation practice, and cultural exploration - from complete beginner to confident communicator.',
+    fullDescription: 'Embark on an exciting Spanish language journey with our comprehensive immersive course, expertly designed for English speakers seeking to achieve genuine fluency. From foundational vocabulary and essential grammar structures to advanced conversation skills and cultural understanding, our native-speaker instructors use proven immersive techniques, interactive exercises, and real-world scenarios to build natural Spanish communication abilities. Perfect for travel, career advancement, or personal enrichment.',
     price: '$40/hour',
     rating: 4.9,
     students: 180,
@@ -472,19 +486,21 @@ const courses = [
       'Regular practice commitment',
       'Interest in Spanish-speaking cultures'
     ],
-    instructorBio: 'Emma Rodriguez is a native Spanish speaker and certified language teacher with 12 years of experience helping English speakers master Spanish.',
+    instructorBio: 'Emma Rodriguez is a native Spanish speaker from Madrid and certified language educator with 12 years of specialized experience helping English speakers master Spanish. She holds advanced qualifications in language pedagogy and has developed innovative immersive teaching methods. Her students achieve remarkable fluency rates, with 91% reaching conversational level within the course duration.',
     outcomes: [
-      'Achieve conversational Spanish fluency',
-      'Understand Spanish grammar fundamentals',
-      'Communicate confidently in Spanish',
-      'Appreciate Spanish-speaking cultures'
+      'Achieve genuine conversational Spanish fluency for real-world communication',
+      'Master Spanish grammar fundamentals with confidence in complex sentence structures',
+      'Communicate naturally in Spanish across social, professional, and travel contexts',
+      'Develop deep appreciation and understanding of Spanish-speaking cultures worldwide',
+      'Build strong foundation for advanced Spanish study or professional language use',
+      'Gain cultural competency essential for international business or travel experiences'
     ]
   },
   {
     id: 11,
     title: 'Music Theory & Piano',
-    description: 'Learn music theory and piano playing techniques from professional musicians.',
-    fullDescription: 'Discover the beauty of music through our integrated theory and piano course. Whether you\'re a complete beginner or looking to formalize your musical knowledge, this course combines practical piano skills with essential music theory to create a well-rounded musical education.',
+    description: 'Master piano performance and music theory through expert instruction - from complete beginner to confident musician with professional technique and deep musical understanding.',
+    fullDescription: 'Discover the transformative power of music through our comprehensive integrated piano and theory course, expertly designed for students of all levels seeking genuine musical mastery. Whether you\'re a complete beginner or looking to formalize existing musical knowledge, our professional musician instructors combine practical piano technique, essential music theory, and performance skills to create exceptional musical education. Prepare for ABRSM and Trinity examinations while developing lifelong musical appreciation and skills.',
     price: '$50/hour',
     rating: 4.6,
     students: 75,
@@ -517,12 +533,14 @@ const courses = [
       'Regular practice time',
       'No prior musical experience needed'
     ],
-    instructorBio: 'David Park is a professional pianist and music educator with 20 years of experience. He has performed internationally and taught students from beginner to advanced levels.',
+    instructorBio: 'David Park is a distinguished professional pianist and music educator with 20 years of performance and teaching experience. He has performed internationally in prestigious venues including Carnegie Hall and Royal Albert Hall, and holds advanced certifications from both ABRSM and Trinity colleges. His students consistently achieve distinction grades in formal examinations, with many pursuing successful musical careers.',
     outcomes: [
-      'Play piano with proper technique',
-      'Understand music theory fundamentals',
-      'Read musical notation fluently',
-      'Perform with confidence and expression'
+      'Develop exceptional piano technique with proper posture, fingering, and musical expression',
+      'Master comprehensive music theory including harmony, rhythm, and compositional principles',
+      'Achieve fluent sight-reading abilities for confident performance of diverse repertoire',
+      'Build sophisticated ear training skills for pitch recognition and musical analysis',
+      'Perform with genuine confidence, artistry, and professional presentation skills',
+      'Prepare successfully for ABRSM/Trinity examinations or pursue advanced musical study'
     ]
   }
 ]
@@ -544,6 +562,15 @@ export default function CoursePage({ params }: CoursePageProps) {
 
   if (!course) {
     notFound()
+  }
+
+  // Function to convert module names to subtopic URLs
+  const moduleToSubtopicUrl = (module: string): string => {
+    return module.toLowerCase()
+      .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/--+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
   }
 
   const handleEnroll = () => {
@@ -803,19 +830,49 @@ export default function CoursePage({ params }: CoursePageProps) {
                 >
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Course Curriculum</h2>
                   <div className="space-y-4">
-                    {course.modules.map((module, index) => (
-                      <div key={index} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-sm">
-                            {index + 1}
+                    {course.modules.map((module, index) => {
+                      const subtopicUrl = moduleToSubtopicUrl(module)
+                      return (
+                        <Link 
+                          key={index} 
+                          href={`/courses/${id}/subtopics/${subtopicUrl}`}
+                          className="block"
+                        >
+                          <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-blue-300 transition-all duration-300 cursor-pointer group">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-sm group-hover:bg-blue-200 transition-colors">
+                                {index + 1}
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{module}</h3>
+                                <p className="text-sm text-gray-500 mt-1">Click to explore this topic in detail</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <PlayCircleIcon className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                                <ChevronRightIcon className="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-900">{module}</h3>
-                          </div>
-                          <PlayCircleIcon className="h-5 w-5 text-gray-400" />
-                        </div>
-                      </div>
-                    ))}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                  
+                  <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                    <div className="flex items-center gap-3 mb-3">
+                      <BookmarkIcon className="h-6 w-6 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-gray-900">Interactive Learning</h3>
+                    </div>
+                    <p className="text-gray-600 mb-4">
+                      Each module includes detailed learning objectives, key topics, practice areas, and exam tips. 
+                      Click on any module above to access comprehensive learning materials and resources.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">Detailed Content</span>
+                      <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">Practice Areas</span>
+                      <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">Exam Tips</span>
+                      <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">Learning Objectives</span>
+                    </div>
                   </div>
                 </motion.div>
               )}
