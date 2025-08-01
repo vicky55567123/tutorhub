@@ -25,12 +25,20 @@ export async function GET(request: NextRequest) {
     // Get the base URL from the request
     const url = new URL(request.url)
     const baseUrl = `${url.protocol}//${url.host}`
+    const redirectUri = `${baseUrl}/api/auth/google/callback`
+
+    console.log('Callback Debug Info:', {
+      baseUrl,
+      redirectUri,
+      host: url.host,
+      protocol: url.protocol
+    })
 
     // Initialize OAuth2 client
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      `${baseUrl}/api/auth/google/callback`
+      redirectUri
     )
 
     // Exchange code for tokens

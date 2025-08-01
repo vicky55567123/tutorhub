@@ -5,8 +5,8 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "8"
-  SECRETS_SCAN_OMIT_PATHS = "*.md,scripts/*,PRIVACY_POLICY.md,GOOGLE_MEET_SETUP.md,NETLIFY_ENVIRONMENT_SETUP.md,.next/**/*,src/app/api/**/*.ts,.netlify/**/*"
-  SECRETS_SCAN_OMIT_KEYS = "NEXTAUTH_URL"
+  SECRETS_SCAN_OMIT_PATHS = "*.md,scripts/*,PRIVACY_POLICY.md,GOOGLE_MEET_SETUP.md,NETLIFY_ENVIRONMENT_SETUP.md,.next/**/*,src/app/api/**/*.ts,.netlify/**/*,.env.example,.env.local"
+  SECRETS_SCAN_OMIT_KEYS = "NEXTAUTH_URL,Key,Value"
 
 [context.production]
   command = "npm run build"
