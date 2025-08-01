@@ -12,7 +12,8 @@ const handler = NextAuth({
         params: {
           prompt: "consent",
           access_type: "offline",
-          response_type: "code"
+          response_type: "code",
+          scope: "openid email profile"
         }
       },
       httpOptions: {
@@ -51,8 +52,14 @@ const handler = NextAuth({
       return true
     },
     async redirect({ url, baseUrl }) {
+      // Handle redirect for both development and production
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      else if (new URL(url).origin === baseUrl) return url
       return baseUrl
     },
+  },
+  session: {
+    strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
 })
