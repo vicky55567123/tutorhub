@@ -20,7 +20,7 @@ const courses = [
     subject: 'Mathematics',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Farhana Kiran',
+    instructor: 'Dr. Sarah Johnson',
     examBoard: 'AQA, Edexcel, OCR'
   },
   {
@@ -35,7 +35,7 @@ const courses = [
     subject: 'Physics',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Zain ul Abedin',
+    instructor: 'Prof. David Wilson',
     examBoard: 'AQA, Edexcel, OCR'
   },
   {
@@ -50,7 +50,7 @@ const courses = [
     subject: 'Chemistry',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Ali Zia',
+    instructor: 'Dr. Emma Thompson',
     examBoard: 'AQA, Edexcel, OCR'
   },
   {
@@ -65,7 +65,7 @@ const courses = [
     subject: 'Biology',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Bilal K Abbasi',
+    instructor: 'Dr. Michael Roberts',
     examBoard: 'AQA, Edexcel, OCR'
   },
   {
@@ -80,7 +80,7 @@ const courses = [
     subject: 'Computer Science',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Fahad Noor',
+    instructor: 'Mr. James Chen',
     examBoard: 'AQA, Edexcel, OCR'
   },
   // Additional Courses
@@ -95,7 +95,7 @@ const courses = [
     category: 'Mathematics',
     duration: '12 weeks',
     level: 'Advanced',
-    instructor: 'Dr. Sarah Johnson'
+    instructor: 'Prof. Lisa Anderson'
   },
   {
     id: 7,
@@ -121,7 +121,7 @@ const courses = [
     category: 'English',
     duration: '10 weeks',
     level: 'Intermediate',
-    instructor: 'Abdul Hanan'
+    instructor: 'Lisa Thompson'
   },
   {
     id: 9,
