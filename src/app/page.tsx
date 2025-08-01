@@ -2,6 +2,7 @@ import HeroSection from '@/components/HeroSection'
 import FeaturesSection from '@/components/FeaturesSection'
 // import TutorShowcase from '@/components/TutorShowcase' // Disabled temporarily
 import GCSESection from '@/components/GCSESection'
+import StartLearningSection from '@/components/StartLearningSection'
 import Link from 'next/link'
 
 export default function Home() {
@@ -10,6 +11,7 @@ export default function Home() {
       <HeroSection />
       <GCSESection />
       {/* <TutorShowcase /> */} {/* Disabled temporarily - tutors section removed */}
+      <StartLearningSection />
       <FeaturesSection />
       
       {/* Popular Subjects */}
