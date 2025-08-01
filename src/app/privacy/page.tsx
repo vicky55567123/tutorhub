@@ -112,7 +112,7 @@ export default function PrivacyPolicyPage() {
               <p className="text-gray-700 mb-4">For privacy-related questions or requests:</p>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-gray-700"><strong>Email:</strong> privacy@tutorhub.com</p>
-                <p className="text-gray-700"><strong>Website:</strong> https://yourtutor.netlify.app/contact</p>
+                <p className="text-gray-700"><strong>Website:</strong> https://YOUR_SITE_NAME.netlify.app/contact</p>
               </div>
             </section>
 

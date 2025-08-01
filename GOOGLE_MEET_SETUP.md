@@ -40,7 +40,7 @@ This guide explains how to set up real Google Meet integration for the HD Video 
    - Name: "HD Video Lessons"
    - Authorized redirect URIs:
      - `http://localhost:3000/api/auth/google/callback` (development)
-     - `https://yourtutor.netlify.app/api/auth/google/callback` (production)
+     - `https://YOUR_SITE_NAME.netlify.app/api/auth/google/callback` (production)
    - Click "Create" and copy the Client ID and Client Secret
 
 ### Step 2: Configure Environment Variables
@@ -54,7 +54,7 @@ GOOGLE_CLIENT_SECRET=your_client_secret_from_step_1
 GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google/callback
 
 # For production deployment, use:
-# GOOGLE_REDIRECT_URI=https://yourtutor.netlify.app/api/auth/google/callback
+# GOOGLE_REDIRECT_URI=https://YOUR_SITE_NAME.netlify.app/api/auth/google/callback
 
 # NextAuth Configuration (if using)
 NEXTAUTH_URL=http://localhost:3000  
@@ -122,8 +122,8 @@ For production deployment:
 
 2. **Environment Variables**
    ```env
-   GOOGLE_REDIRECT_URI=https://yourtutor.netlify.app/api/auth/google/callback
-   NEXTAUTH_URL=https://yourtutor.netlify.app
+   GOOGLE_REDIRECT_URI=https://YOUR_SITE_NAME.netlify.app/api/auth/google/callback
+   NEXTAUTH_URL=https://YOUR_SITE_NAME.netlify.app
    ```
 
 3. **Verify Domain**

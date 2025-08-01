@@ -169,7 +169,7 @@ Our platform integrates with third-party services:
 For privacy-related questions or requests:
 
 **Email:** privacy@tutorhub.com  
-**Website:** https://yourtutor.netlify.app/contact  
+**Website:** https://YOUR_SITE_NAME.netlify.app/contact  
 **Address:** [Your Business Address]
 
 ### Data Protection Officer

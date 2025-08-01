@@ -6,7 +6,7 @@ Add these environment variables in your Netlify dashboard under Site settings > 
 
 ### NextAuth Configuration
 ```
-NEXTAUTH_URL=https://yourtutor.netlify.app
+NEXTAUTH_URL=https://YOUR_SITE_NAME.netlify.app
 NEXTAUTH_SECRET=your_production_secret_here_make_it_long_and_random
 ```
 
@@ -33,7 +33,7 @@ NEXT_PUBLIC_FACEBOOK_CLIENT_ID=your_facebook_client_id
 3. Click on your OAuth 2.0 Client ID
 4. In the "Authorized redirect URIs" section, add:
    ```
-   https://yourtutor.netlify.app/api/auth/callback/google
+   https://YOUR_SITE_NAME.netlify.app/api/auth/callback/google
    ```
 5. Keep the existing localhost URI for development:
    ```
@@ -53,12 +53,12 @@ NEXT_PUBLIC_FACEBOOK_CLIENT_ID=your_facebook_client_id
 
 After configuration:
 - Development: Google OAuth should work on `http://localhost:3000`
-- Production: Google OAuth should work on `https://yourtutor.netlify.app`
+- Production: Google OAuth should work on `https://YOUR_SITE_NAME.netlify.app`
 
 ## Troubleshooting
 
 If you still get OAuth errors:
-1. Verify the callback URL is exactly: `https://yourtutor.netlify.app/api/auth/callback/google`
+1. Verify the callback URL is exactly: `https://YOUR_SITE_NAME.netlify.app/api/auth/callback/google`
 2. Check that all environment variables are set in Netlify
 3. Ensure Google Cloud Console has both development and production URLs
 4. Redeploy the site after adding environment variables
