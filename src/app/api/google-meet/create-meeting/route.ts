@@ -37,11 +37,15 @@ export async function POST(request: NextRequest) {
     }
 
     try {
+      // Determine the correct base URL
+      const baseUrl = process.env.NEXTAUTH_URL || 
+                     (process.env.NODE_ENV === 'production' ? 'https://yourtutor.netlify.app' : 'http://localhost:3000')
+
       // Initialize Google APIs
       const oauth2Client = new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_CLIENT_SECRET,
-        `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/google/callback`
+        `${baseUrl}/api/auth/google/callback`
       )
 
       oauth2Client.setCredentials({
