@@ -11,10 +11,9 @@ interface SignupModalProps {
   isOpen: boolean
   onClose: () => void
   onSwitchToLogin: () => void
-  onDemoLogin?: (userType: 'student' | 'tutor') => void
 }
 
-export default function SignupModal({ isOpen, onClose, onSwitchToLogin, onDemoLogin }: SignupModalProps) {
+export default function SignupModal({ isOpen, onClose, onSwitchToLogin }: SignupModalProps) {
   const { registerUser, signInWithGoogle, signInWithFacebook } = useAuth()
   const [formData, setFormData] = useState({
     firstName: '',
@@ -356,36 +355,6 @@ export default function SignupModal({ isOpen, onClose, onSwitchToLogin, onDemoLo
             <span className="px-2 bg-white text-gray-500">Or sign up with</span>
           </div>
         </div>
-
-        {/* Demo Signup Buttons */}
-        {onDemoLogin && (
-          <div className="space-y-3">
-            <p className="text-center text-sm text-gray-600 font-medium">Quick Demo Signup:</p>
-            <div className="grid grid-cols-2 gap-3">
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => onDemoLogin('student')}
-                className="flex items-center justify-center px-4 py-3 border-2 border-blue-200 rounded-lg shadow-sm bg-blue-50 text-sm font-medium text-blue-700 hover:bg-blue-100 transition-colors"
-              >
-                <span className="mr-2">🎓</span>
-                Demo Student
-              </motion.button>
-              
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => onDemoLogin('tutor')}
-                className="flex items-center justify-center px-4 py-3 border-2 border-green-200 rounded-lg shadow-sm bg-green-50 text-sm font-medium text-green-700 hover:bg-green-100 transition-colors"
-              >
-                <span className="mr-2">👨‍🏫</span>
-                Demo Tutor
-              </motion.button>
-            </div>
-          </div>
-        )}
 
         {/* Social Signup Buttons */}
         <div className="space-y-3">

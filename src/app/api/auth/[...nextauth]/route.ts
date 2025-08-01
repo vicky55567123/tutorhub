@@ -14,6 +14,9 @@ const handler = NextAuth({
           access_type: "offline",
           response_type: "code"
         }
+      },
+      httpOptions: {
+        timeout: 40000,
       }
     }),
     FacebookProvider({

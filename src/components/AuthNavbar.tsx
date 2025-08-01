@@ -8,7 +8,7 @@ import toast from 'react-hot-toast'
 import LoginModal from './LoginModal'
 import SignupModal from './SignupModal'
 import UserProfileDropdown from './UserProfileDropdown'
-import { useAuth, demoUsers } from './AuthContext'
+import { useAuth } from './AuthContext'
 
 const navigationItems = [
   { name: 'Courses', href: '/courses' },
@@ -51,20 +51,6 @@ export default function AuthNavbar() {
   const handleSwitchToLogin = () => {
     setIsSignupModalOpen(false)
     setIsLoginModalOpen(true)
-  }
-
-  const handleDemoLogin = (userType: 'student' | 'tutor') => {
-    const demoUser = demoUsers[userType]
-    login(demoUser)
-    setIsLoginModalOpen(false)
-    setIsSignupModalOpen(false)
-    toast.success(`Welcome back, ${demoUser.name}! 🎉`, {
-      style: {
-        borderRadius: '10px',
-        background: '#10B981',
-        color: '#fff',
-      }
-    })
   }
 
   return (
@@ -262,14 +248,12 @@ export default function AuthNavbar() {
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         onSwitchToSignup={handleSwitchToSignup}
-        onDemoLogin={handleDemoLogin}
       />
       
       <SignupModal
         isOpen={isSignupModalOpen}
         onClose={() => setIsSignupModalOpen(false)}
         onSwitchToLogin={handleSwitchToLogin}
-        onDemoLogin={handleDemoLogin}
       />
     </>
   )
