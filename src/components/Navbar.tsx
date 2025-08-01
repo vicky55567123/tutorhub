@@ -17,6 +17,39 @@ const navigationItems = [
   { name: 'Help Center', href: '/help' },
 ]
 
+const studyToolsResources = [
+  {
+    category: 'Learning Resources',
+    icon: '📚',
+    items: [
+      { name: 'Learning Objectives', href: '/study-tools/objectives', description: 'Clear goals for each topic' },
+      { name: 'Key Topics Overview', href: '/study-tools/topics', description: 'Essential concepts breakdown' },
+      { name: 'Practice Areas', href: '/study-tools/practice', description: 'Focused skill development' },
+      { name: 'Exam Tips', href: '/study-tools/exam-tips', description: 'Expert examination strategies' },
+    ]
+  },
+  {
+    category: 'Interactive Tools',
+    icon: '🔧',
+    items: [
+      { name: 'Formula Bank', href: '/study-tools/formulas', description: 'All essential formulas' },
+      { name: 'Common Mistakes', href: '/study-tools/mistakes', description: 'Learn from typical errors' },
+      { name: 'Real-World Applications', href: '/study-tools/applications', description: 'Practical examples' },
+      { name: 'Progress Tracker', href: '/study-tools/progress', description: 'Monitor your learning' },
+    ]
+  },
+  {
+    category: 'Practice & Assessment',
+    icon: '✍️',
+    items: [
+      { name: 'Practice Questions', href: '/study-tools/questions', description: 'Graded difficulty levels' },
+      { name: 'Mock Exams', href: '/study-tools/mocks', description: 'Full practice papers' },
+      { name: 'Instant Feedback', href: '/study-tools/feedback', description: 'Detailed explanations' },
+      { name: 'Performance Analytics', href: '/study-tools/analytics', description: 'Track your strengths' },
+    ]
+  }
+]
+
 const startLearningSubjects = [
   {
     category: 'Maths',
@@ -78,6 +111,7 @@ export default function Navbar() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false)
   const [isStartLearningOpen, setIsStartLearningOpen] = useState(false)
+  const [isStudyToolsOpen, setIsStudyToolsOpen] = useState(false)
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -205,6 +239,77 @@ export default function Navbar() {
                             onClick={() => setIsStartLearningOpen(false)}
                           >
                             View All Subjects →
+                          </Link>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+              
+              {/* Study Tools Dropdown */}
+              <div className="relative">
+                <motion.button
+                  onClick={() => setIsStudyToolsOpen(!isStudyToolsOpen)}
+                  className="group relative text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-all duration-200 flex items-center"
+                >
+                  Study Tools
+                  <ChevronDownIcon className={`ml-1 h-4 w-4 transition-transform duration-200 ${isStudyToolsOpen ? 'rotate-180' : ''}`} />
+                  <motion.span
+                    className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-secondary-600 to-accent-600"
+                    initial={{ scaleX: 0 }}
+                    whileHover={{ scaleX: 1 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </motion.button>
+                
+                <AnimatePresence>
+                  {isStudyToolsOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full left-0 mt-2 w-[480px] bg-white rounded-xl shadow-2xl border border-gray-200 z-50"
+                      onMouseLeave={() => setIsStudyToolsOpen(false)}
+                    >
+                      <div className="p-6">
+                        <div className="grid grid-cols-1 gap-6">
+                          {studyToolsResources.map((category, index) => (
+                            <div key={category.category}>
+                              <div className="flex items-center mb-3">
+                                <span className="text-lg mr-2">{category.icon}</span>
+                                <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wider">
+                                  {category.category}
+                                </h3>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                {category.items.map((item) => (
+                                  <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    className="group p-3 rounded-lg hover:bg-primary-50 transition-all duration-200 border border-transparent hover:border-primary-200"
+                                    onClick={() => setIsStudyToolsOpen(false)}
+                                  >
+                                    <div className="text-sm font-medium text-gray-900 group-hover:text-primary-600 mb-1">
+                                      {item.name}
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                      {item.description}
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-6 pt-4 border-t border-gray-200">
+                          <Link
+                            href="/study-tools"
+                            className="text-sm font-medium text-primary-600 hover:text-primary-700 flex items-center justify-center py-2 px-4 rounded-lg bg-primary-50 hover:bg-primary-100 transition-all duration-200"
+                            onClick={() => setIsStudyToolsOpen(false)}
+                          >
+                            View All Study Tools →
                           </Link>
                         </div>
                       </div>
@@ -352,6 +457,68 @@ export default function Navbar() {
                         }}
                       >
                         View All Subjects →
+                      </Link>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+              
+              {/* Study Tools Mobile Section */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.15 }}
+              >
+                <button
+                  onClick={() => setIsStudyToolsOpen(!isStudyToolsOpen)}
+                  className="flex items-center justify-between w-full text-gray-700 hover:text-primary-600 py-2 text-base font-medium transition-colors"
+                >
+                  Study Tools
+                  <ChevronDownIcon className={`h-5 w-5 transition-transform duration-200 ${isStudyToolsOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                <AnimatePresence>
+                  {isStudyToolsOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="pl-4 space-y-3 border-l-2 border-secondary-200 ml-2"
+                    >
+                      {studyToolsResources.map((category) => (
+                        <div key={category.category} className="space-y-2">
+                          <div className="flex items-center">
+                            <span className="text-sm mr-2">{category.icon}</span>
+                            <h4 className="text-sm font-semibold text-gray-800 uppercase tracking-wider">
+                              {category.category}
+                            </h4>
+                          </div>
+                          {category.items.map((item) => (
+                            <Link
+                              key={item.name}
+                              href={item.href}
+                              className="block text-sm text-gray-600 hover:text-primary-600 py-1 transition-colors"
+                              onClick={() => {
+                                setIsMobileMenuOpen(false)
+                                setIsStudyToolsOpen(false)
+                              }}
+                            >
+                              {item.name}
+                              <span className="text-xs text-gray-400 block">{item.description}</span>
+                            </Link>
+                          ))}
+                        </div>
+                      ))}
+                      <Link
+                        href="/study-tools"
+                        className="block text-sm font-medium text-primary-600 hover:text-primary-700 py-2 px-3 rounded-lg bg-primary-50 text-center transition-colors"
+                        onClick={() => {
+                          setIsMobileMenuOpen(false)
+                          setIsStudyToolsOpen(false)
+                        }}
+                      >
+                        View All Study Tools →
                       </Link>
                     </motion.div>
                   )}
