@@ -26,7 +26,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if refresh token is available
-    if (!process.env.GOOGLE_REFRESH_TOKEN) {
+    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN
+    console.log('Environment check:', {
+      hasRefreshToken: !!refreshToken,
+      refreshTokenLength: refreshToken ? refreshToken.length : 0,
+      refreshTokenStart: refreshToken ? refreshToken.substring(0, 10) + '...' : 'NOT_FOUND'
+    })
+
+    if (!refreshToken) {
+      console.log('No refresh token found, redirecting to auth')
       return NextResponse.json({
         success: false,
         error: 'Authorization required',
@@ -49,7 +57,7 @@ export async function POST(request: NextRequest) {
       )
 
       oauth2Client.setCredentials({
-        refresh_token: process.env.GOOGLE_REFRESH_TOKEN
+        refresh_token: refreshToken
       })
 
       const calendar = google.calendar({ version: 'v3', auth: oauth2Client })
