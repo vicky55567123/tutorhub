@@ -30,7 +30,7 @@ interface CourseCardProps {
     subject?: string
     duration: string
     level: string
-    instructor: string
+    instructor?: string
     examBoard?: string
   }
   index: number
@@ -73,7 +73,6 @@ export default function CourseCard({ course, index }: CourseCardProps) {
         id: course.id,
         type: 'course',
         title: course.title,
-        instructor: course.instructor,
         rating: course.rating,
         reviewCount: course.students,
         price: course.price,
@@ -219,15 +218,14 @@ export default function CourseCard({ course, index }: CourseCardProps) {
               </div>
             </div>
 
-            {/* Instructor */}
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm text-gray-600">By {course.instructor}</span>
-              {course.examBoard && (
+            {/* Exam Board */}
+            {course.examBoard && (
+              <div className="flex items-center justify-between mb-4">
                 <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                   {course.examBoard}
                 </span>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Enrollment Button */}
             <motion.button

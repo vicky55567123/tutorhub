@@ -42,7 +42,6 @@ const courses = [
     subject: 'Mathematics',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Dr. Sarah Johnson',
     examBoard: 'AQA, Edexcel, OCR',
     modules: [
       'Number and Basic Algebra',
@@ -66,7 +65,6 @@ const courses = [
       'Notebook and writing materials',
       'Access to past papers (provided)'
     ],
-    instructorBio: 'Dr. Sarah Johnson has over 15 years of experience teaching GCSE Mathematics. She holds a PhD in Mathematics Education and has helped over 1,000 students achieve their target grades.',
     outcomes: [
       'Achieve GCSE grade 4-9 in Mathematics',
       'Master all key mathematical concepts',
@@ -87,7 +85,6 @@ const courses = [
     subject: 'Physics',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Prof. David Wilson',
     examBoard: 'AQA, Edexcel, OCR',
     modules: [
       'Forces and Motion',
@@ -111,7 +108,6 @@ const courses = [
       'Lab notebook',
       'Interest in how things work'
     ],
-    instructorBio: 'Prof. David Wilson is a former university lecturer with 20+ years in physics education. He specializes in making complex physics concepts accessible and engaging for GCSE students.',
     outcomes: [
       'Achieve GCSE grade 4-9 in Physics',
       'Understand fundamental physics principles',
@@ -132,7 +128,6 @@ const courses = [
     subject: 'Chemistry',
     duration: '20 weeks',
     level: 'GCSE',
-    instructor: 'Dr. Emma Thompson',
     examBoard: 'AQA, Edexcel, OCR',
     modules: [
       'Atomic Structure and Periodic Table',
@@ -156,7 +151,6 @@ const courses = [
       'Periodic table (provided)',
       'Lab safety awareness'
     ],
-    instructorBio: 'Dr. Emma Thompson is a chemistry education specialist with 12 years of GCSE teaching experience and a PhD in Organic Chemistry. She has developed innovative teaching methods that make complex chemistry concepts accessible and enjoyable, with over 95% of her students achieving their target grades. Her approach combines visual learning, practical applications, and exam-focused strategies.',
     outcomes: [
       'Achieve GCSE Chemistry grade 4-9 with comprehensive exam preparation',
       'Master chemical concepts, calculations, and practical laboratory techniques',
@@ -557,11 +551,6 @@ export default function CoursePage({ params }: CoursePageProps) {
                     <span>{course.level}</span>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2 text-gray-600">
-                  <span>Instructor:</span>
-                  <span className="font-semibold text-gray-900">{course.instructor}</span>
-                </div>
               </motion.div>
             </div>
 
@@ -668,7 +657,6 @@ export default function CoursePage({ params }: CoursePageProps) {
               {[
                 { id: 'overview', label: 'Overview', icon: DocumentTextIcon },
                 { id: 'curriculum', label: 'Curriculum', icon: BookmarkIcon },
-                { id: 'instructor', label: 'Instructor', icon: UserGroupIcon },
                 { id: 'reviews', label: 'Reviews', icon: StarIcon }
               ].map((tab) => (
                 <button
@@ -779,28 +767,6 @@ export default function CoursePage({ params }: CoursePageProps) {
                       <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">Exam Tips</span>
                       <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">Learning Objectives</span>
                     </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {activeTab === 'instructor' && (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Meet Your Instructor</h2>
-                  <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                        {course.instructor.split(' ').map(n => n[0]).join('')}
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900">{course.instructor}</h3>
-                        <p className="text-gray-600">{course.subject} Expert</p>
-                      </div>
-                    </div>
-                    <p className="text-gray-600 leading-relaxed">{course.instructorBio}</p>
                   </div>
                 </motion.div>
               )}
