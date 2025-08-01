@@ -15,6 +15,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { VideoCameraIcon as VideoCameraIconSolid } from '@heroicons/react/24/solid'
 import toast from 'react-hot-toast'
+import CreateMeetingModal from '@/components/CreateMeetingModal'
 
 interface Meeting {
   id: string
@@ -35,93 +36,37 @@ export default function VideoLessonsPage() {
   const [meetings, setMeetings] = useState<Meeting[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past' | 'all'>('upcoming')
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
   useEffect(() => {
     if (user) {
-      // Demo video lessons data
-      const demoVideoLessons: Meeting[] = [
-        {
-          id: '1',
-          title: 'Advanced Calculus: Derivatives and Applications',
-          description: 'Master derivative techniques and their real-world applications in this comprehensive lesson.',
-          startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
-          duration: 60,
-          meetingUrl: 'https://meet.google.com/demo-calculus-lesson',
-          instructor: 'Dr. Sarah Wilson',
-          subject: 'Mathematics',
-          status: 'scheduled' as const,
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: '2', 
-          title: 'Organic Chemistry: Reaction Mechanisms',
-          description: 'Deep dive into organic reaction mechanisms and synthesis strategies.',
-          startTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // In 3 days
-          duration: 90,
-          meetingUrl: 'https://meet.google.com/demo-chemistry-lesson',
-          instructor: 'Prof. James Chen',
-          subject: 'Chemistry',
-          status: 'scheduled' as const,
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: '3',
-          title: 'Physics: Quantum Mechanics Fundamentals',
-          description: 'Introduction to quantum mechanics principles and wave-particle duality.',
-          startTime: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // In 5 days
-          duration: 75,
-          meetingUrl: 'https://meet.google.com/demo-physics-lesson',
-          instructor: 'Dr. Maria Rodriguez',
-          subject: 'Physics',
-          status: 'scheduled' as const,
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: '4',
-          title: 'Python Programming: Data Structures',
-          description: 'Master lists, dictionaries, sets, and tuples in Python programming.',
-          startTime: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
-          duration: 60,
-          meetingUrl: 'https://meet.google.com/demo-python-lesson',
-          instructor: 'Alex Thompson',
-          subject: 'Computer Science',
-          status: 'completed' as const,
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: '5',
-          title: 'Biology: Cell Division and Mitosis',
-          description: 'Comprehensive study of cell division processes and their importance.',
-          startTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
-          duration: 45,
-          meetingUrl: 'https://meet.google.com/demo-biology-lesson',
-          instructor: 'Dr. Emily Watson',
-          subject: 'Biology',
-          status: 'completed' as const,
-          createdAt: new Date().toISOString()
-        }
-      ]
-
-      // Always load demo content for now
-      setIsLoading(true)
-      // Simulate loading actual video lessons
-      setTimeout(() => {
-        setMeetings(demoVideoLessons)
-        setIsLoading(false)
-      }, 1000)
+      loadMeetings()
     }
   }, [user])
 
-  const handleJoinMeeting = (meetingUrl: string, title: string) => {
-    // Show demo message for now
-    toast.success(`This is a demo lesson: ${title}`, {
-      icon: '🎥',
-      duration: 4000,
-      style: {
-        borderRadius: '10px',
-        background: '#3B82F6',
-        color: '#fff',
+  const loadMeetings = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/google-meet/meetings?userId=current_user')
+      if (response.ok) {
+        const data = await response.json()
+        setMeetings(data.meetings || [])
+      } else {
+        setMeetings([])
       }
+    } catch (error) {
+      console.error('Error loading meetings:', error)
+      setMeetings([])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleJoinMeeting = (meetingUrl: string, title: string) => {
+    window.open(meetingUrl, '_blank', 'noopener,noreferrer')
+    toast.success(`Joining ${title}`, {
+      icon: '🎥',
+      duration: 3000,
     })
   }
 
@@ -213,7 +158,7 @@ export default function VideoLessonsPage() {
               </p>
             </div>
             <button
-              onClick={() => toast.success('This is a demo platform. Schedule real lessons after signing up!', { icon: '📚', duration: 4000 })}
+              onClick={() => setIsCreateModalOpen(true)}
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <PlusIcon className="h-5 w-5 mr-2" />
@@ -329,7 +274,7 @@ export default function VideoLessonsPage() {
 
             
             <button
-              onClick={() => toast.success('This is a demo platform. Schedule real lessons after signing up!', { icon: '📚', duration: 4000 })}
+              onClick={() => setIsCreateModalOpen(true)}
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <PlusIcon className="h-5 w-5 mr-2" />
@@ -410,6 +355,13 @@ export default function VideoLessonsPage() {
           </div>
         )}
       </div>
+
+      {/* Create Meeting Modal */}
+      <CreateMeetingModal 
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={loadMeetings}
+      />
     </div>
   )
 }
