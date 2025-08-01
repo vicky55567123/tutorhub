@@ -14,6 +14,7 @@ const navigationItems = [
   { name: 'Find Tutors', href: '/tutors' },
   { name: 'Video Lessons', href: '/video-lessons' },
   { name: 'How It Works', href: '/how-it-works' },
+  { name: 'Help Center', href: '/help' },
 ]
 
 export default function Navbar() {
