@@ -1,6 +1,6 @@
 import HeroSection from '@/components/HeroSection'
 import FeaturesSection from '@/components/FeaturesSection'
-import TutorShowcase from '@/components/TutorShowcase'
+// import TutorShowcase from '@/components/TutorShowcase' // Disabled temporarily
 import GCSESection from '@/components/GCSESection'
 import Link from 'next/link'
 
@@ -9,7 +9,7 @@ export default function Home() {
     <div>
       <HeroSection />
       <GCSESection />
-      <TutorShowcase />
+      {/* <TutorShowcase /> */} {/* Disabled temporarily - tutors section removed */}
       <FeaturesSection />
       
       {/* Popular Subjects */}

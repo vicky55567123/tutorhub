@@ -38,7 +38,7 @@ const enrolledCourses: Course[] = [
   {
     id: 1,
     title: 'GCSE Mathematics (Grades 4-9)',
-    instructor: 'Farhana Kiran',
+    instructor: 'Subject Expert', // Generic name instead of specific tutor
     progress: 0,
     totalLessons: 24,
     completedLessons: 0,

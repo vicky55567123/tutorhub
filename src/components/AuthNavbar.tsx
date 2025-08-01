@@ -12,7 +12,7 @@ import { useAuth } from './AuthContext'
 
 const navigationItems = [
   { name: 'Courses', href: '/courses' },
-  { name: 'Find Tutors', href: '/tutors' },
+  // { name: 'Find Tutors', href: '/tutors' }, // Disabled temporarily
   { name: 'Video Lessons', href: '/video-lessons' },
   { name: 'How It Works', href: '/how-it-works' },
 ]
