@@ -11,12 +11,10 @@ import {
   BookOpenIcon,
   PlayIcon,
   PlusIcon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon
+  CheckCircleIcon
 } from '@heroicons/react/24/outline'
 import { VideoCameraIcon as VideoCameraIconSolid } from '@heroicons/react/24/solid'
 import toast from 'react-hot-toast'
-import CreateMeetingModal from '@/components/CreateMeetingModal'
 
 interface Meeting {
   id: string
@@ -37,53 +35,91 @@ export default function VideoLessonsPage() {
   const [meetings, setMeetings] = useState<Meeting[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past' | 'all'>('upcoming')
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [setupStatus, setSetupStatus] = useState<any>(null)
-
-  const checkSetupStatus = useCallback(async () => {
-    try {
-      const response = await fetch('/api/google-meet/setup-status')
-      const data = await response.json()
-      setSetupStatus(data)
-    } catch (error) {
-      console.error('Error checking setup status:', error)
-    }
-  }, [])
-
-  const fetchMeetings = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      const response = await fetch(`/api/google-meet/meetings?userId=${user?.id}`)
-      const data = await response.json()
-      
-      if (data.success) {
-        setMeetings(data.meetings)
-      } else {
-        toast.error('Failed to load video lessons')
-      }
-    } catch (error) {
-      console.error('Error fetching meetings:', error)
-      toast.error('Failed to load video lessons')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [user?.id])
 
   useEffect(() => {
     if (user) {
-      checkSetupStatus()
-      fetchMeetings()
+      // Demo video lessons data
+      const demoVideoLessons: Meeting[] = [
+        {
+          id: '1',
+          title: 'Advanced Calculus: Derivatives and Applications',
+          description: 'Master derivative techniques and their real-world applications in this comprehensive lesson.',
+          startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+          duration: 60,
+          meetingUrl: 'https://meet.google.com/demo-calculus-lesson',
+          instructor: 'Dr. Sarah Wilson',
+          subject: 'Mathematics',
+          status: 'scheduled' as const,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: '2', 
+          title: 'Organic Chemistry: Reaction Mechanisms',
+          description: 'Deep dive into organic reaction mechanisms and synthesis strategies.',
+          startTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // In 3 days
+          duration: 90,
+          meetingUrl: 'https://meet.google.com/demo-chemistry-lesson',
+          instructor: 'Prof. James Chen',
+          subject: 'Chemistry',
+          status: 'scheduled' as const,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: '3',
+          title: 'Physics: Quantum Mechanics Fundamentals',
+          description: 'Introduction to quantum mechanics principles and wave-particle duality.',
+          startTime: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // In 5 days
+          duration: 75,
+          meetingUrl: 'https://meet.google.com/demo-physics-lesson',
+          instructor: 'Dr. Maria Rodriguez',
+          subject: 'Physics',
+          status: 'scheduled' as const,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: '4',
+          title: 'Python Programming: Data Structures',
+          description: 'Master lists, dictionaries, sets, and tuples in Python programming.',
+          startTime: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
+          duration: 60,
+          meetingUrl: 'https://meet.google.com/demo-python-lesson',
+          instructor: 'Alex Thompson',
+          subject: 'Computer Science',
+          status: 'completed' as const,
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: '5',
+          title: 'Biology: Cell Division and Mitosis',
+          description: 'Comprehensive study of cell division processes and their importance.',
+          startTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
+          duration: 45,
+          meetingUrl: 'https://meet.google.com/demo-biology-lesson',
+          instructor: 'Dr. Emily Watson',
+          subject: 'Biology',
+          status: 'completed' as const,
+          createdAt: new Date().toISOString()
+        }
+      ]
+
+      // Always load demo content for now
+      setIsLoading(true)
+      // Simulate loading actual video lessons
+      setTimeout(() => {
+        setMeetings(demoVideoLessons)
+        setIsLoading(false)
+      }, 1000)
     }
-  }, [user, fetchMeetings, checkSetupStatus])
+  }, [user])
 
   const handleJoinMeeting = (meetingUrl: string, title: string) => {
-    // Open Google Meet in a new tab
-    window.open(meetingUrl, '_blank')
-    toast.success(`Joining ${title}...`, {
+    // Show demo message for now
+    toast.success(`This is a demo lesson: ${title}`, {
       icon: '🎥',
+      duration: 4000,
       style: {
         borderRadius: '10px',
-        background: '#10B981',
+        background: '#3B82F6',
         color: '#fff',
       }
     })
@@ -116,7 +152,7 @@ export default function VideoLessonsPage() {
       case 'completed':
         return <CheckCircleIcon className="h-5 w-5 text-green-600" />
       case 'cancelled':
-        return <ExclamationTriangleIcon className="h-5 w-5 text-red-600" />
+        return <div className="h-5 w-5 text-red-600 flex items-center justify-center">✕</div>
       default:
         return <CalendarIcon className="h-5 w-5 text-gray-600" />
     }
@@ -177,7 +213,7 @@ export default function VideoLessonsPage() {
               </p>
             </div>
             <button
-              onClick={() => setIsCreateModalOpen(true)}
+              onClick={() => toast.success('This is a demo platform. Schedule real lessons after signing up!', { icon: '📚', duration: 4000 })}
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <PlusIcon className="h-5 w-5 mr-2" />
@@ -186,39 +222,7 @@ export default function VideoLessonsPage() {
           </div>
         </div>
 
-        {/* Setup Status Alert */}
-        {setupStatus && !setupStatus.isConfigured && (
-          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <div className="flex items-start">
-              <ExclamationTriangleIcon className="h-5 w-5 text-amber-500 mt-0.5 mr-3" />
-              <div>
-                <h3 className="text-sm font-semibold text-amber-800 mb-1">
-                  Google Meet Setup Required
-                </h3>
-                <p className="text-sm text-amber-700 mb-3">
-                  To use HD Video Lessons, you need to configure Google Meet integration. 
-                  This requires setting up Google Cloud Console credentials.
-                </p>
-                <div className="text-sm text-amber-700">
-                  <p className="font-medium mb-1">Missing configuration:</p>
-                  <ul className="list-disc list-inside space-y-1">
-                    {setupStatus.missingVars?.map((varName: string) => (
-                      <li key={varName}>{varName}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="mt-3">
-                  <a 
-                    href="/GOOGLE_MEET_SETUP.md"
-                    className="text-sm font-medium text-amber-800 hover:text-amber-900 underline"
-                  >
-                    View Setup Instructions →
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {/* Features Banner */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-200">
@@ -322,50 +326,10 @@ export default function VideoLessonsPage() {
                activeTab === 'past' ? 'Your completed sessions will appear here.' :
                'Start by scheduling a video lesson with one of our expert tutors.'}
             </p>
-            
-            {/* Setup Notice - Only show if not configured */}
-            {setupStatus && !setupStatus.isConfigured && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 max-w-md mx-auto">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 text-sm">ℹ️</span>
-                    </div>
-                  </div>
-                  <div className="ml-3 text-left">
-                    <h4 className="text-sm font-medium text-blue-800 mb-1">Google Meet Integration</h4>
-                    <p className="text-sm text-blue-700">
-                      Video lessons are powered by Google Meet. Real meeting links will be generated once Google Calendar API is configured.
-                    </p>
-                    <p className="text-xs text-blue-600 mt-2">
-                      See GOOGLE_MEET_SETUP.md for setup instructions.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
 
-            {/* Ready Status - Show when configured */}
-            {setupStatus && setupStatus.isConfigured && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 max-w-md mx-auto">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <span className="text-green-600 text-sm">✅</span>
-                    </div>
-                  </div>
-                  <div className="ml-3 text-left">
-                    <h4 className="text-sm font-medium text-green-800 mb-1">Google Meet Ready</h4>
-                    <p className="text-sm text-green-700">
-                      Google Meet integration is configured and ready. Schedule lessons to create real Google Meet links!
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
             
             <button
-              onClick={() => setIsCreateModalOpen(true)}
+              onClick={() => toast.success('This is a demo platform. Schedule real lessons after signing up!', { icon: '📚', duration: 4000 })}
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <PlusIcon className="h-5 w-5 mr-2" />
@@ -446,14 +410,6 @@ export default function VideoLessonsPage() {
           </div>
         )}
       </div>
-
-      {/* Create Meeting Modal */}
-      <CreateMeetingModal 
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={fetchMeetings}
-        setupStatus={setupStatus}
-      />
     </div>
   )
 }
