@@ -17,11 +17,67 @@ const navigationItems = [
   { name: 'Help Center', href: '/help' },
 ]
 
+const startLearningSubjects = [
+  {
+    category: 'Maths',
+    subjects: [
+      { name: 'Maths', href: '/subjects/maths' },
+      { name: 'Additional Maths', href: '/subjects/additional-maths' },
+      { name: 'Further Maths', href: '/subjects/further-maths' },
+      { name: 'Statistics', href: '/subjects/statistics' },
+    ]
+  },
+  {
+    category: 'Science',
+    subjects: [
+      { name: 'Biology', href: '/subjects/biology' },
+      { name: 'Chemistry', href: '/subjects/chemistry' },
+      { name: 'Physics', href: '/subjects/physics' },
+      { name: 'Combined Science', href: '/subjects/combined-science' },
+    ]
+  },
+  {
+    category: 'English',
+    subjects: [
+      { name: 'English Literature', href: '/subjects/english-literature' },
+      { name: 'English Language', href: '/subjects/english-language' },
+      { name: 'English Language & Literature', href: '/subjects/english-language-and-literature' },
+    ]
+  },
+  {
+    category: 'Humanities',
+    subjects: [
+      { name: 'Geography', href: '/subjects/geography' },
+      { name: 'History', href: '/subjects/history' },
+      { name: 'Psychology', href: '/subjects/psychology' },
+      { name: 'Religious Studies', href: '/subjects/religious-studies' },
+      { name: 'Sociology', href: '/subjects/sociology' },
+    ]
+  },
+  {
+    category: 'Business & Economics',
+    subjects: [
+      { name: 'Business', href: '/subjects/business' },
+      { name: 'Economics', href: '/subjects/economics' },
+      { name: 'Accounting', href: '/subjects/accounting' },
+      { name: 'Business Management', href: '/subjects/business-management' },
+    ]
+  },
+  {
+    category: 'Computer Science',
+    subjects: [
+      { name: 'Computer Science', href: '/subjects/computer-science' },
+      { name: 'ICT', href: '/subjects/ict' },
+    ]
+  }
+]
+
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false)
+  const [isStartLearningOpen, setIsStartLearningOpen] = useState(false)
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -93,6 +149,70 @@ export default function Navbar() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:ml-8 md:flex md:space-x-8">
+              {/* Start Learning Dropdown */}
+              <div className="relative">
+                <motion.button
+                  onClick={() => setIsStartLearningOpen(!isStartLearningOpen)}
+                  className="group relative text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-all duration-200 flex items-center"
+                >
+                  Start Learning
+                  <ChevronDownIcon className={`ml-1 h-4 w-4 transition-transform duration-200 ${isStartLearningOpen ? 'rotate-180' : ''}`} />
+                  <motion.span
+                    className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary-600 to-secondary-600"
+                    initial={{ scaleX: 0 }}
+                    whileHover={{ scaleX: 1 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </motion.button>
+                
+                <AnimatePresence>
+                  {isStartLearningOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full left-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50"
+                      onMouseLeave={() => setIsStartLearningOpen(false)}
+                    >
+                      <div className="p-6">
+                        <div className="grid grid-cols-2 gap-6">
+                          {startLearningSubjects.map((category, index) => (
+                            <div key={category.category}>
+                              <h3 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wider">
+                                {category.category}
+                              </h3>
+                              <ul className="space-y-2">
+                                {category.subjects.map((subject) => (
+                                  <li key={subject.name}>
+                                    <Link
+                                      href={subject.href}
+                                      className="text-sm text-gray-600 hover:text-primary-600 hover:bg-primary-50 px-2 py-1 rounded-md block transition-all duration-200"
+                                      onClick={() => setIsStartLearningOpen(false)}
+                                    >
+                                      {subject.name}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-6 pt-4 border-t border-gray-200">
+                          <Link
+                            href="/subjects"
+                            className="text-sm font-medium text-primary-600 hover:text-primary-700 flex items-center justify-center py-2 px-4 rounded-lg bg-primary-50 hover:bg-primary-100 transition-all duration-200"
+                            onClick={() => setIsStartLearningOpen(false)}
+                          >
+                            View All Subjects →
+                          </Link>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+              
               {navigationItems.map((item, index) => (
                 <Link
                   key={item.name}
@@ -180,12 +300,70 @@ export default function Navbar() {
             className="md:hidden bg-white border-t border-gray-200"
           >
             <div className="px-4 py-4 space-y-3">
+              {/* Start Learning Mobile Section */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <button
+                  onClick={() => setIsStartLearningOpen(!isStartLearningOpen)}
+                  className="flex items-center justify-between w-full text-gray-700 hover:text-primary-600 py-2 text-base font-medium transition-colors"
+                >
+                  Start Learning
+                  <ChevronDownIcon className={`h-5 w-5 transition-transform duration-200 ${isStartLearningOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                <AnimatePresence>
+                  {isStartLearningOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="pl-4 space-y-3 border-l-2 border-primary-200 ml-2"
+                    >
+                      {startLearningSubjects.map((category) => (
+                        <div key={category.category} className="space-y-2">
+                          <h4 className="text-sm font-semibold text-gray-800 uppercase tracking-wider">
+                            {category.category}
+                          </h4>
+                          {category.subjects.map((subject) => (
+                            <Link
+                              key={subject.name}
+                              href={subject.href}
+                              className="block text-sm text-gray-600 hover:text-primary-600 py-1 transition-colors"
+                              onClick={() => {
+                                setIsMobileMenuOpen(false)
+                                setIsStartLearningOpen(false)
+                              }}
+                            >
+                              {subject.name}
+                            </Link>
+                          ))}
+                        </div>
+                      ))}
+                      <Link
+                        href="/subjects"
+                        className="block text-sm font-medium text-primary-600 hover:text-primary-700 py-2 px-3 rounded-lg bg-primary-50 text-center transition-colors"
+                        onClick={() => {
+                          setIsMobileMenuOpen(false)
+                          setIsStartLearningOpen(false)
+                        }}
+                      >
+                        View All Subjects →
+                      </Link>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+              
               {navigationItems.map((item, index) => (
                 <motion.div
                   key={item.name}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: (index + 2) * 0.1 }}
                 >
                   <Link
                     href={item.href}
