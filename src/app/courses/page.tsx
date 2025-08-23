@@ -20,6 +20,7 @@ const courses = [
     subject: 'Mathematics',
     duration: '20 weeks',
     level: 'GCSE',
+    instructor: 'Dr. Sarah Johnson',
     examBoard: 'AQA, Edexcel, OCR'
   },
   {
@@ -34,6 +35,7 @@ const courses = [
     subject: 'Physics',
     duration: '20 weeks',
     level: 'GCSE',
+    instructor: 'Prof. David Wilson',
     examBoard: 'AQA, Edexcel, OCR'
   },
   {
@@ -43,11 +45,12 @@ const courses = [
     price: '£38/hour',
     rating: 4.9,
     students: 160,
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop',
+    image: 'https://images.unsplash.com/photo-1554475901-4538ddfbccc2?w=400&h=300&fit=crop',
     category: 'GCSE',
     subject: 'Chemistry',
     duration: '20 weeks',
     level: 'GCSE',
+    instructor: 'Dr. Emma Thompson',
     examBoard: 'AQA, Edexcel, OCR'
   },
   {
@@ -62,6 +65,7 @@ const courses = [
     subject: 'Biology',
     duration: '20 weeks',
     level: 'GCSE',
+    instructor: 'Dr. Michael Roberts',
     examBoard: 'AQA, Edexcel, OCR'
   },
   {
@@ -76,6 +80,7 @@ const courses = [
     subject: 'Computer Science',
     duration: '20 weeks',
     level: 'GCSE',
+    instructor: 'Mr. James Chen',
     examBoard: 'AQA, Edexcel, OCR'
   },
   // Additional Courses
@@ -89,7 +94,8 @@ const courses = [
     image: 'https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?w=400&h=300&fit=crop',
     category: 'Mathematics',
     duration: '12 weeks',
-    level: 'Advanced'
+    level: 'Advanced',
+    instructor: 'Dr. Sarah Johnson'
   },
   {
     id: 7,
@@ -101,7 +107,8 @@ const courses = [
     image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=300&fit=crop',
     category: 'Programming',
     duration: '16 weeks',
-    level: 'Beginner'
+    level: 'Beginner',
+    instructor: 'Prof. Michael Chen'
   },
   {
     id: 8,
@@ -113,7 +120,8 @@ const courses = [
     image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=300&fit=crop',
     category: 'English',
     duration: '10 weeks',
-    level: 'Intermediate'
+    level: 'Intermediate',
+    instructor: 'Abdul Hanan'
   },
   {
     id: 9,
@@ -125,7 +133,8 @@ const courses = [
     image: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=400&h=300&fit=crop',
     category: 'Science',
     duration: '14 weeks',
-    level: 'Intermediate'
+    level: 'Intermediate',
+    instructor: 'Dr. James Wilson'
   }
 ]
 

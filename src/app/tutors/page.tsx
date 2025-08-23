@@ -21,22 +21,6 @@ const tutors = [
   },
   {
     id: 1,
-    name: 'Farhana Kiran',
-    subject: 'GCSE Mathematics',
-    specialization: 'Mathematics (Grades 4-9)',
-    experience: '8 years',
-    rating: 4.9,
-    reviews: 156,
-    price: '£35/hour',
-    description: 'GCSE Mathematics specialist with 8 years experience. Helped 200+ students achieve grades 7-9. Expert in AQA, Edexcel & OCR.',
-    availability: 'Available today',
-    verified: true,
-    avatar: '👩‍🏫',
-    qualifications: ['PhD Mathematics', 'QTS', 'GCSE Examiner'],
-    examBoards: ['AQA', 'Edexcel', 'OCR']
-  },
-  {
-    id: 2,
     name: 'Zain ul Abedin',
     subject: 'GCSE Physics',
     specialization: 'Physics (Grades 4-9)',
@@ -52,7 +36,7 @@ const tutors = [
     examBoards: ['AQA', 'Edexcel', 'OCR']
   },
   {
-    id: 3,
+    id: 2,
     name: 'Ali Zia',
     subject: 'GCSE Chemistry',
     specialization: 'Chemistry (Grades 4-9)',
@@ -68,7 +52,7 @@ const tutors = [
     examBoards: ['AQA', 'Edexcel', 'OCR']
   },
   {
-    id: 4,
+    id: 3,
     name: 'Bilal K Abbasi',
     subject: 'GCSE Biology',
     specialization: 'Biology (Grades 4-9)',
@@ -84,7 +68,7 @@ const tutors = [
     examBoards: ['AQA', 'Edexcel', 'OCR']
   },
   {
-    id: 5,
+    id: 4,
     name: 'Fahad Noor',
     subject: 'GCSE Computer Science',
     specialization: 'Computer Science (Grades 4-9)',
@@ -101,7 +85,7 @@ const tutors = [
   },
   // General Subject Tutors
   {
-    id: 6,
+    id: 5,
     name: 'Dr. Sarah Johnson',
     subject: 'Mathematics',
     experience: '8 years',
@@ -114,7 +98,7 @@ const tutors = [
     avatar: '👩‍🏫'
   },
   {
-    id: 8,
+    id: 6,
     name: 'Abdul Hanan',
     subject: 'English Literature',
     experience: '6 years',
@@ -127,7 +111,7 @@ const tutors = [
     avatar: '👩‍🎓'
   },
   {
-    id: 9,
+    id: 7,
     name: 'Dr. James Wilson',
     subject: 'Physics',
     experience: '12 years',

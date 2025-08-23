@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { StarIcon } from '@heroicons/react/24/solid'
 import { ChatBubbleLeftIcon, VideoCameraIcon } from '@heroicons/react/24/outline'
+import VideoIntroModal from './VideoIntroModal'
 
 const featuredTutors = [
   {
@@ -14,91 +15,77 @@ const featuredTutors = [
     rating: 4.9,
     reviews: 284,
     hourlyRate: 45,
-    languages: ['English (Fluent)', 'Urdu (Native)', 'Arabic (Basic)'],
+    languages: ['English (Fluent)'],
     specialties: ['GCSE Mathematics', 'GCSE Physics', 'GCSE Chemistry', 'Multi-Subject Teaching'],
     videoIntro: true,
     backgroundColor: 'from-yellow-400 to-orange-500',
-    flag: '��'
+    flag: '🇵🇰'
   },
   {
     id: 2,
-    name: 'Farhana Kiran',
-    subject: 'Mathematics',
-    avatar: '�‍🏫',
-    rating: 4.9,
-    reviews: 156,
-    hourlyRate: 35,
-    languages: ['English (Native)', 'Urdu (Fluent)'],
-    specialties: ['GCSE Mathematics', 'Algebra', 'Statistics'],
-    videoIntro: true,
-    backgroundColor: 'from-blue-400 to-indigo-500',
-    flag: '��'
-  },
-  {
-    id: 3,
     name: 'Zain ul Abedin',
     subject: 'GCSE Physics',
-    avatar: '�‍🔬',
+    avatar: '👨‍🔬',
     rating: 4.8,
     reviews: 143,
     hourlyRate: 40,
-    languages: ['English (Fluent)', 'Urdu (Native)'],
+    languages: ['English (Fluent)'],
     specialties: ['GCSE Physics', 'Mechanics', 'Electricity'],
     videoIntro: true,
     backgroundColor: 'from-purple-400 to-pink-500',
-    flag: '��'
+    flag: '🇵🇰'
   },
   {
-    id: 4,
+    id: 3,
     name: 'Ali Zia',
     subject: 'GCSE Chemistry',
-    avatar: '�‍⚗️',
+    avatar: '👨‍⚗️',
     rating: 4.9,
     reviews: 128,
     hourlyRate: 38,
-    languages: ['English (Fluent)', 'Urdu (Native)'],
+    languages: ['English (Fluent)'],
     specialties: ['GCSE Chemistry', 'Organic Chemistry', 'Chemical Analysis'],
     videoIntro: true,
     backgroundColor: 'from-green-400 to-emerald-500',
     flag: '🇬🇧'
   },
   {
-    id: 5,
+    id: 4,
     name: 'Fahad Noor',
     subject: 'GCSE Computer Science',
     avatar: '👨‍💻',
     rating: 4.8,
     reviews: 112,
     hourlyRate: 42,
-    languages: ['English (Fluent)', 'Urdu (Native)'],
+    languages: ['English (Fluent)'],
     specialties: ['GCSE Computer Science', 'Python Programming', 'Computational Thinking'],
     videoIntro: true,
     backgroundColor: 'from-cyan-400 to-blue-500',
     flag: '🇬🇧'
   },
   {
-    id: 6,
+    id: 5,
     name: 'Bilal K Abbasi',
     subject: 'GCSE Biology',
     avatar: '👨‍⚕️',
     rating: 4.7,
     reviews: 167,
     hourlyRate: 36,
-    languages: ['English (Fluent)', 'Urdu (Native)'],
+    languages: ['English (Fluent)'],
     specialties: ['GCSE Biology', 'Genetics', 'Human Biology'],
     videoIntro: true,
     backgroundColor: 'from-teal-400 to-green-500',
     flag: '🇬🇧'
   },
   {
-    id: 7,
+    id: 6,
     name: 'Abdul Hanan',
     subject: 'English Literature',
     avatar: '👨‍📚',
     rating: 4.9,
     reviews: 189,
     hourlyRate: 40,
-    languages: ['English (Native)', 'Urdu (Fluent)'],
+    languages: ['English (Native)'],
     specialties: ['GCSE English', 'Literature Analysis', 'Creative Writing'],
     videoIntro: true,
     backgroundColor: 'from-rose-400 to-red-500',
@@ -109,6 +96,7 @@ const featuredTutors = [
 export default function TutorShowcase() {
   const [currentTutor, setCurrentTutor] = useState(0)
   const [isClient, setIsClient] = useState(false)
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
@@ -261,10 +249,11 @@ export default function TutorShowcase() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsVideoModalOpen(true)}
                     className="flex items-center space-x-2 px-4 py-2 bg-white border-2 border-gray-200 rounded-xl hover:border-primary-300 transition-all duration-200"
                   >
                     <VideoCameraIcon className="w-5 h-5 text-gray-600" />
-                    <span className="text-sm font-medium text-gray-700">Preview</span>
+                    <span className="text-sm font-medium text-gray-700">Watch Intro</span>
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -296,6 +285,12 @@ export default function TutorShowcase() {
           ))}
         </div>
       </div>
+      
+      {/* Video Introduction Modal */}
+      <VideoIntroModal 
+        isOpen={isVideoModalOpen} 
+        onClose={() => setIsVideoModalOpen(false)} 
+      />
     </section>
   )
 }

@@ -2,8 +2,9 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { PlayIcon, StarIcon, UserGroupIcon } from '@heroicons/react/24/solid'
+import { PlayIcon, StarIcon, UserGroupIcon, VideoCameraIcon } from '@heroicons/react/24/solid'
 import { useState, useEffect } from 'react'
+import VideoIntroModal from './VideoIntroModal'
 
 const stats = [
   { label: 'Active Students', value: '10,000+', icon: UserGroupIcon },
@@ -35,6 +36,7 @@ const testimonials = [
 export default function HeroSection() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
   const [isClient, setIsClient] = useState(false)
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
 
   useEffect(() => {
     setIsClient(true)
@@ -155,15 +157,15 @@ export default function HeroSection() {
                 />
               </Link>
               
-              <Link 
-                href="/tutors" 
+              <button 
+                onClick={() => setIsVideoModalOpen(true)}
                 className="group px-8 py-4 bg-white text-gray-800 rounded-2xl font-semibold text-lg border-2 border-gray-200 transition-all duration-300 hover:border-primary-300 hover:bg-gradient-to-r hover:from-primary-50 hover:to-secondary-50 hover:scale-105 shadow-md hover:shadow-lg"
               >
                 <span className="flex items-center gap-2">
-                  Find a Tutor
-                  <UserGroupIcon className="w-5 h-5" />
+                  <VideoCameraIcon className="w-5 h-5 text-primary-600" />
+                  Watch Introduction
                 </span>
-              </Link>
+              </button>
             </motion.div>
 
             {/* Contact CTA */}
@@ -304,6 +306,12 @@ export default function HeroSection() {
           </motion.div>
         </div>
       </div>
+      
+      {/* Video Introduction Modal */}
+      <VideoIntroModal 
+        isOpen={isVideoModalOpen} 
+        onClose={() => setIsVideoModalOpen(false)} 
+      />
     </div>
   )
 }
