@@ -11,6 +11,9 @@ import UserProfileDropdown from './UserProfileDropdown'
 import { useAuth } from './AuthContext'
 
 const navigationItems = [
+  { name: 'GCSE/IGCSE/O-Level', href: '/gcse-igcse-o-level' },
+  { name: 'A-Levels', href: '/a-levels' },
+  { name: 'Mechanical Engineering', href: '/mechanical-engineering' },
   { name: 'Courses', href: '/courses' },
   // { name: 'Find Tutors', href: '/tutors' }, // Disabled temporarily
   { name: 'Video Lessons', href: '/video-lessons' },
@@ -56,7 +59,7 @@ export default function AuthNavbar() {
   return (
     <>
       <motion.nav
-        className={`sticky top-0 z-50 transition-all duration-300 ${
+        className={`sticky top-0 z-40 auth-navigation transition-all duration-300 ${
           isScrolled 
             ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200' 
             : 'bg-white shadow-sm border-b'
@@ -89,7 +92,7 @@ export default function AuthNavbar() {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="group relative text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-all duration-200"
+                    className="group relative text-gray-700 hover:text-primary-600 px-3 py-2 text-base font-bold transition-all duration-200 whitespace-nowrap"
                   >
                     {item.name}
                     <motion.span
@@ -170,7 +173,7 @@ export default function AuthNavbar() {
                   >
                     <Link
                       href={item.href}
-                      className="block text-gray-700 hover:text-primary-600 py-2 text-base font-medium transition-colors"
+                      className="block text-gray-700 hover:text-primary-600 py-2 text-base font-bold transition-colors whitespace-nowrap"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {item.name}

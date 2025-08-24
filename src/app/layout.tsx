@@ -3,9 +3,11 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import TopMenu from '@/components/TopMenu'
 import AuthNavbar from '@/components/AuthNavbar'
+import SidebarNavigation from '@/components/SidebarNavigation'
 import Footer from '@/components/Footer'
 import ToastProvider from '@/components/ToastProvider'
 import FloatingContactButton from '@/components/FloatingContactButton'
+import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton'
 import { AuthProvider } from '@/components/AuthContext'
 import NextAuthProvider from '@/components/NextAuthProvider'
 
@@ -27,16 +29,20 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <NextAuthProvider>
           <AuthProvider>
-            <div className="min-h-screen flex flex-col">
-              <TopMenu />
-              <AuthNavbar />
-              <main className="flex-grow">
-                {children}
-              </main>
-              <Footer />
+            <div className="min-h-screen flex">
+              <SidebarNavigation />
+              <div className="flex-1 flex flex-col ml-0 md:ml-20">
+                <TopMenu />
+                <AuthNavbar />
+                <main className="flex-grow">
+                  {children}
+                </main>
+                <Footer />
+              </div>
             </div>
             <ToastProvider />
             <FloatingContactButton />
+            <WhatsAppFloatingButton />
           </AuthProvider>
         </NextAuthProvider>
       </body>

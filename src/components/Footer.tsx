@@ -26,12 +26,12 @@ export default function Footer() {
               <div className="flex items-center">
                 <span className="text-green-400 mr-2">💬</span>
                 <a 
-                  href="https://wa.me/447446255033" 
+                  href="https://wa.me/447446255033?text=Hi! I'm interested in TutorHub's tutoring services. Could you please provide more information?" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-green-400 hover:text-green-300 transition duration-150 font-medium"
                 >
-                  WhatsApp: +44 7446 255033
+                  WhatsApp Chat
                 </a>
               </div>
               <div className="flex items-center">

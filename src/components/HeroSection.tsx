@@ -182,12 +182,12 @@ export default function HeroSection() {
                 📞 Call Us: +44 7446 255033
               </a>
               <a 
-                href="https://wa.me/447446255033" 
+                href="https://wa.me/447446255033?text=Hi! I'm interested in TutorHub's tutoring services. Could you please provide more information about courses and pricing?"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 px-6 py-3 bg-green-100 text-green-800 rounded-xl font-medium text-lg hover:bg-green-200 transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg border border-green-200"
               >
-                � WhatsApp: +44 7446 255033
+                💬 WhatsApp Chat
               </a>
             </motion.div>
 

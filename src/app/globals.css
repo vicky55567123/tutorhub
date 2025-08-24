@@ -154,3 +154,68 @@ body {
   pointer-events: none;
   transition: all 0.3s ease;
 }
+
+/* Sidebar Layout Styles */
+@media (max-width: 768px) {
+  .sidebar-mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 45;
+  }
+  
+  .sidebar-navigation {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .sidebar-navigation.show {
+    transform: translateX(0);
+  }
+}
+
+/* Z-index hierarchy for proper layering */
+.sidebar-container {
+  z-index: 60 !important;
+}
+
+.top-navigation {
+  z-index: 40 !important;
+}
+
+.auth-navigation {
+  z-index: 40 !important;
+}
+
+/* Main content area adjustments */
+.main-content-area {
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Ensure content doesn't overlap with sidebar on desktop */
+@media (min-width: 768px) {
+  .main-content-wrapper {
+    margin-left: 80px;
+    transition: margin-left 0.3s ease-in-out;
+  }
+  
+  .main-content-wrapper.sidebar-expanded {
+    margin-left: 280px;
+  }
+}
+
+/* Ensure floating buttons don't interfere with sidebar */
+.floating-button-container {
+  z-index: 50;
+}
+
+/* Responsive adjustments for small screens */
+@media (max-width: 640px) {
+  .sidebar-navigation {
+    width: 280px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  }
+}

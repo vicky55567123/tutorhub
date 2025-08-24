@@ -9,7 +9,7 @@ import LoginModal from './LoginModal'
 import SignupModal from './SignupModal'
 
 const navigationItems = [
-  { name: 'GCSE/IGCSE', href: '/gcse-igcse' },
+  { name: 'GCSE/IGCSE/O-Level', href: '/gcse-igcse-o-level' },
   { name: 'A-Levels', href: '/a-levels' },
   { name: 'Mechanical Engineering', href: '/mechanical-engineering' },
   { name: 'Courses', href: '/courses' },
