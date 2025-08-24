@@ -9,7 +9,9 @@ import LoginModal from './LoginModal'
 import SignupModal from './SignupModal'
 
 const navigationItems = [
-  { name: 'GCSE Tutoring', href: '/courses?category=GCSE' },
+  { name: 'GCSE/IGCSE', href: '/gcse-igcse' },
+  { name: 'A-Levels', href: '/a-levels' },
+  { name: 'Mechanical Engineering', href: '/mechanical-engineering' },
   { name: 'Courses', href: '/courses' },
   // { name: 'Find Tutors', href: '/tutors' }, // Disabled temporarily
   { name: 'Video Lessons', href: '/video-lessons' },
