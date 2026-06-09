@@ -115,10 +115,10 @@ const coreSubjects = [
 ]
 
 const successStats = [
-  { label: 'Students Taught', value: '15,000+', icon: UserGroupIcon, color: 'text-blue-600' },
-  { label: 'Average Grade Improvement', value: '2.3 Grades', icon: TrophyIcon, color: 'text-green-600' },
-  { label: 'Success Rate', value: '96.8%', icon: ChartBarIcon, color: 'text-purple-600' },
-  { label: 'Expert Tutors', value: '450+', icon: StarIcon, color: 'text-orange-600' }
+  { label: 'Years Teaching', value: '8+', icon: UserGroupIcon, color: 'text-blue-600' },
+  { label: 'Grade Improvement', value: 'Avg. 2 Grades', icon: TrophyIcon, color: 'text-green-600' },
+  { label: 'Student Success', value: '96%', icon: ChartBarIcon, color: 'text-purple-600' },
+  { label: 'Subjects Covered', value: 'Maths, Physics, Chemistry', icon: StarIcon, color: 'text-orange-600' }
 ]
 
 const comparisonFeatures = [
@@ -460,7 +460,7 @@ export default function GCSEIGCSEOLevelPage() {
               Ready to Excel in Your Exams?
             </h2>
             <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              Join thousands of students who have achieved their target grades with our expert tutoring across GCSE, IGCSE, and O-Level qualifications.
+              Join students who have achieved their target grades with focused tutoring across GCSE, IGCSE, and O-Level qualifications.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

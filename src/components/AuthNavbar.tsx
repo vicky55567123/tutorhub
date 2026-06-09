@@ -15,6 +15,8 @@ const navigationItems = [
   { name: 'A-Levels', href: '/a-levels' },
   { name: 'Mechanical Engineering', href: '/mechanical-engineering' },
   { name: 'Courses', href: '/courses' },
+  { name: 'Crash Courses', href: '/crash-courses' },
+  { name: 'Past Papers', href: '/past-papers' },
   // { name: 'Find Tutors', href: '/tutors' }, // Disabled temporarily
   { name: 'Video Lessons', href: '/video-lessons' },
   { name: 'How It Works', href: '/how-it-works' },

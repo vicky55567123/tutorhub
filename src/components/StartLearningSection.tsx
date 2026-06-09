@@ -480,7 +480,7 @@ export default function StartLearningSection() {
                     <h4 className="font-semibold text-sm mb-1">{course}</h4>
                     <div className="flex items-center gap-1">
                       <StarIcon className="h-4 w-4 text-yellow-400 fill-current" />
-                      <span className="text-xs text-gray-500">4.9 (2k+ reviews)</span>
+                      <span className="text-xs text-gray-500">Highly rated</span>
                     </div>
                   </div>
                   <ArrowRightIcon className="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
@@ -502,7 +502,7 @@ export default function StartLearningSection() {
               Ready to Start Learning?
             </h3>
             <p className="text-white/80 mb-6 max-w-2xl mx-auto">
-              Join thousands of students who have improved their grades with our expert-created resources. 
+              Join students who have improved their grades with focused, expert-created resources. 
               Start your free trial today and experience the difference.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

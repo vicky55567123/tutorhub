@@ -182,9 +182,6 @@ export default function CreateMeetingModal({ isOpen, onClose, onSuccess, setupSt
                 <option value="Physics">Physics</option>
                 <option value="Chemistry">Chemistry</option>
                 <option value="Biology">Biology</option>
-                <option value="English">English</option>
-                <option value="History">History</option>
-                <option value="Geography">Geography</option>
                 <option value="Computer Science">Computer Science</option>
                 <option value="Other">Other</option>
               </select>

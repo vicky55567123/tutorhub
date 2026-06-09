@@ -18,6 +18,13 @@ import {
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 
+const formatFixedDate = (date: Date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 interface Course {
   id: number
   title: string
@@ -46,7 +53,7 @@ const enrolledCourses: Course[] = [
     nextLesson: 'Introduction to Algebra',
     image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=300&fit=crop',
     status: 'active',
-    enrolledDate: new Date().toLocaleDateString(),
+    enrolledDate: formatFixedDate(new Date()),
     lastAccessed: 'Never'
   }
 ]

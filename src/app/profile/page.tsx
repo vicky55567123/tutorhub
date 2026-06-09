@@ -17,6 +17,13 @@ import {
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 
+const formatFixedDate = (date: Date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export default function ProfilePage() {
   const { user } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
@@ -28,11 +35,7 @@ export default function ProfilePage() {
       : 'Eager learner looking to expand knowledge and skills.',
     location: 'Location not specified',
     phone: 'Phone not provided',
-    joinDate: new Date().toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    })
+    joinDate: formatFixedDate(new Date())
   })
 
   if (!user) {
@@ -69,11 +72,7 @@ export default function ProfilePage() {
         : 'Eager learner looking to expand knowledge and skills.',
       location: 'Location not specified',
       phone: 'Phone not provided',
-      joinDate: new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      })
+      joinDate: formatFixedDate(new Date())
     })
   }
 

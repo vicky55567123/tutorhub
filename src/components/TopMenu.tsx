@@ -16,7 +16,7 @@ export default function TopMenu() {
           {/* Left side - Promotional message */}
           <div className="flex items-center space-x-4">
             <span className="text-gray-600">
-              🎉 <strong>New Year Special:</strong> Get 50% off your first lesson!
+              Book your free trial lesson today.
             </span>
           </div>
 

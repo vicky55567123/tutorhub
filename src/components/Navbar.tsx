@@ -11,7 +11,6 @@ import SignupModal from './SignupModal'
 const navigationItems = [
   { name: 'GCSE/IGCSE/O-Level', href: '/gcse-igcse-o-level' },
   { name: 'A-Levels', href: '/a-levels' },
-  { name: 'Mechanical Engineering', href: '/mechanical-engineering' },
   { name: 'Courses', href: '/courses' },
   // { name: 'Find Tutors', href: '/tutors' }, // Disabled temporarily
   { name: 'Video Lessons', href: '/video-lessons' },
@@ -72,37 +71,9 @@ const startLearningSubjects = [
     ]
   },
   {
-    category: 'English',
-    subjects: [
-      { name: 'English Literature', href: '/subjects/english-literature' },
-      { name: 'English Language', href: '/subjects/english-language' },
-      { name: 'English Language & Literature', href: '/subjects/english-language-and-literature' },
-    ]
-  },
-  {
-    category: 'Humanities',
-    subjects: [
-      { name: 'Geography', href: '/subjects/geography' },
-      { name: 'History', href: '/subjects/history' },
-      { name: 'Psychology', href: '/subjects/psychology' },
-      { name: 'Religious Studies', href: '/subjects/religious-studies' },
-      { name: 'Sociology', href: '/subjects/sociology' },
-    ]
-  },
-  {
-    category: 'Business & Economics',
-    subjects: [
-      { name: 'Business', href: '/subjects/business' },
-      { name: 'Economics', href: '/subjects/economics' },
-      { name: 'Accounting', href: '/subjects/accounting' },
-      { name: 'Business Management', href: '/subjects/business-management' },
-    ]
-  },
-  {
     category: 'Computer Science',
     subjects: [
       { name: 'Computer Science', href: '/subjects/computer-science' },
-      { name: 'ICT', href: '/subjects/ict' },
     ]
   }
 ]
@@ -114,6 +85,7 @@ export default function Navbar() {
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false)
   const [isStartLearningOpen, setIsStartLearningOpen] = useState(false)
   const [isStudyToolsOpen, setIsStudyToolsOpen] = useState(false)
+  const [isCurriculumOpen, setIsCurriculumOpen] = useState(false)
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -249,6 +221,79 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
               
+              {/* Curriculum Dropdown */}
+              <div className="relative">
+                <motion.button
+                  onClick={() => setIsCurriculumOpen(!isCurriculumOpen)}
+                  className="group relative text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-all duration-200 flex items-center"
+                >
+                  Subjects
+                  <ChevronDownIcon className={`ml-1 h-4 w-4 transition-transform duration-200 ${isCurriculumOpen ? 'rotate-180' : ''}`} />
+                  <motion.span
+                    className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary-600 to-secondary-600"
+                    initial={{ scaleX: 0 }}
+                    whileHover={{ scaleX: 1 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </motion.button>
+
+                <AnimatePresence>
+                  {isCurriculumOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute top-full left-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-50"
+                      onMouseLeave={() => setIsCurriculumOpen(false)}
+                    >
+                      <div className="p-5">
+                        {[
+                          { label: 'GCSE', color: 'text-blue-700', bg: 'bg-blue-50', links: [
+                            { name: 'GCSE Maths', href: '/gcse/maths' },
+                            { name: 'GCSE Physics', href: '/gcse/physics' },
+                            { name: 'GCSE Chemistry', href: '/gcse/chemistry' },
+                          ]},
+                          { label: 'IGCSE', color: 'text-emerald-700', bg: 'bg-emerald-50', links: [
+                            { name: 'IGCSE Maths', href: '/igcse/maths' },
+                            { name: 'IGCSE Physics', href: '/igcse/physics' },
+                            { name: 'IGCSE Chemistry', href: '/igcse/chemistry' },
+                          ]},
+                          { label: 'O-Level', color: 'text-purple-700', bg: 'bg-purple-50', links: [
+                            { name: 'O-Level Maths', href: '/o-level/maths' },
+                            { name: 'O-Level Physics', href: '/o-level/physics' },
+                            { name: 'O-Level Chemistry', href: '/o-level/chemistry' },
+                          ]},
+                          { label: 'A-Level', color: 'text-indigo-700', bg: 'bg-indigo-50', links: [
+                            { name: 'A-Level Maths', href: '/a-level/maths' },
+                            { name: 'A-Level Physics', href: '/a-level/physics' },
+                            { name: 'A-Level Chemistry', href: '/a-level/chemistry' },
+                          ]},
+                        ].map((curriculum) => (
+                          <div key={curriculum.label} className="mb-4 last:mb-0">
+                            <span className={`text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded ${curriculum.bg} ${curriculum.color} mb-2 inline-block`}>
+                              {curriculum.label}
+                            </span>
+                            <div className="flex gap-2 flex-wrap">
+                              {curriculum.links.map((link) => (
+                                <Link
+                                  key={link.href}
+                                  href={link.href}
+                                  className="text-sm text-gray-600 hover:text-primary-600 hover:bg-primary-50 px-2 py-1 rounded-md transition-all duration-200"
+                                  onClick={() => setIsCurriculumOpen(false)}
+                                >
+                                  {link.name.replace(`${curriculum.label} `, '')}
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               {/* Study Tools Dropdown */}
               <div className="relative">
                 <motion.button

@@ -49,6 +49,24 @@ const navigationItems: NavigationItem[] = [
     )
   },
   {
+    href: '/crash-courses',
+    name: 'Crash Courses',
+    icon: ({ className }) => (
+      <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+        <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    )
+  },
+  {
+    href: '/past-papers',
+    name: 'Past Papers',
+    icon: ({ className }) => (
+      <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z M4 5a2 2 0 012-2v1a1 1 0 001 1h1a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zM7 9a1 1 0 000 2v3a1 1 0 001 1h3a1 1 0 001-1v-3a1 1 0 100-2H7z" />
+      </svg>
+    )
+  },
+  {
     href: '/subjects',
     name: 'Subjects',
     icon: ({ className }) => (

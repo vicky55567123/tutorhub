@@ -17,6 +17,13 @@ import {
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
 import toast from 'react-hot-toast'
 
+const formatFixedDate = (date: Date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 interface CourseCardProps {
   course: {
     id: number
@@ -77,7 +84,7 @@ export default function CourseCard({ course, index }: CourseCardProps) {
         reviewCount: course.students,
         price: course.price,
         image: course.image,
-        addedDate: new Date().toLocaleDateString(),
+        addedDate: formatFixedDate(new Date()),
         description: course.description
       }
       favorites.push(newFavorite)

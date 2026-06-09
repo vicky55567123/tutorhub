@@ -69,14 +69,14 @@ export default function VideoIntroModal({ isOpen, onClose }: VideoIntroModalProp
       endTime: 90,
       background: 'from-violet-600 via-purple-600 to-fuchsia-600',
       icon: '⭐',
-      title: '98% Success Rate',
+      title: 'Proven Results',
       subtitle: 'Results That Speak for Themselves',
-      voiceover: 'Our students consistently achieve grades 4-9, with 98% reaching their target grades.',
+      voiceover: 'Students consistently achieve significant grade improvements through focused, personalized tutoring.',
       content: [
-        '10,000+ successful students',
-        '500+ expert tutors',
-        'Average 2 grade improvement',
-        'Money-back guarantee'
+        'Significant grade improvements',
+        'Personalized to each student',
+        'Exam-focused strategies',
+        'Regular progress reviews'
       ]
     },
     {
@@ -121,10 +121,10 @@ export default function VideoIntroModal({ isOpen, onClose }: VideoIntroModalProp
       subtitle: 'Excellence Awaits',
       voiceover: 'Ready to transform your academic future? Let\'s start your success story today!',
       content: [
-        'Free consultation available',
-        'Flexible payment options',
+        'Free trial lesson available',
+        'Flexible scheduling',
         'Start anytime',
-        'Join thousands of successful students'
+        'Book via WhatsApp or phone'
       ]
     }
   ], [])
@@ -465,7 +465,7 @@ export default function VideoIntroModal({ isOpen, onClose }: VideoIntroModalProp
               <div className="text-center">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Ready to Start Learning?</h3>
                 <p className="text-gray-600 mb-4">
-                  Join thousands of students achieving their GCSE goals with expert tutoring
+                  Join students who have improved their grades with personalized tutoring
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <button

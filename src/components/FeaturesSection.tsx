@@ -38,7 +38,7 @@ const features = [
       'Background verified',
       'University graduates',
       'Industry professionals',
-      '4.8+ average rating',
+      'Highly rated by students',
       'Continuous training'
     ]
   },

@@ -4,14 +4,9 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { 
-  AcademicCapIcon,
   BeakerIcon, 
   CalculatorIcon,
-  BookOpenIcon,
-  GlobeAltIcon,
-  BuildingOfficeIcon,
   ComputerDesktopIcon,
-  HeartIcon
 } from '@heroicons/react/24/outline'
 
 const subjectCategories = [
@@ -38,45 +33,11 @@ const subjectCategories = [
     ]
   },
   {
-    category: 'English',
-    icon: BookOpenIcon,
-    color: 'from-purple-500 to-purple-600',
-    subjects: [
-      { name: 'English Literature', description: 'Analysis of poetry, prose, and drama from various periods', href: '/subjects/english-literature' },
-      { name: 'English Language', description: 'Language skills, creative writing, and communication', href: '/subjects/english-language' },
-      { name: 'English Language & Literature', description: 'Combined study of language skills and literary analysis', href: '/subjects/english-language-and-literature' },
-    ]
-  },
-  {
-    category: 'Humanities',
-    icon: GlobeAltIcon,
-    color: 'from-orange-500 to-orange-600',
-    subjects: [
-      { name: 'Geography', description: 'Physical and human geography, environmental studies', href: '/subjects/geography' },
-      { name: 'History', description: 'Historical events, periods, and analytical skills', href: '/subjects/history' },
-      { name: 'Psychology', description: 'Human behavior, cognitive processes, and mental health', href: '/subjects/psychology' },
-      { name: 'Religious Studies', description: 'World religions, ethics, and philosophical concepts', href: '/subjects/religious-studies' },
-      { name: 'Sociology', description: 'Social structures, institutions, and human society', href: '/subjects/sociology' },
-    ]
-  },
-  {
-    category: 'Business & Economics',
-    icon: BuildingOfficeIcon,
-    color: 'from-red-500 to-red-600',
-    subjects: [
-      { name: 'Business', description: 'Business operations, marketing, finance, and entrepreneurship', href: '/subjects/business' },
-      { name: 'Economics', description: 'Economic theory, markets, and government policy', href: '/subjects/economics' },
-      { name: 'Accounting', description: 'Financial accounting, management accounting, and auditing', href: '/subjects/accounting' },
-      { name: 'Business Management', description: 'Leadership, strategy, and organizational behavior', href: '/subjects/business-management' },
-    ]
-  },
-  {
     category: 'Computer Science',
     icon: ComputerDesktopIcon,
     color: 'from-indigo-500 to-indigo-600',
     subjects: [
       { name: 'Computer Science', description: 'Programming, algorithms, data structures, and software engineering', href: '/subjects/computer-science' },
-      { name: 'ICT', description: 'Information technology, digital literacy, and computer applications', href: '/subjects/ict' },
     ]
   }
 ]

@@ -125,7 +125,7 @@ const tutors = [
   }
 ]
 
-const subjects = ['All Subjects', 'Mathematics', 'Computer Science', 'Physics', 'Chemistry', 'Biology', 'English Literature']
+const subjects = ['All Subjects', 'Mathematics', 'Computer Science', 'Physics', 'Chemistry', 'Biology']
 
 export default function Tutors() {
   return (
