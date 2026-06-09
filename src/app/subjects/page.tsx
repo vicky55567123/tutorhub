@@ -7,6 +7,7 @@ import {
   BeakerIcon, 
   CalculatorIcon,
   ComputerDesktopIcon,
+  AcademicCapIcon,
 } from '@heroicons/react/24/outline'
 
 const subjectCategories = [
