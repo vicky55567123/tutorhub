@@ -12,6 +12,7 @@ const navigationItems = [
   { name: 'GCSE/IGCSE/O-Level', href: '/gcse-igcse-o-level' },
   { name: 'A-Levels', href: '/a-levels' },
   { name: 'Courses', href: '/courses' },
+  { name: 'Blog', href: '/blog' },
   // { name: 'Find Tutors', href: '/tutors' }, // Disabled temporarily
   { name: 'Video Lessons', href: '/video-lessons' },
   { name: 'How It Works', href: '/how-it-works' },

@@ -151,6 +151,16 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <section className="py-12 bg-gray-50 border-y border-gray-200">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-3">Weekly GCSE Maths Blog</h2>
+          <p className="text-gray-600 mb-6">Free weekly articles to help students avoid mistakes and improve exam performance.</p>
+          <Link href="/blog" className="inline-flex px-7 py-3 rounded-xl bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors">
+            Read the Blog
+          </Link>
+        </div>
+      </section>
       
       {/* Subjects at a Glance */}
       <section className="py-16 bg-gradient-to-br from-secondary-50 via-white to-accent-50">
