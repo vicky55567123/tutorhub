@@ -250,17 +250,17 @@ export default function Navbar() {
                       <div className="p-5">
                         {[
                           { label: 'GCSE', color: 'text-blue-700', bg: 'bg-blue-50', links: [
-                            { name: 'GCSE Maths', href: '/gcse/maths' },
+                            { name: 'GCSE Maths Tutor', href: '/gcse-maths-tutor' },
                             { name: 'GCSE Physics', href: '/gcse/physics' },
                             { name: 'GCSE Chemistry', href: '/gcse/chemistry' },
                           ]},
                           { label: 'IGCSE', color: 'text-emerald-700', bg: 'bg-emerald-50', links: [
-                            { name: 'IGCSE Maths', href: '/igcse/maths' },
+                            { name: 'IGCSE Maths Tutor', href: '/igcse-maths-tutor' },
                             { name: 'IGCSE Physics', href: '/igcse/physics' },
                             { name: 'IGCSE Chemistry', href: '/igcse/chemistry' },
                           ]},
                           { label: 'O-Level', color: 'text-purple-700', bg: 'bg-purple-50', links: [
-                            { name: 'O-Level Maths', href: '/o-level/maths' },
+                            { name: 'O-Level Maths Tutor', href: '/o-level-maths-tutor' },
                             { name: 'O-Level Physics', href: '/o-level/physics' },
                             { name: 'O-Level Chemistry', href: '/o-level/chemistry' },
                           ]},
@@ -268,6 +268,10 @@ export default function Navbar() {
                             { name: 'A-Level Maths', href: '/a-level/maths' },
                             { name: 'A-Level Physics', href: '/a-level/physics' },
                             { name: 'A-Level Chemistry', href: '/a-level/chemistry' },
+                          ]},
+                          { label: 'Online', color: 'text-teal-700', bg: 'bg-teal-50', links: [
+                            { name: 'Online Maths Tutor UK', href: '/online-maths-tutor-uk' },
+                            { name: 'Online Maths Tutor UAE', href: '/online-maths-tutor-uae' },
                           ]},
                         ].map((curriculum) => (
                           <div key={curriculum.label} className="mb-4 last:mb-0">

@@ -192,6 +192,27 @@ export default function Home() {
               </Link>
             ))}
           </div>
+
+          <div className="mt-10">
+            <h3 className="text-2xl font-bold text-center text-gray-900 mb-6">Dedicated Tutor Pages</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {[
+                { name: 'GCSE Maths Tutor', href: '/gcse-maths-tutor' },
+                { name: 'IGCSE Maths Tutor', href: '/igcse-maths-tutor' },
+                { name: 'O-Level Maths Tutor', href: '/o-level-maths-tutor' },
+                { name: 'Online Maths Tutor UK', href: '/online-maths-tutor-uk' },
+                { name: 'Online Maths Tutor UAE', href: '/online-maths-tutor-uae' },
+              ].map((page) => (
+                <Link
+                  key={page.href}
+                  href={page.href}
+                  className="bg-white rounded-xl p-4 text-center border border-gray-200 hover:border-primary-300 hover:shadow-md transition-all duration-200 font-semibold text-gray-800 hover:text-primary-700"
+                >
+                  {page.name}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 

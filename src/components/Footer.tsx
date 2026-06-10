@@ -65,8 +65,28 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="text-gray-400 hover:text-white transition duration-150">
-                  Pricing
+                <Link href="/gcse-maths-tutor" className="text-gray-400 hover:text-white transition duration-150">
+                  GCSE Maths Tutor
+                </Link>
+              </li>
+              <li>
+                <Link href="/igcse-maths-tutor" className="text-gray-400 hover:text-white transition duration-150">
+                  IGCSE Maths Tutor
+                </Link>
+              </li>
+              <li>
+                <Link href="/o-level-maths-tutor" className="text-gray-400 hover:text-white transition duration-150">
+                  O-Level Maths Tutor
+                </Link>
+              </li>
+              <li>
+                <Link href="/online-maths-tutor-uk" className="text-gray-400 hover:text-white transition duration-150">
+                  Online Maths Tutor UK
+                </Link>
+              </li>
+              <li>
+                <Link href="/online-maths-tutor-uae" className="text-gray-400 hover:text-white transition duration-150">
+                  Online Maths Tutor UAE
                 </Link>
               </li>
             </ul>
