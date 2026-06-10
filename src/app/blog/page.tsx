@@ -1,4 +1,19 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Maths Tutoring Blog | GCSE, IGCSE & O-Level Tips',
+  description: 'Weekly GCSE Maths articles on exam mistakes, revision strategies, formula sheets, and grade improvement.',
+  alternates: {
+    canonical: 'https://yourtutor.netlify.app/blog',
+  },
+  openGraph: {
+    title: 'Maths Tutoring Blog',
+    description: 'Weekly GCSE Maths articles and revision advice.',
+    url: 'https://yourtutor.netlify.app/blog',
+    type: 'website',
+  },
+}
 
 const posts = [
   {

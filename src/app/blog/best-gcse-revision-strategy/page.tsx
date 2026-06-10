@@ -1,4 +1,13 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Best GCSE Revision Strategy | Maths Tutoring Blog',
+  description: 'Build an effective GCSE revision strategy using active recall, past papers, and weekly review cycles.',
+  alternates: {
+    canonical: 'https://yourtutor.netlify.app/blog/best-gcse-revision-strategy',
+  },
+}
 
 export default function BestGCSERevisionStrategyPage() {
   return (

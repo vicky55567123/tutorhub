@@ -1,4 +1,13 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Top 10 GCSE Maths Exam Mistakes | Maths Tutoring Blog',
+  description: 'Learn the 10 most common GCSE Maths exam mistakes and how to avoid losing easy marks.',
+  alternates: {
+    canonical: 'https://yourtutor.netlify.app/blog/top-10-gcse-maths-exam-mistakes',
+  },
+}
 
 export default function Top10GCSEMathsExamMistakesPage() {
   return (

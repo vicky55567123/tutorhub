@@ -1,4 +1,13 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'How to Get Grade 9 in GCSE Maths | Maths Tutoring Blog',
+  description: 'A practical strategy to achieve grade 9 in GCSE Maths with focused revision and exam technique.',
+  alternates: {
+    canonical: 'https://yourtutor.netlify.app/blog/how-to-get-grade-9-in-gcse-maths',
+  },
+}
 
 export default function HowToGetGrade9InGCSEMathsPage() {
   return (

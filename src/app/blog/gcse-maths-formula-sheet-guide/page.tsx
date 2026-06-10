@@ -1,4 +1,13 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'GCSE Maths Formula Sheet Guide | Maths Tutoring Blog',
+  description: 'A practical guide to using the GCSE Maths formula sheet effectively in exam conditions.',
+  alternates: {
+    canonical: 'https://yourtutor.netlify.app/blog/gcse-maths-formula-sheet-guide',
+  },
+}
 
 export default function GCSEMathsFormulaSheetGuidePage() {
   return (
