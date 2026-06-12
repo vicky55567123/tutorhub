@@ -80,7 +80,7 @@ export default function ContactPage() {
       description: 'Instant messaging support',
       icon: WhatsAppIcon,
       contact: '+44 7446 255033',
-      action: 'https://wa.me/447446255033?text=Hi! I\'m interested in TutorHub\'s tutoring services. Could you please provide more information?',
+      action: 'https://wa.me/447446255033?text=Hi! I\'m interested in Ahmed Tutors\' tutoring services. Could you please provide more information?',
       available: '24/7 Quick Response',
       color: 'green'
     },
@@ -88,8 +88,8 @@ export default function ContactPage() {
       title: 'Email Support',
       description: 'Detailed inquiries and support',
       icon: EnvelopeIcon,
-      contact: 'contact@tutorhub.com',
-      action: 'mailto:contact@tutorhub.com',
+      contact: 'contact@ahmedtutors.com',
+      action: 'mailto:contact@ahmedtutors.com',
       available: '24 hours response',
       color: 'purple'
     },

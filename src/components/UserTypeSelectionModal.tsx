@@ -35,7 +35,7 @@ export default function UserTypeSelectionModal({ isOpen, onClose, user }: UserTy
     // Log the user in with their selected type
     login(completeUser)
     
-    toast.success(`Welcome to TutorHub as a ${selectedType}! 🎉`, {
+    toast.success(`Welcome to Ahmed Tutors as a ${selectedType}! 🎉`, {
       style: {
         borderRadius: '10px',
         background: '#10B981',
@@ -70,7 +70,7 @@ export default function UserTypeSelectionModal({ isOpen, onClose, user }: UserTy
             Welcome, {user.name}!
           </h3>
           <p className="text-gray-600 mb-6">
-            To complete your registration, please tell us how you&apos;ll be using TutorHub:
+            To complete your registration, please tell us how you&apos;ll be using Ahmed Tutors:
           </p>
         </div>
 

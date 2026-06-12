@@ -47,7 +47,7 @@ export default function HelpCenterPage() {
     {
       id: 'getting-started',
       title: 'Getting Started',
-      description: 'Learn the basics of using TutorHub',
+      description: 'Learn the basics of using Ahmed Tutors',
       icon: AcademicCapIconSolid,
       articles: [
         {
@@ -129,7 +129,7 @@ export default function HelpCenterPage() {
   const faqs: FAQItem[] = [
     {
       id: '1',
-      question: 'How do I sign up for TutorHub?',
+      question: 'How do I sign up for Ahmed Tutors?',
       answer: 'You can sign up using your Google account for quick access, or create a new account with your email. After signing up, complete your profile to get personalized course recommendations.',
       category: 'getting-started'
     },
@@ -203,7 +203,7 @@ export default function HelpCenterPage() {
               Help Center
             </h1>
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-              Find answers, get support, and learn how to make the most of your TutorHub experience
+              Find answers, get support, and learn how to make the most of your Ahmed Tutors experience
             </p>
             
             {/* Search Bar */}
@@ -303,7 +303,7 @@ export default function HelpCenterPage() {
                   <EnvelopeIcon className="h-5 w-5 text-gray-400 mr-3" />
                   <div>
                     <p className="text-sm font-medium text-gray-900">Email Support</p>
-                    <p className="text-sm text-gray-600">support@tutorhub.com</p>
+                    <p className="text-sm text-gray-600">support@ahmedtutors.com</p>
                   </div>
                 </div>
                 <div className="flex items-center">
@@ -389,7 +389,7 @@ export default function HelpCenterPage() {
               Still Have Questions?
             </h3>
             <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              Our comprehensive documentation and video tutorials can help you get the most out of TutorHub. 
+              Our comprehensive documentation and video tutorials can help you get the most out of Ahmed Tutors. 
               Or reach out to our friendly support team for personalized assistance.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

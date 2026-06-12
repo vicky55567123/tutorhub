@@ -80,10 +80,10 @@ export default function AuthNavbar() {
                   whileTap={{ scale: 0.95 }}
                 >
                   <div className="w-8 h-8 bg-gradient-to-br from-primary-600 via-secondary-600 to-accent-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">T</span>
+                    <span className="text-white font-bold text-sm">A</span>
                   </div>
                   <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                    TutorHub
+                      Ahmed Tutors
                   </span>
                 </motion.div>
               </Link>

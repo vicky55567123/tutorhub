@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy - TutorHub',
-  description: 'Privacy Policy for TutorHub online tutoring platform',
+  title: 'Privacy Policy - Ahmed Tutors',
+  description: 'Privacy Policy for Ahmed Tutors online tutoring platform',
 }
 
 export default function PrivacyPolicyPage() {
@@ -10,7 +10,7 @@ export default function PrivacyPolicyPage() {
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white shadow-lg rounded-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Privacy Policy for TutorHub</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Privacy Policy for Ahmed Tutors</h1>
           
           <div className="prose prose-lg max-w-none">
             <p className="text-sm text-gray-600 mb-6">
@@ -21,7 +21,7 @@ export default function PrivacyPolicyPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Introduction</h2>
               <p className="text-gray-700 leading-relaxed">
-                TutorHub (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our online tutoring platform and services.
+                Ahmed Tutors (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our online tutoring platform and services.
               </p>
             </section>
 
@@ -72,7 +72,7 @@ export default function PrivacyPolicyPage() {
 
               <h3 className="text-xl font-medium text-gray-800 mb-3">Data Handling</h3>
               <ul className="list-disc list-inside text-gray-700 mb-4 space-y-2">
-                <li>We <strong>DO NOT</strong> access your personal calendar events unrelated to TutorHub</li>
+                <li>We <strong>DO NOT</strong> access your personal calendar events unrelated to Ahmed Tutors</li>
                 <li>We <strong>DO NOT</strong> store your Google account credentials</li>
                 <li>Meeting data is only used for lesson management purposes</li>
                 <li>We comply with Google API Services User Data Policy</li>
@@ -111,7 +111,7 @@ export default function PrivacyPolicyPage() {
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Contact Information</h2>
               <p className="text-gray-700 mb-4">For privacy-related questions or requests:</p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700"><strong>Email:</strong> privacy@tutorhub.com</p>
+                <p className="text-gray-700"><strong>Email:</strong> privacy@ahmedtutors.com</p>
                 <p className="text-gray-700"><strong>Website:</strong> https://YOUR_SITE_NAME.netlify.app/contact</p>
               </div>
             </section>
@@ -130,7 +130,7 @@ export default function PrivacyPolicyPage() {
                 <strong>Version:</strong> 1.0
               </p>
               <p className="text-sm text-gray-500 mt-2">
-                This Privacy Policy is effective as of the date listed above. Your continued use of TutorHub constitutes acceptance of these terms.
+                This Privacy Policy is effective as of the date listed above. Your continued use of Ahmed Tutors constitutes acceptance of these terms.
               </p>
             </div>
           </div>

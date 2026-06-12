@@ -37,9 +37,9 @@ export default function VideoIntroModal({ isOpen, onClose }: VideoIntroModalProp
       endTime: 30,
       background: 'from-primary-600 via-secondary-600 to-accent-600',
       icon: '🎓',
-      title: 'Welcome to TutorHub',
+      title: 'Welcome to Ahmed Tutors',
       subtitle: 'Your Gateway to Academic Excellence',
-      voiceover: 'Hello! Welcome to TutorHub, where academic dreams become reality.',
+      voiceover: 'Hello! Welcome to Ahmed Tutors, where academic dreams become reality.',
       content: [
         'Expert GCSE tutoring',
         'Personalized learning approach',
@@ -271,7 +271,7 @@ export default function VideoIntroModal({ isOpen, onClose }: VideoIntroModalProp
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Welcome to TutorHub</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Welcome to Ahmed Tutors</h2>
                 <p className="text-gray-600">Discover how we can help you achieve your learning goals</p>
               </div>
               <button

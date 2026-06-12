@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Terms of Service - TutorHub',
-  description: 'Terms of Service for TutorHub online tutoring platform',
+  title: 'Terms of Service - Ahmed Tutors',
+  description: 'Terms of Service for Ahmed Tutors online tutoring platform',
 }
 
 export default function TermsOfServicePage() {
@@ -21,7 +21,7 @@ export default function TermsOfServicePage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Agreement to Terms</h2>
               <p className="text-gray-700 leading-relaxed">
-                By accessing and using TutorHub (&quot;the Platform&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). 
+                By accessing and using Ahmed Tutors (&quot;the Platform&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). 
                 If you do not agree to these Terms, please do not use our services.
               </p>
             </section>
@@ -29,7 +29,7 @@ export default function TermsOfServicePage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Description of Service</h2>
               <p className="text-gray-700 leading-relaxed mb-4">
-                TutorHub is an online platform that connects students with qualified tutors for educational purposes. 
+                Ahmed Tutors is an online platform that connects students with qualified tutors for educational purposes. 
                 Our services include but are not limited to:
               </p>
               <ul className="list-disc list-inside text-gray-700 space-y-2">
@@ -63,7 +63,7 @@ export default function TermsOfServicePage() {
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Acceptable Use</h2>
-              <p className="text-gray-700 mb-4">You agree to use TutorHub only for lawful educational purposes. You may not:</p>
+              <p className="text-gray-700 mb-4">You agree to use Ahmed Tutors only for lawful educational purposes. You may not:</p>
               <ul className="list-disc list-inside text-gray-700 space-y-2">
                 <li>Violate any applicable laws or regulations</li>
                 <li>Harass, abuse, or harm other users</li>
@@ -113,7 +113,7 @@ export default function TermsOfServicePage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Intellectual Property</h2>
               <p className="text-gray-700 mb-4">
-                The TutorHub platform, including its design, functionality, and content, is protected by copyright, 
+                The Ahmed Tutors platform, including its design, functionality, and content, is protected by copyright, 
                 trademark, and other intellectual property laws.
               </p>
               <ul className="list-disc list-inside text-gray-700 space-y-2">
@@ -128,7 +128,7 @@ export default function TermsOfServicePage() {
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Privacy and Data Protection</h2>
               <p className="text-gray-700">
                 Your privacy is important to us. Please review our Privacy Policy, which explains how we collect, 
-                use, and protect your information. By using TutorHub, you consent to our data practices as described 
+                use, and protect your information. By using Ahmed Tutors, you consent to our data practices as described 
                 in our Privacy Policy.
               </p>
             </section>
@@ -168,7 +168,7 @@ export default function TermsOfServicePage() {
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Contact Information</h2>
               <p className="text-gray-700 mb-4">For questions about these Terms:</p>
               <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700"><strong>Email:</strong> legal@tutorhub.com</p>
+                <p className="text-gray-700"><strong>Email:</strong> legal@ahmedtutors.com</p>
                 <p className="text-gray-700"><strong>Website:</strong> https://YOUR_SITE_NAME.netlify.app/contact</p>
               </div>
             </section>
@@ -177,7 +177,7 @@ export default function TermsOfServicePage() {
               <h2 className="text-2xl font-semibold text-gray-800 mb-4">Changes to Terms</h2>
               <p className="text-gray-700">
                 We may update these Terms from time to time. Significant changes will be communicated through 
-                email or platform notifications. Continued use of TutorHub after changes constitutes acceptance 
+                email or platform notifications. Continued use of Ahmed Tutors after changes constitutes acceptance 
                 of the updated Terms.
               </p>
             </section>

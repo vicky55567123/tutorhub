@@ -14,7 +14,7 @@ import NextAuthProvider from '@/components/NextAuthProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'TutorHub - Online Tutoring Platform',
+  title: 'Ahmed Tutors - Online Tutoring Platform',
   description: 'Connect with expert tutors and learn anything, anywhere. Personalized online learning sessions with qualified professionals.',
   keywords: 'online tutoring, tutors, learning, education, courses, online classes',
 }

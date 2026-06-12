@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-2xl font-bold mb-4">TutorHub</h3>
+            <h3 className="text-2xl font-bold mb-4">Ahmed Tutors</h3>
             <p className="text-gray-400 mb-4 max-w-md">
               Empowering learners worldwide through quality education. 
               Connect with expert tutors and achieve your learning goals.
@@ -26,7 +26,7 @@ export default function Footer() {
               <div className="flex items-center">
                 <span className="text-green-400 mr-2">💬</span>
                 <a 
-                  href="https://wa.me/447446255033?text=Hi! I'm interested in TutorHub's tutoring services. Could you please provide more information?" 
+                  href="https://wa.me/447446255033?text=Hi! I'm interested in Ahmed Tutors' tutoring services. Could you please provide more information?" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-green-400 hover:text-green-300 transition duration-150 font-medium"
@@ -37,10 +37,10 @@ export default function Footer() {
               <div className="flex items-center">
                 <EnvelopeIcon className="h-5 w-5 text-blue-400 mr-2" />
                 <a 
-                  href="mailto:contact@tutorhub.com" 
+                  href="mailto:contact@ahmedtutors.com" 
                   className="text-blue-400 hover:text-blue-300 transition duration-150"
                 >
-                  contact@tutorhub.com
+                  contact@ahmedtutors.com
                 </a>
               </div>
             </div>
@@ -131,7 +131,7 @@ export default function Footer() {
         
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">
-            © 2025 TutorHub. All rights reserved.
+            © 2025 Ahmed Tutors. All rights reserved.
           </p>
         </div>
       </div>

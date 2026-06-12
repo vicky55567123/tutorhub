@@ -164,7 +164,7 @@ export default function SidebarNavigation() {
               transition={{ duration: 0.2 }}
             >
               <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                <span className="text-blue-900 font-bold text-xl">T</span>
+                <span className="text-blue-900 font-bold text-xl">A</span>
               </div>
             </motion.div>
             {(isExpanded || isMobileOpen) && (
@@ -173,7 +173,7 @@ export default function SidebarNavigation() {
                 animate={{ opacity: 1, x: 0 }}
                 className="ml-3 text-xl font-bold"
               >
-                TutorHub
+                Ahmed Tutors
               </motion.span>
             )}
           </div>
@@ -245,7 +245,7 @@ export default function SidebarNavigation() {
                 animate={{ opacity: 1 }}
                 className="text-center text-blue-200 text-sm"
               >
-                <p>© 2024 TutorHub</p>
+                <p>© 2024 Ahmed Tutors</p>
                 <p>Excellence in Education</p>
               </motion.div>
             )}

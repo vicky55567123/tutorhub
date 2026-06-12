@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'How It Works - TutorHub',
-  description: 'Learn how TutorHub connects students with expert tutors for personalized online learning',
+  title: 'How It Works - Ahmed Tutors',
+  description: 'Learn how Ahmed Tutors connects students with expert tutors for personalized online learning',
 }
 
 export default function HowItWorksPage() {
@@ -14,7 +14,7 @@ export default function HowItWorksPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              How TutorHub Works
+              How Ahmed Tutors Works
             </h1>
             <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
               Get matched with expert tutors in just 3 simple steps and start learning today
@@ -69,7 +69,7 @@ export default function HowItWorksPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose TutorHub?
+              Why Choose Ahmed Tutors?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               We&apos;ve designed every feature to make online learning effective, engaging, and accessible
@@ -224,7 +224,7 @@ export default function HowItWorksPage() {
             Ready to Start Learning?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of students who have improved their grades and confidence with TutorHub
+            Join thousands of students who have improved their grades and confidence with Ahmed Tutors
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

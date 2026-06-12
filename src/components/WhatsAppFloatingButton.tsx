@@ -32,7 +32,7 @@ export default function WhatsAppFloatingButton() {
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="mb-3 mr-1 hidden sm:flex items-center bg-white border border-gray-200 text-gray-800 rounded-full px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300"
+        className="relative z-20 mb-3 mr-1 hidden sm:flex items-center bg-white border border-gray-200 text-gray-800 rounded-full px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 2.8, duration: 0.3 }}
@@ -60,7 +60,7 @@ export default function WhatsAppFloatingButton() {
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 ml-auto"
+        className="relative z-20 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 ml-auto"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         whileHover={{ scale: 1.1 }}
@@ -72,7 +72,7 @@ export default function WhatsAppFloatingButton() {
 
       {/* Pulse Animation */}
       <motion.div
-        className="absolute inset-0 bg-green-500 rounded-full opacity-30"
+        className="pointer-events-none absolute inset-0 bg-green-500 rounded-full opacity-30"
         animate={{
           scale: [1, 1.3, 1],
           opacity: [0.3, 0, 0.3],
