@@ -18,26 +18,40 @@ export default function WhatsAppFloatingButton() {
   const [isHovered, setIsHovered] = useState(false)
 
   const phoneNumber = "447446255033"
-  const message = "Hi! I'm interested in TutorHub's tutoring services. Could you please provide more information about courses and pricing?"
+  const message = "Hi Ahmed, I'm interested in tutoring support. Could you share details and availability?"
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 
   return (
     <motion.div
-      className="fixed bottom-6 left-6 z-50"
+      className="fixed bottom-6 right-6 z-50"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{ delay: 2.5, duration: 0.3 }}
     >
-      {/* Tooltip */}
+      <motion.a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mb-3 mr-1 hidden sm:flex items-center bg-white border border-gray-200 text-gray-800 rounded-full px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2.8, duration: 0.3 }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.98 }}
+        aria-label="Chat with Ahmed on WhatsApp"
+      >
+        <span className="text-sm font-semibold whitespace-nowrap">Chat with Ahmed on WhatsApp</span>
+      </motion.a>
+
       {isHovered && (
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          className="absolute right-16 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg shadow-lg whitespace-nowrap"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="hidden sm:block absolute bottom-20 right-0 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-xs whitespace-nowrap"
         >
-          Chat with us on WhatsApp
-          <div className="absolute right-0 top-1/2 transform translate-x-full -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-900 border-t-4 border-t-transparent border-b-4 border-b-transparent" />
+          Usually replies quickly
         </motion.div>
       )}
 
@@ -46,12 +60,12 @@ export default function WhatsAppFloatingButton() {
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300"
+        className="w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 ml-auto"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        aria-label="Chat on WhatsApp"
+        aria-label="Chat with Ahmed on WhatsApp"
       >
         <WhatsAppIcon className="w-8 h-8 text-white" />
       </motion.a>

@@ -7,7 +7,6 @@ import SidebarNavigation from '@/components/SidebarNavigation'
 import Footer from '@/components/Footer'
 import BookingFormSection from '@/components/BookingFormSection'
 import ToastProvider from '@/components/ToastProvider'
-import FloatingContactButton from '@/components/FloatingContactButton'
 import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton'
 import { AuthProvider } from '@/components/AuthContext'
 import NextAuthProvider from '@/components/NextAuthProvider'
@@ -43,7 +42,6 @@ export default function RootLayout({
               </div>
             </div>
             <ToastProvider />
-            <FloatingContactButton />
             <WhatsAppFloatingButton />
           </AuthProvider>
         </NextAuthProvider>

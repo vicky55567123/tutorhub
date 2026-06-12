@@ -155,10 +155,15 @@ export default function Home() {
       <section className="py-12 bg-gray-50 border-y border-gray-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Weekly GCSE Maths Blog</h2>
-          <p className="text-gray-600 mb-6">Free weekly articles to help students avoid mistakes and improve exam performance.</p>
-          <Link href="/blog" className="inline-flex px-7 py-3 rounded-xl bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors">
-            Read the Blog
-          </Link>
+          <p className="text-gray-600 mb-6">Free weekly articles and curated past papers to improve exam performance.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link href="/blog" className="inline-flex px-7 py-3 rounded-xl bg-primary-600 text-white font-semibold hover:bg-primary-700 transition-colors">
+              Read the Blog
+            </Link>
+            <Link href="/past-papers" className="inline-flex px-7 py-3 rounded-xl bg-white text-gray-900 font-semibold border border-gray-300 hover:bg-gray-100 transition-colors">
+              Browse Past Papers
+            </Link>
+          </div>
         </div>
       </section>
       

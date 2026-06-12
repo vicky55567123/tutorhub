@@ -70,6 +70,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/past-papers" className="text-gray-400 hover:text-white transition duration-150">
+                  Past Papers
+                </Link>
+              </li>
+              <li>
                 <Link href="/gcse-maths-tutor" className="text-gray-400 hover:text-white transition duration-150">
                   GCSE Maths Tutor
                 </Link>
