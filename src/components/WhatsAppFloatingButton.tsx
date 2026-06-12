@@ -21,9 +21,17 @@ export default function WhatsAppFloatingButton() {
   const message = "Hi Ahmed, I'm interested in tutoring support. Could you share details and availability?"
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 
+  const handleWhatsAppClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+    const popup = window.open(whatsappUrl, '_blank', 'noopener,noreferrer')
+    if (!popup) {
+      window.location.href = whatsappUrl
+    }
+  }
+
   return (
     <motion.div
-      className="fixed bottom-6 right-6 z-50"
+      className="fixed bottom-6 right-6 z-[70] pointer-events-none flex flex-col items-end"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{ delay: 2.5, duration: 0.3 }}
@@ -32,12 +40,13 @@ export default function WhatsAppFloatingButton() {
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative z-20 mb-3 mr-1 hidden sm:flex items-center bg-white border border-gray-200 text-gray-800 rounded-full px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300"
+        className="pointer-events-auto relative z-20 mb-3 mr-1 hidden sm:flex items-center bg-white border border-gray-200 text-gray-800 rounded-full px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-300"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 2.8, duration: 0.3 }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onClick={handleWhatsAppClick}
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.98 }}
         aria-label="Chat with Ahmed on WhatsApp"
@@ -49,7 +58,7 @@ export default function WhatsAppFloatingButton() {
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="hidden sm:block absolute bottom-20 right-0 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-xs whitespace-nowrap"
+          className="pointer-events-none hidden sm:block absolute bottom-20 right-0 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-xs whitespace-nowrap"
         >
           Usually replies quickly
         </motion.div>
@@ -60,9 +69,10 @@ export default function WhatsAppFloatingButton() {
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative z-20 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 ml-auto"
+        className="pointer-events-auto relative z-20 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 ml-auto"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onClick={handleWhatsAppClick}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         aria-label="Chat with Ahmed on WhatsApp"
@@ -72,7 +82,7 @@ export default function WhatsAppFloatingButton() {
 
       {/* Pulse Animation */}
       <motion.div
-        className="pointer-events-none absolute inset-0 bg-green-500 rounded-full opacity-30"
+        className="pointer-events-none absolute bottom-0 right-0 w-14 h-14 bg-green-500 rounded-full opacity-30"
         animate={{
           scale: [1, 1.3, 1],
           opacity: [0.3, 0, 0.3],
