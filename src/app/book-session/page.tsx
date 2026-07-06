@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
+import { formatInTimeZone } from 'date-fns-tz'
 import {
   CalendarIcon,
   ClockIcon,
@@ -10,11 +11,21 @@ import {
   MagnifyingGlassIcon,
   UserCircleIcon,
   CheckCircleIcon,
+  GlobeAltIcon,
 } from '@heroicons/react/24/outline'
 import { useAuth } from '@/components/AuthContext'
 import { isSupabaseConfigured, dbOperations, UserProfile, TutorAvailability } from '@/lib/supabase'
+import {
+  COMMON_TIMEZONES,
+  DEFAULT_TIMEZONE,
+  getBrowserTimeZone,
+  timeZoneAbbreviation,
+  zonedDateTimeToUtc,
+  formatTimeInZone,
+  dateKeyInZone,
+  dayOfWeekInZone,
+} from '@/lib/timezone'
 
-const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const SLOT_STEP_MINUTES = 30
 const DAYS_AHEAD = 14
 
@@ -24,25 +35,23 @@ function addDays(date: Date, days: number) {
   return d
 }
 
-function toDateKey(date: Date) {
-  return date.toISOString().split('T')[0]
-}
-
 function timeStringToMinutes(t: string) {
   const [h, m] = t.split(':').map(Number)
   return h * 60 + m
 }
 
-/** Builds bookable start-time slots for a given calendar day from the tutor's
- *  recurring/one-off availability windows, excluding already-booked ranges. */
+/** Builds bookable start-time slots for a given calendar day (in the tutor's
+ *  own timezone) from the tutor's recurring/one-off availability windows,
+ *  excluding already-booked ranges. Returns real UTC instants. */
 function computeSlotsForDay(
   day: Date,
   availability: TutorAvailability[],
   busySlots: { start_time: string; end_time: string }[],
-  durationMinutes: number
+  durationMinutes: number,
+  tutorTimezone: string
 ): Date[] {
-  const dayKey = toDateKey(day)
-  const dow = day.getDay()
+  const dayKey = dateKeyInZone(day, tutorTimezone)
+  const dow = dayOfWeekInZone(day, tutorTimezone)
 
   const windows = availability.filter(
     (a) => (a.is_recurring && a.day_of_week === dow) || (!a.is_recurring && a.specific_date === dayKey)
@@ -56,9 +65,9 @@ function computeSlotsForDay(
     const endMin = timeStringToMinutes(window.end_time)
 
     for (let m = startMin; m + durationMinutes <= endMin; m += SLOT_STEP_MINUTES) {
-      const slotStart = new Date(day)
-      slotStart.setHours(0, 0, 0, 0)
-      slotStart.setMinutes(m)
+      const hh = String(Math.floor(m / 60)).padStart(2, '0')
+      const mm = String(m % 60).padStart(2, '0')
+      const slotStart = zonedDateTimeToUtc(dayKey, `${hh}:${mm}`, tutorTimezone)
       const slotEnd = new Date(slotStart.getTime() + durationMinutes * 60000)
 
       if (slotStart <= now) continue
@@ -97,7 +106,13 @@ export default function BookSessionPage() {
   const [description, setDescription] = useState('')
   const [isBooking, setIsBooking] = useState(false)
 
+  // Timezone the STUDENT wants to view times in. Defaults to UK time, can be
+  // changed to any region - persisted to their profile once picked.
+  const [studentTimezone, setStudentTimezone] = useState(DEFAULT_TIMEZONE)
+
   const days = useMemo(() => Array.from({ length: DAYS_AHEAD }, (_, i) => addDays(new Date(), i)), [])
+
+  const tutorTimezone = selectedTutor?.timezone || DEFAULT_TIMEZONE
 
   useEffect(() => {
     async function loadTutors() {
@@ -116,7 +131,30 @@ export default function BookSessionPage() {
       }
     }
     loadTutors()
+
+    // Load the student's previously saved timezone preference, if any.
+    async function loadStudentTimezone() {
+      if (!user) return
+      try {
+        const profile = await dbOperations.getProfile(user.id)
+        if (profile?.timezone) setStudentTimezone(profile.timezone)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    loadStudentTimezone()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const handleStudentTimezoneChange = async (newTimezone: string) => {
+    setStudentTimezone(newTimezone)
+    if (!user) return
+    try {
+      await dbOperations.updateProfile(user.id, { timezone: newTimezone })
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   useEffect(() => {
     if (!selectedTutor) return
@@ -148,8 +186,8 @@ export default function BookSessionPage() {
 
   const slotsForSelectedDay = useMemo(() => {
     if (!selectedTutor) return []
-    return computeSlotsForDay(selectedDay, availability, busySlots, duration)
-  }, [selectedTutor, selectedDay, availability, busySlots, duration])
+    return computeSlotsForDay(selectedDay, availability, busySlots, duration, tutorTimezone)
+  }, [selectedTutor, selectedDay, availability, busySlots, duration, tutorTimezone])
 
   const handleBook = async () => {
     if (!user) {
@@ -294,6 +332,31 @@ export default function BookSessionPage() {
         <p className="text-gray-600 mt-1">Pick a tutor, choose an available time slot, and we&apos;ll set up a Google Meet automatically.</p>
       </div>
 
+      {/* Student timezone selector - defaults to UK time */}
+      <div className="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
+        <span className="flex items-center gap-2 text-sm font-medium text-gray-700 whitespace-nowrap">
+          <GlobeAltIcon className="h-5 w-5 text-primary-600" /> Show times in:
+        </span>
+        <select
+          value={studentTimezone}
+          onChange={(e) => handleStudentTimezoneChange(e.target.value)}
+          aria-label="Your timezone"
+          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+        >
+          {COMMON_TIMEZONES.map((tz) => (
+            <option key={tz.value} value={tz.value}>
+              {tz.label} ({timeZoneAbbreviation(tz.value)})
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={() => handleStudentTimezoneChange(getBrowserTimeZone())}
+          className="text-sm font-medium text-primary-600 hover:text-primary-700 whitespace-nowrap"
+        >
+          Use my device&apos;s timezone
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Tutor list */}
         <div className="lg:col-span-1">
@@ -351,7 +414,7 @@ export default function BookSessionPage() {
             </div>
           ) : (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-2">
                 <h2 className="text-lg font-semibold text-gray-900">
                   Availability for {selectedTutor.full_name}
                 </h2>
@@ -366,21 +429,25 @@ export default function BookSessionPage() {
                   <option value={90}>90 minutes</option>
                 </select>
               </div>
+              <p className="text-xs text-gray-400 mb-4">
+                Tutor&apos;s local time zone: {timeZoneAbbreviation(tutorTimezone)} · Times below are shown in{' '}
+                {timeZoneAbbreviation(studentTimezone)} (your selection) with the tutor&apos;s local time alongside.
+              </p>
 
-              {/* Day picker */}
+              {/* Day picker (dates shown are the tutor's local calendar days) */}
               <div className="flex gap-2 overflow-x-auto pb-3 mb-4">
                 {days.map((day) => {
-                  const isSelected = toDateKey(day) === toDateKey(selectedDay)
+                  const isSelected = day.getTime() === selectedDay.getTime()
                   return (
                     <button
-                      key={toDateKey(day)}
+                      key={day.getTime()}
                       onClick={() => setSelectedDay(day)}
                       className={`flex-shrink-0 w-16 py-2 rounded-lg text-center border ${
                         isSelected ? 'bg-primary-600 text-white border-primary-600' : 'border-gray-200 hover:border-primary-300'
                       }`}
                     >
-                      <div className="text-xs">{DAY_NAMES[day.getDay()].slice(0, 3)}</div>
-                      <div className="font-semibold">{day.getDate()}</div>
+                      <div className="text-xs">{formatInTimeZone(day, tutorTimezone, 'EEE')}</div>
+                      <div className="font-semibold">{formatInTimeZone(day, tutorTimezone, 'd')}</div>
                     </button>
                   )
                 })}
@@ -397,17 +464,23 @@ export default function BookSessionPage() {
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-6">
                   {slotsForSelectedDay.map((slot) => {
                     const isSelected = selectedSlot?.getTime() === slot.getTime()
+                    const sameZone = tutorTimezone === studentTimezone
                     return (
                       <button
                         key={slot.toISOString()}
                         onClick={() => setSelectedSlot(slot)}
-                        className={`py-2 rounded-lg border text-sm font-medium ${
+                        className={`py-2 px-1 rounded-lg border text-sm font-medium flex flex-col items-center ${
                           isSelected
                             ? 'bg-primary-600 text-white border-primary-600'
                             : 'border-gray-200 hover:border-primary-300 text-gray-700'
                         }`}
                       >
-                        {slot.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        <span>{formatTimeInZone(slot, studentTimezone)}</span>
+                        {!sameZone && (
+                          <span className={`text-[10px] font-normal ${isSelected ? 'text-white/80' : 'text-gray-400'}`}>
+                            {formatTimeInZone(slot, tutorTimezone)} tutor&apos;s time
+                          </span>
+                        )}
                       </button>
                     )
                   })}
@@ -500,9 +573,17 @@ export default function BookSessionPage() {
                       </>
                     )}
                   </button>
-                  <p className="text-xs text-gray-500 flex items-center gap-1">
-                    <CheckCircleIcon className="h-4 w-4 text-green-500" />
-                    {selectedSlot.toLocaleString([], { dateStyle: 'full', timeStyle: 'short' })} · {duration} min
+                  <p className="text-xs text-gray-500 flex flex-col gap-1">
+                    <span className="flex items-center gap-1">
+                      <CheckCircleIcon className="h-4 w-4 text-green-500" />
+                      {formatInTimeZone(selectedSlot, studentTimezone, 'EEE d MMM yyyy, h:mm a')} ({timeZoneAbbreviation(studentTimezone)}, your time)
+                      · {duration} min
+                    </span>
+                    {tutorTimezone !== studentTimezone && (
+                      <span className="pl-5 text-gray-400">
+                        Tutor sees: {formatInTimeZone(selectedSlot, tutorTimezone, 'EEE d MMM yyyy, h:mm a')} ({timeZoneAbbreviation(tutorTimezone)})
+                      </span>
+                    )}
                   </p>
                 </div>
               )}

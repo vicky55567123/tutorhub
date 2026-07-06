@@ -127,6 +127,32 @@ up an admin approval screen later. `hourly_rate`, `subjects`, `bio` etc. can
 be filled in via `profiles` for now (a dedicated tutor-profile-editing UI can
 be added next).
 
+## 9. Timezones
+
+Every profile has a `timezone` column (defaults to `Europe/London`, i.e. UK
+time). Tutors pick their own timezone on the **My Availability** page - all
+the weekly time windows they set are interpreted in that zone. Students pick
+which timezone they want to *view* times in on the **Book a Session** page
+(also defaults to UK time); each bookable slot shows the time in the
+student's chosen zone with the tutor's local time alongside it, so there's
+never any ambiguity about which time zone a session is happening in.
+
+## 10. Admin Dashboard
+
+Visit `/admin` (also appears in the sidebar as "Admin Dashboard") to see:
+- Total registered tutors / students
+- Total sessions booked and how many are still upcoming
+- A table of every student with their number of booked sessions, total
+  hours, and which subjects they've studied
+- A table of every tutor with their number of sessions, total hours taught,
+  and an hours-per-subject breakdown
+
+**To make a user an admin:** open the Supabase Table Editor -> `profiles`
+table, find their row, and change `user_type` from `student`/`tutor` to
+`admin`. There's no sign-up option for this - it must be set manually for
+security. The stats API (`/api/admin/stats`) checks this field server-side
+using the service role key, so only genuine admins can see everyone's data.
+
 ---
 
 ### Troubleshooting
@@ -139,3 +165,6 @@ be added next).
 - **New tutor doesn't show up in Book a Session** - the tutors list only
   returns rows where `user_type = 'tutor'`; check the `profiles` table in
   Supabase.
+- **"Admins only" on /admin** - your account's `user_type` in the `profiles`
+  table isn't set to `admin` yet (see section 10 above).
+

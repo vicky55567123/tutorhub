@@ -22,7 +22,7 @@ interface UserProfileDropdownProps {
     name: string
     email: string
     avatar?: string
-    type: 'student' | 'tutor'
+    type: 'student' | 'tutor' | 'admin'
   }
   onLogout: () => void
 }

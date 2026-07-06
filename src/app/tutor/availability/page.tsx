@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { PlusIcon, TrashIcon, ClockIcon, CalendarDaysIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, TrashIcon, ClockIcon, CalendarDaysIcon, GlobeAltIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '@/components/AuthContext'
-import { isSupabaseConfigured, TutorAvailability } from '@/lib/supabase'
+import { isSupabaseConfigured, TutorAvailability, dbOperations } from '@/lib/supabase'
+import { COMMON_TIMEZONES, DEFAULT_TIMEZONE, timeZoneAbbreviation } from '@/lib/timezone'
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
@@ -19,6 +20,9 @@ export default function TutorAvailabilityPage() {
   const [startTime, setStartTime] = useState('16:00')
   const [endTime, setEndTime] = useState('19:00')
 
+  const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE)
+  const [isSavingTimezone, setIsSavingTimezone] = useState(false)
+
   const loadSlots = async () => {
     if (!user) return
     setIsLoading(true)
@@ -26,6 +30,9 @@ export default function TutorAvailabilityPage() {
       const res = await fetch(`/api/availability?tutorId=${user.id}`)
       const data = await res.json()
       if (data.success) setSlots(data.availability)
+
+      const profile = await dbOperations.getProfile(user.id)
+      if (profile?.timezone) setTimezone(profile.timezone)
     } catch (error) {
       console.error(error)
     } finally {
@@ -37,6 +44,21 @@ export default function TutorAvailabilityPage() {
     loadSlots()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
+
+  const handleTimezoneChange = async (newTimezone: string) => {
+    setTimezone(newTimezone)
+    if (!user) return
+    setIsSavingTimezone(true)
+    try {
+      await dbOperations.updateProfile(user.id, { timezone: newTimezone })
+      toast.success('Timezone updated - students will now see times converted from this zone.')
+    } catch (error) {
+      console.error(error)
+      toast.error('Failed to save timezone')
+    } finally {
+      setIsSavingTimezone(false)
+    }
+  }
 
   const handleAddSlot = async () => {
     if (startTime >= endTime) {
@@ -135,9 +157,35 @@ export default function TutorAvailabilityPage() {
         </p>
       </div>
 
+      {/* Timezone */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <h2 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+          <GlobeAltIcon className="h-5 w-5 text-primary-600" /> Your Timezone
+        </h2>
+        <p className="text-sm text-gray-500 mb-3">
+          All the times below are in this timezone (default: UK time). Students booking from other regions will
+          automatically see the equivalent time converted into their own timezone.
+        </p>
+        <select
+          value={timezone}
+          onChange={(e) => handleTimezoneChange(e.target.value)}
+          disabled={isSavingTimezone}
+          aria-label="Your timezone"
+          className="w-full sm:w-96 border border-gray-300 rounded-lg px-3 py-2 disabled:opacity-60"
+        >
+          {COMMON_TIMEZONES.map((tz) => (
+            <option key={tz.value} value={tz.value}>
+              {tz.label} ({timeZoneAbbreviation(tz.value)})
+            </option>
+          ))}
+        </select>
+      </motion.div>
+
       {/* Add new slot */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-xl shadow-sm p-6 mb-8">
-        <h2 className="font-semibold text-gray-900 mb-4">Add a weekly time window</h2>
+        <h2 className="font-semibold text-gray-900 mb-4">
+          Add a weekly time window <span className="text-sm font-normal text-gray-500">({timeZoneAbbreviation(timezone)})</span>
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <select
             value={dayOfWeek}
@@ -195,6 +243,7 @@ export default function TutorAvailabilityPage() {
                       <span className="flex items-center gap-2">
                         <ClockIcon className="h-4 w-4 text-primary-600" />
                         {slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}
+                        <span className="text-xs text-gray-400">({timeZoneAbbreviation(timezone)})</span>
                       </span>
                       <button
                         onClick={() => handleDeleteSlot(slot.id)}

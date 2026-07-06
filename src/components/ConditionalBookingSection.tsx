@@ -16,6 +16,7 @@ const HIDDEN_PREFIXES = [
   '/my-courses',
   '/book-session',
   '/tutor/availability',
+  '/admin',
   '/auth-debug',
   '/calendar-auth',
 ]

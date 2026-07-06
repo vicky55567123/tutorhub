@@ -9,7 +9,7 @@ interface User {
   name: string
   email: string
   avatar?: string
-  type: 'student' | 'tutor'
+  type: 'student' | 'tutor' | 'admin'
 }
 
 interface AuthContextType {
@@ -38,7 +38,7 @@ const profileToUser = (profile: UserProfile): User => ({
   name: profile.full_name,
   email: profile.email,
   avatar: profile.avatar_url,
-  type: (profile.user_type === 'tutor' ? 'tutor' : 'student'),
+  type: profile.user_type === 'tutor' ? 'tutor' : profile.user_type === 'admin' ? 'admin' : 'student',
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
