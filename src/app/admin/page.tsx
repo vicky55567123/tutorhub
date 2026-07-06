@@ -16,6 +16,8 @@ import {
   ChevronUpIcon,
   CurrencyPoundIcon,
   GiftIcon,
+  EyeIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline'
 import { useAuth } from '@/components/AuthContext'
 import { isSupabaseConfigured } from '@/lib/supabase'
@@ -31,7 +33,10 @@ interface SessionRow {
   status: string
   isTrial: boolean
   price: number
-  paymentStatus: 'unpaid' | 'paid' | 'free'
+  paymentStatus: 'unpaid' | 'pending' | 'paid' | 'free' | 'rejected'
+  paymentReference?: string | null
+  paymentProof?: string | null
+  paymentSubmittedAt?: string | null
 }
 
 interface StudentRow {
@@ -72,6 +77,7 @@ interface AdminStats {
   upcomingSessions: number
   totalRevenue: number
   totalTrials: number
+  pendingPayments: number
 }
 
 type ModalType = 'student' | 'tutor' | null
@@ -125,10 +131,20 @@ function formatDateTime(value?: string) {
 function paymentBadgeClasses(status: string) {
   if (status === 'paid') return 'bg-green-50 text-green-700'
   if (status === 'free') return 'bg-blue-50 text-blue-700'
+  if (status === 'pending') return 'bg-amber-50 text-amber-700'
+  if (status === 'rejected') return 'bg-red-50 text-red-700'
   return 'bg-yellow-50 text-yellow-700'
 }
 
-function SessionsTable({ sessions, withLabel }: { sessions: SessionRow[]; withLabel: string }) {
+function SessionsTable({
+  sessions,
+  withLabel,
+  onReview,
+}: {
+  sessions: SessionRow[]
+  withLabel: string
+  onReview?: (session: SessionRow) => void
+}) {
   if (sessions.length === 0) {
     return <p className="text-gray-500 text-xs">No sessions booked yet.</p>
   }
@@ -163,9 +179,20 @@ function SessionsTable({ sessions, withLabel }: { sessions: SessionRow[]; withLa
               <td className="py-1.5 pr-3 text-gray-500 capitalize">{s.status}</td>
               <td className="py-1.5 pr-3 text-gray-700 font-medium">£{s.price.toFixed(2)}</td>
               <td className="py-1.5 pr-3">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${paymentBadgeClasses(s.paymentStatus)}`}>
-                  {s.paymentStatus}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${paymentBadgeClasses(s.paymentStatus)}`}>
+                    {s.paymentStatus}
+                  </span>
+                  {s.paymentProof && onReview && (
+                    <button
+                      onClick={() => onReview(s)}
+                      className="inline-flex items-center gap-0.5 text-primary-600 hover:text-primary-800"
+                      aria-label="Review payment proof"
+                    >
+                      <EyeIcon className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
               </td>
             </tr>
           ))}
@@ -190,6 +217,8 @@ export default function AdminDashboardPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [expandedTutorId, setExpandedTutorId] = useState<string | null>(null)
   const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null)
+  const [reviewSession, setReviewSession] = useState<SessionRow | null>(null)
+  const [isReviewing, setIsReviewing] = useState(false)
 
   const loadStats = useCallback(async () => {
     if (!user) return
@@ -258,6 +287,32 @@ export default function AdminDashboardPage() {
     setModalType(null)
     setEditingId(null)
     setForm(emptyForm)
+  }
+
+  async function handlePaymentDecision(status: 'paid' | 'rejected') {
+    if (!reviewSession) return
+    setIsReviewing(true)
+    try {
+      const token = await getAccessToken()
+      if (!token) {
+        toast.error('Session expired, please log in again')
+        return
+      }
+      const res = await fetch('/api/admin/bookings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ id: reviewSession.id, paymentStatus: status }),
+      })
+      const data = await res.json()
+      if (!data.success) throw new Error(data.error || 'Failed to update payment')
+      toast.success(status === 'paid' ? 'Payment confirmed' : 'Payment rejected')
+      setReviewSession(null)
+      loadStats()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update payment')
+    } finally {
+      setIsReviewing(false)
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -419,6 +474,7 @@ export default function AdminDashboardPage() {
     { label: 'Upcoming Sessions', value: stats?.upcomingSessions ?? 0, icon: ClockIcon, color: 'from-orange-500 to-red-500' },
     { label: 'Total Revenue', value: `£${(stats?.totalRevenue ?? 0).toFixed(2)}`, icon: CurrencyPoundIcon, color: 'from-emerald-600 to-teal-600' },
     { label: 'Free Trials Used', value: stats?.totalTrials ?? 0, icon: GiftIcon, color: 'from-sky-500 to-blue-600' },
+    { label: 'Pending Payments', value: stats?.pendingPayments ?? 0, icon: ExclamationTriangleIcon, color: 'from-amber-500 to-orange-500' },
   ]
 
   return (
@@ -531,7 +587,7 @@ export default function AdminDashboardPage() {
                                 <p className="text-gray-400 uppercase tracking-wide text-xs mb-2">
                                   Sessions ({s.sessions.length}) - exact date &amp; time
                                 </p>
-                                <SessionsTable sessions={s.sessions} withLabel="Tutor" />
+                                <SessionsTable sessions={s.sessions} withLabel="Tutor" onReview={setReviewSession} />
                               </td>
                             </tr>
                           )}
@@ -654,7 +710,7 @@ export default function AdminDashboardPage() {
                                   <p className="text-gray-400 uppercase tracking-wide text-xs mb-2">
                                     Sessions ({t.sessions.length}) - exact date &amp; time
                                   </p>
-                                  <SessionsTable sessions={t.sessions} withLabel="Student" />
+                                  <SessionsTable sessions={t.sessions} withLabel="Student" onReview={setReviewSession} />
                                 </div>
                               </td>
                             </tr>
@@ -809,6 +865,84 @@ export default function AdminDashboardPage() {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Payment proof review modal */}
+      <AnimatePresence>
+        {reviewSession && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setReviewSession(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-900">Review Payment Proof</h3>
+                <button onClick={() => setReviewSession(null)} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="px-6 py-5 space-y-4">
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-xs text-gray-400">Amount</p>
+                    <p className="font-semibold text-gray-900">£{reviewSession.price.toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Current status</p>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${paymentBadgeClasses(reviewSession.paymentStatus)}`}>
+                      {reviewSession.paymentStatus}
+                    </span>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-xs text-gray-400">Reference / payer</p>
+                    <p className="text-gray-700">{reviewSession.paymentReference || '—'}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-xs text-gray-400">Submitted</p>
+                    <p className="text-gray-700">{formatDateTime(reviewSession.paymentSubmittedAt || undefined)}</p>
+                  </div>
+                </div>
+
+                {reviewSession.paymentProof ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={reviewSession.paymentProof}
+                    alt="Payment proof screenshot"
+                    className="w-full max-h-80 object-contain border border-gray-200 rounded-lg bg-gray-50"
+                  />
+                ) : (
+                  <p className="text-sm text-gray-500">No screenshot was attached.</p>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => handlePaymentDecision('rejected')}
+                    disabled={isReviewing}
+                    className="flex-1 px-4 py-2 border border-red-300 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 disabled:opacity-50"
+                  >
+                    Reject
+                  </button>
+                  <button
+                    onClick={() => handlePaymentDecision('paid')}
+                    disabled={isReviewing}
+                    className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                  >
+                    {isReviewing ? 'Saving...' : 'Mark as Paid'}
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}

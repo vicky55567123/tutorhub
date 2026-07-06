@@ -14,7 +14,7 @@ import {
   GlobeAltIcon,
 } from '@heroicons/react/24/outline'
 import { useAuth } from '@/components/AuthContext'
-import SessionPaymentModal from '@/components/SessionPaymentModal'
+import SessionPaymentModal, { PaymentProofData } from '@/components/SessionPaymentModal'
 import { isSupabaseConfigured, dbOperations, UserProfile, TutorAvailability } from '@/lib/supabase'
 import {
   COMMON_TIMEZONES,
@@ -236,7 +236,7 @@ export default function BookSessionPage() {
     }
   }
 
-  const submitBooking = async (paymentConfirmed: boolean) => {
+  const submitBooking = async (paymentConfirmed: boolean, proof?: PaymentProofData) => {
     if (!user || !selectedTutor || !selectedSlot) return
 
     const finalSubject = (subject === '__other__' ? customSubject : subject).trim()
@@ -268,6 +268,9 @@ export default function BookSessionPage() {
           studentEmail: user.email,
           isTrial: sessionType === 'trial',
           paymentConfirmed,
+          payerName: proof?.payerName || null,
+          paymentReference: proof?.reference || null,
+          paymentProof: proof?.screenshotDataUrl || null,
         }),
       })
 
@@ -278,7 +281,7 @@ export default function BookSessionPage() {
         toast.success(
           sessionType === 'trial'
             ? 'Free trial booked! Check your email for the Google Meet invite.'
-            : 'Session booked! Check your email for the Google Meet invite.'
+            : 'Session booked! Your payment is pending admin verification - check your email for the Google Meet invite.'
         )
         setSelectedSlot(null)
         setSubject('')
@@ -708,7 +711,7 @@ export default function BookSessionPage() {
           amount={computedPrice ?? 0}
           description={`${effectiveDuration}-minute session with ${selectedTutor.full_name}`}
           onClose={() => setIsPaymentModalOpen(false)}
-          onSuccess={() => submitBooking(true)}
+          onSuccess={(proof) => submitBooking(true, proof)}
         />
       )}
     </div>

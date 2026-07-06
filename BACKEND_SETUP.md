@@ -196,28 +196,46 @@ rules, enforced server-side in [src/app/api/bookings/route.ts](src/app/api/booki
 
 - **Paid session**: price = the tutor's `hourly_rate` × session length. The
   student sees the price on **Book a Session**, clicks "Pay & Book", and a
-  demo checkout modal ([src/components/SessionPaymentModal.tsx](src/components/SessionPaymentModal.tsx))
-  collects card details (client-side format validation only - no real card
-  processor is wired up yet; Stripe integration is still on the roadmap).
-  Once "paid", the booking API is called again with `paymentConfirmed: true`
-  and the booking is created with `payment_status = 'paid'` and the
-  calculated `price`. If a tutor hasn't set an `hourly_rate` yet, paid
-  booking is disabled for them until an admin or the tutor sets one.
-- **Free trial**: fixed at **20 minutes**, `price = 0`,
-  `payment_status = 'free'`, `is_trial = true`. A student can only ever book
-  **one** trial - the API checks by the student's **account email** (via the
-  service-role client, across all their bookings, not just what RLS would
-  normally let them see) and rejects a second trial attempt with a 409 error
-  telling them to book a paid session instead.
-- Both the price and payment status are visible to admins for every session
-  in the Admin Dashboard (see section 10), including total revenue collected
-  and how many free trials have been used platform-wide.
+  bank-transfer modal ([src/components/SessionPaymentModal.tsx](src/components/SessionPaymentModal.tsx))
+  opens in two steps:
+  1. **Bank details** - shows the fixed account to transfer into (name,
+     account number, sort code - edit the `BANK_DETAILS` constant at the top
+     of that file to change them) and the exact amount due.
+  2. **Proof of payment** - after clicking "I've Paid", the student enters
+     their name (and optionally a transaction reference) and uploads a
+     screenshot of the completed transfer. The image is compressed
+     client-side and stored inline as a base64 data URL (no separate file
+     storage bucket is needed).
 
-If you already have a `bookings` table from before this feature, run
-[database/booking_payments_and_trial.sql](database/booking_payments_and_trial.sql)
-in the Supabase SQL Editor to add the missing columns.
+  The booking is created immediately (so the slot is held) with
+  `payment_status = 'pending'` until an admin reviews the screenshot. In the
+  Admin Dashboard, any session with a submitted proof shows an eye icon next
+  to its payment badge - click it to view the screenshot full-size and
+  either **Mark as Paid** or **Reject**. A "Pending Payments" stat card shows
+  how many are awaiting review. If a tutor hasn't set an `hourly_rate` yet,
+  paid booking is disabled for them until an admin or the tutor sets one.
+- **Free trial**: fixed at **20 minutes**, `price = 0`,
+  `payment_status = 'free'`, `is_trial = true` - no proof/review needed. A
+  student can only ever book **one** trial - the API checks by the student's
+  **account email** (via the service-role client, across all their
+  bookings, not just what RLS would normally let them see) and rejects a
+  second trial attempt with a 409 error telling them to book a paid session
+  instead.
+- Both the price and payment status (including `pending`/`rejected`) are
+  visible to admins for every session in the Admin Dashboard (see section
+  10), including total revenue collected (only counts `paid`, not
+  `pending`) and how many free trials have been used platform-wide.
+
+If you already have a `bookings` table from before this feature, run, in
+order:
+1. [database/booking_payments_and_trial.sql](database/booking_payments_and_trial.sql) -
+   adds `is_trial`, `price`, `payment_status`.
+2. [database/bank_transfer_payment_proof.sql](database/bank_transfer_payment_proof.sql) -
+   adds `payment_reference`, `payment_proof`, `payment_submitted_at`, and
+   widens `payment_status` to allow `pending`/`rejected`.
 
 ---
+
 
 ### Troubleshooting
 
@@ -237,6 +255,10 @@ in the Supabase SQL Editor to add the missing columns.
   they must be run manually once in the Supabase SQL Editor). The admin
   dashboard now detects this and shows a "Database update needed" screen with
   the exact SQL to paste; run it once and refresh.
+- **"column bookings.payment_reference/payment_proof does not exist"** - run
+  [database/bank_transfer_payment_proof.sql](database/bank_transfer_payment_proof.sql)
+  in the Supabase SQL Editor (adds the bank-transfer proof columns and
+  widens `payment_status` to allow `pending`/`rejected`).
 - **"Payment is required before this session can be booked"** - the student
   tried to book a paid session without completing the checkout step; this is
   expected and enforced server-side in `/api/bookings` (see section 11).

@@ -61,16 +61,22 @@ export async function GET(request: NextRequest) {
 
 // POST /api/bookings - student books a session with a tutor.
 // Body: { tutorId, title, subject, description, startTime (ISO), durationMinutes,
-//         tutorEmail, studentEmail, isTrial?, paymentConfirmed? }
+//         tutorEmail, studentEmail, isTrial?, paymentConfirmed?, payerName?,
+//         paymentReference?, paymentProof? }
 //
-// Payment rules:
+// Payment rules (manual bank transfer, no card processor):
 //   - isTrial=true: forced to a fixed 20-minute, free (£0) session. Only
 //     allowed once per student email - checked across ALL accounts via the
 //     service-role client, not just the caller's own bookings (which RLS
 //     would otherwise limit them to).
-//   - isTrial=false (default): price = tutor's hourly_rate * duration, and
-//     the request must include paymentConfirmed=true (set after the student
-//     completes the checkout step client-side) or it's rejected with 402.
+//   - isTrial=false (default): price = tutor's hourly_rate * duration. The
+//     student transfers this amount to a fixed bank account shown client-
+//     side, then submits paymentConfirmed=true plus a payerName/reference
+//     and a paymentProof screenshot (base64 data URL). Missing confirmation
+//     is rejected with 402; missing proof is rejected with 400. When
+//     accepted the booking is created immediately with payment_status =
+//     'pending' - an admin must review the screenshot in the Admin
+//     Dashboard and mark it 'paid' or 'rejected' afterwards.
 export async function POST(request: NextRequest) {
   const auth = await requireUser(request)
   if ('error' in auth) return auth.error
@@ -88,6 +94,9 @@ export async function POST(request: NextRequest) {
     studentEmail,
     isTrial = false,
     paymentConfirmed = false,
+    payerName,
+    paymentReference,
+    paymentProof,
   } = body
 
   if (!tutorId || !title || !startTime) {
@@ -141,7 +150,7 @@ export async function POST(request: NextRequest) {
   }
 
   let price = 0
-  let paymentStatus: 'paid' | 'free' = 'free'
+  let paymentStatus: 'pending' | 'free' = 'free'
 
   if (isTrial) {
     // A student may book exactly one free trial. We check by account EMAIL
@@ -208,7 +217,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    paymentStatus = 'paid'
+    if (!paymentProof) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Please attach a screenshot of your bank transfer as proof of payment.',
+          requiresPayment: true,
+          price,
+          currency: 'GBP',
+        },
+        { status: 400 }
+      )
+    }
+
+    // The booking is created straight away so the slot is held, but the
+    // payment itself stays 'pending' until an admin reviews the uploaded
+    // screenshot in the Admin Dashboard and marks it paid/rejected.
+    paymentStatus = 'pending'
   }
 
   const url = new URL(request.url)
@@ -258,6 +283,11 @@ export async function POST(request: NextRequest) {
       is_trial: isTrial,
       price,
       payment_status: paymentStatus,
+      payment_reference: isTrial
+        ? null
+        : [payerName, paymentReference].filter(Boolean).join(' - ') || null,
+      payment_proof: isTrial ? null : paymentProof || null,
+      payment_submitted_at: isTrial ? null : new Date().toISOString(),
       google_event_id: meetResult.eventId,
       meeting_url: meetResult.meetingUrl,
       calendar_link: meetResult.calendarLink,

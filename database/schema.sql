@@ -124,12 +124,17 @@ create table if not exists public.bookings (
   status text not null default 'scheduled'
     check (status in ('scheduled', 'confirmed', 'in-progress', 'completed', 'cancelled')),
 
-  -- Payments: a session is only bookable once payment_status is 'paid' (via
-  -- Stripe/checkout in the future) or 'free' (the student's one-time trial).
+  -- Payments: manual bank transfer. A session is bookable once the student
+  -- submits proof of transfer (payment_status = 'pending'); an admin then
+  -- reviews the screenshot and marks it 'paid' or 'rejected'. Free trials
+  -- get 'free' immediately with no review needed.
   is_trial boolean not null default false,
   price numeric(10, 2) not null default 0,
   payment_status text not null default 'unpaid'
-    check (payment_status in ('unpaid', 'paid', 'free')),
+    check (payment_status in ('unpaid', 'pending', 'paid', 'free', 'rejected')),
+  payment_reference text,
+  payment_proof text,
+  payment_submitted_at timestamptz,
 
   -- Google Meet / Calendar metadata
   google_event_id text unique,

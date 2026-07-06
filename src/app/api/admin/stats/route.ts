@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     admin
       .from('bookings')
       .select(
-        'id, student_id, tutor_id, subject, title, duration_minutes, status, start_time, end_time, is_trial, price, payment_status'
+        'id, student_id, tutor_id, subject, title, duration_minutes, status, start_time, end_time, is_trial, price, payment_status, payment_reference, payment_proof, payment_submitted_at'
       ),
   ])
 
@@ -102,6 +102,9 @@ export async function GET(request: NextRequest) {
             isTrial: !!b.is_trial,
             price: Number(b.price) || 0,
             paymentStatus: b.payment_status,
+            paymentReference: b.payment_reference || null,
+            paymentProof: b.payment_proof || null,
+            paymentSubmittedAt: b.payment_submitted_at || null,
           }
         })
         .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
@@ -161,6 +164,9 @@ export async function GET(request: NextRequest) {
             isTrial: !!b.is_trial,
             price: Number(b.price) || 0,
             paymentStatus: b.payment_status,
+            paymentReference: b.payment_reference || null,
+            paymentProof: b.payment_proof || null,
+            paymentSubmittedAt: b.payment_submitted_at || null,
           }
         })
         .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
@@ -194,6 +200,7 @@ export async function GET(request: NextRequest) {
     0
   )
   const totalTrials = allBookings.filter((b) => b.is_trial && b.status !== 'cancelled').length
+  const pendingPayments = allBookings.filter((b) => b.payment_status === 'pending').length
 
   return NextResponse.json({
     success: true,
@@ -204,6 +211,7 @@ export async function GET(request: NextRequest) {
       upcomingSessions,
       totalRevenue: Math.round(totalRevenue * 100) / 100,
       totalTrials,
+      pendingPayments,
     },
     students,
     tutors,
