@@ -283,7 +283,7 @@ export default function CoursePage({ params }: CoursePageProps) {
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">What You&apos;ll Learn</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {course.skills.map((skill, index) => (
+                      {(course.skills || []).map((skill, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <CheckCircleIcon className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
                           <span className="text-gray-600">{skill}</span>
@@ -295,7 +295,7 @@ export default function CoursePage({ params }: CoursePageProps) {
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">Learning Outcomes</h3>
                     <div className="space-y-2">
-                      {course.outcomes.map((outcome, index) => (
+                      {(course.outcomes || []).map((outcome, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <CheckCircleIcon className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
                           <span className="text-gray-600">{outcome}</span>
@@ -314,7 +314,7 @@ export default function CoursePage({ params }: CoursePageProps) {
                 >
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Course Curriculum</h2>
                   <div className="space-y-4">
-                    {course.modules.map((module, index) => {
+                    {(course.modules || []).map((module, index) => {
                       const subtopicUrl = moduleToSubtopicUrl(module)
                       return (
                         <Link 
@@ -390,7 +390,7 @@ export default function CoursePage({ params }: CoursePageProps) {
               <div className="bg-white border border-gray-200 rounded-lg p-6 sticky top-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Course Requirements</h3>
                 <div className="space-y-2">
-                  {course.requirements.map((requirement, index) => (
+                  {(course.requirements || []).map((requirement, index) => (
                     <div key={index} className="flex items-start gap-2">
                       <CheckCircleIcon className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
                       <span className="text-sm text-gray-600">{requirement}</span>
