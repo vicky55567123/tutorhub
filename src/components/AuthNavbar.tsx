@@ -71,49 +71,25 @@ export default function AuthNavbar() {
         transition={{ duration: 0.5 }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="flex-shrink-0">
-                <motion.div 
-                  className="flex items-center space-x-2"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <div className="w-8 h-8 bg-gradient-to-br from-primary-600 via-secondary-600 to-accent-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">A</span>
-                  </div>
-                  <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                      Ahmed Tutors
-                  </span>
-                </motion.div>
-              </Link>
-              
-              {/* Desktop Navigation */}
-              <div className="hidden md:ml-8 md:flex md:space-x-8">
-                {navigationItems.map((item, index) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className="group relative text-gray-700 hover:text-primary-600 px-3 py-2 text-base font-bold transition-all duration-200 whitespace-nowrap"
-                  >
-                    {item.name}
-                    <motion.span
-                      className={`absolute bottom-0 left-0 w-full h-0.5 origin-left ${
-                        index === 0 ? 'bg-gradient-to-r from-primary-600 to-secondary-600' :
-                        index === 1 ? 'bg-gradient-to-r from-secondary-600 to-accent-600' :
-                        'bg-gradient-to-r from-accent-600 to-primary-600'
-                      }`}
-                      initial={{ scaleX: 0 }}
-                      whileHover={{ scaleX: 1 }}
-                      transition={{ duration: 0.2 }}
-                    />
-                  </Link>
-                ))}
-              </div>
-            </div>
+          {/* Row 1: logo + auth section - always fits, never clipped */}
+          <div className="flex items-center justify-between h-16 gap-2">
+            <Link href="/" className="flex-shrink-0">
+              <motion.div 
+                className="flex items-center space-x-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <div className="w-8 h-8 bg-gradient-to-br from-primary-600 via-secondary-600 to-accent-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">A</span>
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                    Ahmed Tutors
+                </span>
+              </motion.div>
+            </Link>
 
-            {/* Desktop Auth Section */}
-            <div className="hidden md:flex items-center space-x-4">
+            {/* Auth Section - always visible, even on narrow/mobile screens */}
+            <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
               {user ? (
                 <UserProfileDropdown user={user} onLogout={logout} />
               ) : (
@@ -122,7 +98,7 @@ export default function AuthNavbar() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleOpenLogin}
-                    className="text-gray-700 hover:text-primary-600 px-4 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-primary-50"
+                    className="text-gray-700 hover:text-primary-600 px-2 sm:px-4 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-primary-50 whitespace-nowrap"
                   >
                     Login
                   </motion.button>
@@ -130,20 +106,20 @@ export default function AuthNavbar() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleOpenSignup}
-                    className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-6 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                    className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white px-3 sm:px-6 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl whitespace-nowrap"
                   >
                     Sign Up
                   </motion.button>
                 </>
               )}
-            </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
+              {/* Menu button - toggles the nav links drawer below the xl
+                  breakpoint (covers mobile, tablet and small laptop widths) */}
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="text-gray-700 hover:text-primary-600 p-2"
+                className="xl:hidden text-gray-700 hover:text-primary-600 p-2"
+                aria-label="Toggle navigation menu"
               >
                 {isMobileMenuOpen ? (
                   <XMarkIcon className="h-6 w-6" />
@@ -153,9 +129,34 @@ export default function AuthNavbar() {
               </motion.button>
             </div>
           </div>
+
+          {/* Row 2: full nav links - only shown once there's enough width
+              (xl+) for every item to fit on one line without clipping or
+              relying on an invisible/undiscoverable horizontal scroll. */}
+          <div className="hidden xl:flex items-center justify-center gap-4 h-12 border-t border-gray-100">
+            {navigationItems.map((item, index) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="group relative text-gray-700 hover:text-primary-600 px-2 py-2 text-sm font-bold transition-all duration-200 whitespace-nowrap"
+              >
+                {item.name}
+                <motion.span
+                  className={`absolute bottom-0 left-0 w-full h-0.5 origin-left ${
+                    index === 0 ? 'bg-gradient-to-r from-primary-600 to-secondary-600' :
+                    index === 1 ? 'bg-gradient-to-r from-secondary-600 to-accent-600' :
+                    'bg-gradient-to-r from-accent-600 to-primary-600'
+                  }`}
+                  initial={{ scaleX: 0 }}
+                  whileHover={{ scaleX: 1 }}
+                  transition={{ duration: 0.2 }}
+                />
+              </Link>
+            ))}
+          </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile / Tablet Menu (below xl) - contains all nav links */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
@@ -163,7 +164,7 @@ export default function AuthNavbar() {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="md:hidden bg-white border-t border-gray-200"
+              className="xl:hidden bg-white border-t border-gray-200"
             >
               <div className="px-4 py-4 space-y-3">
                 {navigationItems.map((item, index) => (

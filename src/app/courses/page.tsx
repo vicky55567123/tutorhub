@@ -5,138 +5,23 @@ import { motion } from 'framer-motion'
 import CourseCard from '@/components/CourseCard'
 import { LoadingCard } from '@/components/LoadingSpinner'
 import toast from 'react-hot-toast'
+import { courses as sharedCourses, courseImageUrl } from '@/lib/coursesData'
 
-const courses = [
-  // GCSE Courses
-  {
-    id: 1,
-    title: 'GCSE Mathematics (Grades 4-9)',
-    description: 'Complete GCSE Maths preparation covering Number, Algebra, Geometry, Statistics and Probability.',
-    price: '£35/hour',
-    rating: 4.9,
-    students: 250,
-    image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=300&fit=crop',
-    category: 'GCSE',
-    subject: 'Mathematics',
-    duration: '20 weeks',
-    level: 'GCSE',
-    instructor: 'Dr. Sarah Johnson',
-    examBoard: 'AQA, Edexcel, OCR'
-  },
-  {
-    id: 2,
-    title: 'GCSE Physics (Grades 4-9)',
-    description: 'Master GCSE Physics topics including Forces, Energy, Waves, Electricity and Particle Physics.',
-    price: '£40/hour',
-    rating: 4.8,
-    students: 180,
-    image: 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?w=400&h=300&fit=crop',
-    category: 'GCSE',
-    subject: 'Physics',
-    duration: '20 weeks',
-    level: 'GCSE',
-    instructor: 'Prof. David Wilson',
-    examBoard: 'AQA, Edexcel, OCR'
-  },
-  {
-    id: 3,
-    title: 'GCSE Chemistry (Grades 4-9)',
-    description: 'Comprehensive GCSE Chemistry covering Atomic Structure, Bonding, Chemical Reactions and Analysis.',
-    price: '£38/hour',
-    rating: 4.9,
-    students: 160,
-    image: 'https://images.unsplash.com/photo-1554475901-4538ddfbccc2?w=400&h=300&fit=crop',
-    category: 'GCSE',
-    subject: 'Chemistry',
-    duration: '20 weeks',
-    level: 'GCSE',
-    instructor: 'Dr. Emma Thompson',
-    examBoard: 'AQA, Edexcel, OCR'
-  },
-  {
-    id: 4,
-    title: 'GCSE Biology (Grades 4-9)',
-    description: 'GCSE Biology essentials: Cell Biology, Human Biology, Genetics, Evolution and Ecology.',
-    price: '£36/hour',
-    rating: 4.7,
-    students: 200,
-    image: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=400&h=300&fit=crop',
-    category: 'GCSE',
-    subject: 'Biology',
-    duration: '20 weeks',
-    level: 'GCSE',
-    instructor: 'Dr. Michael Roberts',
-    examBoard: 'AQA, Edexcel, OCR'
-  },
-  {
-    id: 5,
-    title: 'GCSE Computer Science (Grades 4-9)',
-    description: 'GCSE Computer Science: Programming, Algorithms, Data Structures and Computer Systems.',
-    price: '£42/hour',
-    rating: 4.8,
-    students: 140,
-    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=300&fit=crop',
-    category: 'GCSE',
-    subject: 'Computer Science',
-    duration: '20 weeks',
-    level: 'GCSE',
-    instructor: 'Mr. James Chen',
-    examBoard: 'AQA, Edexcel, OCR'
-  },
-  // Additional Courses
-  {
-    id: 6,
-    title: 'Advanced Mathematics',
-    description: 'Master calculus, algebra, and advanced mathematical concepts with expert guidance.',
-    price: '$50/hour',
-    rating: 4.9,
-    students: 150,
-    image: 'https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?w=400&h=300&fit=crop',
-    category: 'Mathematics',
-    duration: '12 weeks',
-    level: 'Advanced',
-    instructor: 'Dr. Sarah Johnson'
-  },
-  {
-    id: 7,
-    title: 'Computer Science Fundamentals',
-    description: 'Learn programming, algorithms, and computer science principles from industry experts.',
-    price: '$60/hour',
-    rating: 4.8,
-    students: 200,
-    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=300&fit=crop',
-    category: 'Programming',
-    duration: '16 weeks',
-    level: 'Beginner',
-    instructor: 'Prof. Michael Chen'
-  },
-  {
-    id: 8,
-    title: 'English Literature & Writing',
-    description: 'Improve your writing skills and explore classic and modern literature.',
-    price: '$45/hour',
-    rating: 4.7,
-    students: 120,
-    image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=300&fit=crop',
-    category: 'English',
-    duration: '10 weeks',
-    level: 'Intermediate',
-    instructor: 'Abdul Hanan'
-  },
-  {
-    id: 9,
-    title: 'Physics & Chemistry',
-    description: 'Understand the fundamental principles of physics and chemistry with hands-on examples.',
-    price: '$55/hour',
-    rating: 4.8,
-    students: 90,
-    image: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=400&h=300&fit=crop',
-    category: 'Science',
-    duration: '14 weeks',
-    level: 'Intermediate',
-    instructor: 'Dr. James Wilson'
-  }
-]
+const courses = sharedCourses.map((c) => ({
+  id: c.id,
+  title: c.title,
+  description: c.description,
+  price: c.price,
+  rating: c.rating,
+  students: c.students,
+  image: courseImageUrl(c.imageId, { w: 400, h: 300 }),
+  category: c.category,
+  subject: c.subject,
+  duration: c.duration,
+  level: c.level,
+  instructor: c.instructor,
+  examBoard: c.examBoard,
+}))
 
 const categories = [
   { name: 'All', color: 'from-gray-500 to-gray-600', icon: '📚' },

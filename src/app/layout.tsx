@@ -5,7 +5,7 @@ import TopMenu from '@/components/TopMenu'
 import AuthNavbar from '@/components/AuthNavbar'
 import SidebarNavigation from '@/components/SidebarNavigation'
 import Footer from '@/components/Footer'
-import BookingFormSection from '@/components/BookingFormSection'
+import ConditionalBookingSection from '@/components/ConditionalBookingSection'
 import ToastProvider from '@/components/ToastProvider'
 import WhatsAppFloatingButton from '@/components/WhatsAppFloatingButton'
 import { AuthProvider } from '@/components/AuthContext'
@@ -37,7 +37,7 @@ export default function RootLayout({
                 <main className="flex-grow">
                   {children}
                 </main>
-                <BookingFormSection />
+                <ConditionalBookingSection />
                 <Footer />
               </div>
             </div>

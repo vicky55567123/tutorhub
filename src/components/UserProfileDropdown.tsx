@@ -66,7 +66,7 @@ export default function UserProfileDropdown({ user, onLogout }: UserProfileDropd
   }
 
   return (
-    <Menu as="div" className="relative inline-block text-left">
+    <Menu as="div" className="relative z-50 inline-block text-left">
       <div>
         <Menu.Button className="flex items-center space-x-2 text-gray-700 hover:text-primary-600 transition-colors">
           <motion.div
@@ -91,7 +91,7 @@ export default function UserProfileDropdown({ user, onLogout }: UserProfileDropd
             ) : (
               <UserCircleIcon className="h-8 w-8" />
             )}
-            <span className="hidden md:block font-medium">{user.name}</span>
+            <span className="hidden lg:block font-medium max-w-[140px] truncate">{user.name}</span>
             <ChevronDownIcon className="h-4 w-4 text-gray-400" />
           </motion.div>
         </Menu.Button>
@@ -106,7 +106,7 @@ export default function UserProfileDropdown({ user, onLogout }: UserProfileDropd
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="absolute right-0 z-50 mt-2 w-56 origin-top-right bg-white rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-2">
             {/* User Info */}
             <div className="px-4 py-3 border-b border-gray-100">

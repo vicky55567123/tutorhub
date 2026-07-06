@@ -1,0 +1,141 @@
+# Backend Setup Guide - Real Accounts, Availability & Google Meet Booking
+
+This document explains how to turn on the real backend that was added for:
+
+1. Persistent **student** and **tutor** accounts (sign up / login)
+2. Tutors setting their **weekly availability**
+3. Students **booking a session** with a tutor (with double-booking prevention)
+4. Automatic **Google Meet** creation for every confirmed booking
+
+Everything is built on [Supabase](https://supabase.com) (a hosted Postgres +
+Auth + instant REST API) so you don't need to run your own database server.
+
+---
+
+## 1. Create a Supabase project
+
+1. Go to https://supabase.com and create a free project.
+2. Open **Project Settings -> API** and copy:
+   - `Project URL`
+   - `anon public` key
+   - `service_role` key (keep this secret!)
+3. Open the **SQL Editor** in Supabase, paste the entire contents of
+   [database/schema.sql](database/schema.sql) and run it. This creates:
+   - `profiles` - one row per user (student, tutor or admin), auto-created
+     whenever someone signs up via Supabase Auth
+   - `tutor_availability` - weekly recurring slots (or one-off dates) that a
+     tutor is free to teach
+   - `bookings` - a confirmed session between a student and a tutor, with the
+     Google Meet link attached
+   - Row Level Security policies so users can only see/edit their own data
+   - A `get_tutor_busy_slots()` function so students can see which times are
+     taken without exposing other students' private booking details
+
+## 2. Configure environment variables
+
+Copy [.env.example](.env.example) to `.env.local` and fill in:
+
+```dotenv
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+```
+
+Once these three are set, the app automatically switches from the old
+localStorage demo database to real, persisted Supabase accounts - no code
+changes needed (see `isSupabaseConfigured` in [src/lib/supabase.ts](src/lib/supabase.ts)).
+
+## 3. Enable email/password sign-in in Supabase
+
+Supabase Auth has email/password enabled by default. For local development,
+it's easiest to turn OFF "Confirm email" so accounts are usable immediately:
+
+**Authentication -> Providers -> Email -> disable "Confirm email"**
+(re-enable this in production and configure a custom SMTP sender).
+
+## 4. (Optional) Enable Google sign-in via Supabase
+
+If you want students/tutors to sign in with Google directly through Supabase
+(recommended, replaces the old NextAuth Google popup once configured):
+
+1. **Authentication -> Providers -> Google** in Supabase, toggle it on.
+2. Create OAuth credentials in Google Cloud Console and paste the Client ID /
+   Secret into Supabase.
+3. Add the Supabase-provided redirect URL to your Google OAuth app's
+   "Authorized redirect URIs".
+
+If you skip this step, the app automatically falls back to the existing
+NextAuth Google/Facebook/GitHub login (see `AuthContext.tsx`), but those users
+won't have a `profiles` row and therefore can't book sessions or set
+availability until Supabase auth is configured.
+
+## 5. Configure the Google Meet "booking calendar" account
+
+All Google Meet links are created on a single Google account (this is much
+simpler than asking every tutor to connect their own calendar). This part was
+already scaffolded in the project:
+
+1. Set `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` in `.env.local` (see
+   [GOOGLE_MEET_SETUP.md](GOOGLE_MEET_SETUP.md) / [GOOGLE_CALENDAR_API_SETUP.md](GOOGLE_CALENDAR_API_SETUP.md)
+   for full Google Cloud Console instructions).
+2. Start the app and visit `/api/auth/google/authorize` once, logged in as an
+   admin, to grant Calendar access and generate a refresh token.
+3. Copy the resulting `GOOGLE_REFRESH_TOKEN` into `.env.local`.
+
+Once this is done, every booking created through `/api/bookings` will:
+- create a Google Calendar event with a Google Meet link,
+- email both the student and tutor an invite,
+- store the `google_event_id`, `meeting_url` and `calendar_link` on the
+  booking row.
+
+## 6. How the pieces fit together
+
+| Feature | Where |
+|---|---|
+| Sign up / log in | [src/components/AuthContext.tsx](src/components/AuthContext.tsx), [src/components/SignupModal.tsx](src/components/SignupModal.tsx), [src/components/LoginModal.tsx](src/components/LoginModal.tsx) |
+| Tutor directory | `GET` [src/app/api/tutors/route.ts](src/app/api/tutors/route.ts) |
+| Tutor sets availability | [src/app/tutor/availability/page.tsx](src/app/tutor/availability/page.tsx) -> [src/app/api/availability/route.ts](src/app/api/availability/route.ts) |
+| Student books a session | [src/app/book-session/page.tsx](src/app/book-session/page.tsx) -> [src/app/api/bookings/route.ts](src/app/api/bookings/route.ts) |
+| Google Meet creation | [src/lib/googleMeet.ts](src/lib/googleMeet.ts) |
+| Dashboard upcoming sessions | [src/app/dashboard/page.tsx](src/app/dashboard/page.tsx) |
+
+## 7. Booking flow in detail
+
+1. Student opens **Book a Session**, picks a tutor.
+2. The page loads that tutor's weekly availability plus their already-booked
+   time ranges (via the `get_tutor_busy_slots` RPC) and computes free slots
+   for the next 14 days.
+3. Student picks a slot and confirms. The client calls
+   `POST /api/bookings` with their Supabase access token in the
+   `Authorization: Bearer` header.
+4. The API route:
+   - re-checks the tutor has no overlapping booking (defense in depth),
+   - creates the Google Calendar event + Meet link,
+   - inserts the `bookings` row (a Postgres trigger also rejects overlapping
+     bookings at the database level, so double-booking is impossible even
+     under concurrent requests),
+   - rolls back (deletes) the Google Calendar event if the insert fails.
+5. Both dashboards (student & tutor) show the session under **Upcoming
+   Sessions** with a **Join Meeting** button and a **Cancel** button.
+
+## 8. Tutor sign-up
+
+Tutors sign up exactly like students, just choosing "Tutor" in the sign-up
+modal. New tutor profiles start with `is_approved = false` - flip this to
+`true` (e.g. via the Supabase Table Editor) for tutors you've vetted, or wire
+up an admin approval screen later. `hourly_rate`, `subjects`, `bio` etc. can
+be filled in via `profiles` for now (a dedicated tutor-profile-editing UI can
+be added next).
+
+---
+
+### Troubleshooting
+
+- **"Backend not configured" message** - `NEXT_PUBLIC_SUPABASE_URL` /
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY` are missing from `.env.local` (restart `npm
+  run dev` after adding them).
+- **Booking fails with a Google error** - visit `/api/auth/google/authorize`
+  again to refresh `GOOGLE_REFRESH_TOKEN`.
+- **New tutor doesn't show up in Book a Session** - the tutors list only
+  returns rows where `user_type = 'tutor'`; check the `profiles` table in
+  Supabase.

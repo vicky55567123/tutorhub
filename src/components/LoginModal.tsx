@@ -46,9 +46,20 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup }: LoginM
       
     } catch (error: any) {
       setIsLoading(false)
-      const errorMessage = error.message === 'Invalid email or password' 
-        ? 'Invalid email or password. Please check your credentials.'
-        : 'Failed to sign in. Please try again.'
+      const rawMessage: string = error?.message || ''
+      let errorMessage = rawMessage || 'Failed to sign in. Please try again.'
+
+      if (rawMessage === 'Invalid email or password' || rawMessage.toLowerCase().includes('invalid login')) {
+        errorMessage = 'Invalid email or password. Please check your credentials.'
+      } else if (rawMessage.toLowerCase().includes('email not confirmed')) {
+        errorMessage = 'Please confirm your email address first. Check your inbox for the confirmation link.'
+      } else if (rawMessage.toLowerCase().includes('rate limit') || rawMessage.toLowerCase().includes('429')) {
+        errorMessage = 'Too many attempts. Please wait a minute and try again.'
+      } else if (rawMessage.toLowerCase().includes('supabase not configured')) {
+        errorMessage = 'The backend is not configured yet. Please contact the site admin.'
+      }
+
+      console.error('Login error:', error)
       toast.error(errorMessage)
     }
   }

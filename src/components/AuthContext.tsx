@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
-import { localStorageDB, UserProfile } from '../lib/supabase'
+import { supabase, isSupabaseConfigured, authOperations, dbOperations, localStorageDB, UserProfile } from '../lib/supabase'
 
 interface User {
   id: string
@@ -27,16 +27,98 @@ interface AuthContextType {
   isLoading: boolean
   signInWithGoogle: () => Promise<void>
   signInWithFacebook: () => Promise<void>
+  getAccessToken: () => Promise<string | null>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+// Convert a Supabase profile row into the shape the rest of the app expects
+const profileToUser = (profile: UserProfile): User => ({
+  id: profile.id,
+  name: profile.full_name,
+  email: profile.email,
+  avatar: profile.avatar_url,
+  type: (profile.user_type === 'tutor' ? 'tutor' : 'student'),
+})
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const { data: session, status } = useSession()
 
+  // ---------------------------------------------------------------------
+  // Real Supabase Auth (email/password + Google OAuth) - primary path once
+  // NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY are configured.
+  // ---------------------------------------------------------------------
   useEffect(() => {
+    if (!isSupabaseConfigured || !supabase) return
+
+    let isMounted = true
+
+    const loadFromSession = async (supabaseUserId: string, fallback?: { email?: string; name?: string; avatar?: string }) => {
+      try {
+        let profile = await dbOperations.getProfile(supabaseUserId)
+        if (!profile && fallback?.email) {
+          // Profile row hasn't been created by the DB trigger yet (edge case) - create it now
+          profile = await dbOperations.upsertProfile({
+            id: supabaseUserId,
+            email: fallback.email,
+            full_name: fallback.name || fallback.email,
+            user_type: 'student',
+            avatar_url: fallback.avatar,
+          })
+        }
+        if (profile && isMounted) {
+          const u = profileToUser(profile)
+          setUser(u)
+          localStorage.setItem('current_user', JSON.stringify(u))
+        }
+      } catch (error) {
+        console.error('Error loading Supabase profile:', error)
+      } finally {
+        if (isMounted) setIsLoading(false)
+      }
+    }
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user) {
+        loadFromSession(data.session.user.id, {
+          email: data.session.user.email || undefined,
+          name: (data.session.user.user_metadata as any)?.full_name,
+          avatar: (data.session.user.user_metadata as any)?.avatar_url,
+        })
+      } else {
+        setIsLoading(false)
+      }
+    })
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      if (newSession?.user) {
+        setIsLoading(true)
+        loadFromSession(newSession.user.id, {
+          email: newSession.user.email || undefined,
+          name: (newSession.user.user_metadata as any)?.full_name,
+          avatar: (newSession.user.user_metadata as any)?.avatar_url,
+        })
+      } else {
+        setUser(null)
+        localStorage.removeItem('current_user')
+      }
+    })
+
+    return () => {
+      isMounted = false
+      listener.subscription.unsubscribe()
+    }
+  }, [])
+
+  // ---------------------------------------------------------------------
+  // Legacy fallback path: NextAuth session (Google/Facebook/GitHub) and the
+  // localStorage demo database. Only used when Supabase isn't configured.
+  // ---------------------------------------------------------------------
+  useEffect(() => {
+    if (isSupabaseConfigured) return // Supabase effect above takes over
+
     if (status === 'loading') {
       setIsLoading(true)
       return
@@ -53,8 +135,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         type: sessionUser.userType || 'student'
       }
       setUser(nextAuthUser)
-      
-      // Also save to localStorage for consistency
       localStorage.setItem('current_user', JSON.stringify(nextAuthUser))
     } else {
       // Check localStorage for regular email/password users
@@ -62,7 +142,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (storedUser) {
         try {
           const parsedUser = JSON.parse(storedUser)
-          // Only use localStorage user if it's not from OAuth (has no image)
           if (!parsedUser.avatar || !parsedUser.avatar.includes('googleusercontent')) {
             setUser(parsedUser)
           }
@@ -72,7 +151,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     }
-    
+
     setIsLoading(false)
   }, [session, status])
 
@@ -82,24 +161,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const logout = async () => {
-    // Sign out from NextAuth if user is OAuth user
+    if (isSupabaseConfigured) {
+      await authOperations.signOut()
+    }
     if (session) {
       await signOut({ redirect: false })
     }
-    
-    // Clear local state and storage
     setUser(null)
     localStorage.removeItem('current_user')
   }
-
-  // Convert UserProfile to User type
-  const convertProfileToUser = (profile: UserProfile): User => ({
-    id: profile.id,
-    name: profile.full_name,
-    email: profile.email,
-    avatar: profile.avatar_url,
-    type: profile.user_type
-  })
 
   const registerUser = async (userData: {
     firstName: string
@@ -108,15 +178,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password: string
     userType: 'student' | 'tutor'
   }): Promise<User> => {
+    const fullName = `${userData.firstName} ${userData.lastName}`.trim()
+
+    if (isSupabaseConfigured) {
+      const result = await authOperations.signUp({
+        email: userData.email,
+        password: userData.password,
+        fullName,
+        userType: userData.userType,
+      })
+
+      if (!result.user) {
+        throw new Error('Sign up failed')
+      }
+
+      // If email confirmation is required, Supabase won't return a session yet.
+      if (!result.session) {
+        const pendingUser: User = {
+          id: result.user.id,
+          name: fullName,
+          email: userData.email,
+          type: userData.userType,
+        }
+        throw Object.assign(new Error('Please check your inbox to confirm your email before logging in.'), {
+          code: 'EMAIL_CONFIRMATION_REQUIRED',
+          user: pendingUser,
+        })
+      }
+
+      const profile = await dbOperations.getProfile(result.user.id)
+      const user = profile
+        ? profileToUser(profile)
+        : { id: result.user.id, name: fullName, email: userData.email, type: userData.userType }
+      login(user)
+      return user
+    }
+
+    // Fallback: localStorage demo database
     try {
       const profile = await localStorageDB.createUser({
         email: userData.email,
-        full_name: `${userData.firstName} ${userData.lastName}`,
+        full_name: fullName,
         user_type: userData.userType,
         password: userData.password
       })
-
-      const user = convertProfileToUser(profile)
+      const user = profileToUser(profile)
       login(user)
       return user
     } catch (error) {
@@ -125,9 +231,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const loginWithEmailPassword = async (email: string, password: string): Promise<User> => {
+    if (isSupabaseConfigured) {
+      const result = await authOperations.signIn(email, password)
+      if (!result.user) throw new Error('Invalid email or password')
+
+      const profile = await dbOperations.getProfile(result.user.id)
+      const user = profile
+        ? profileToUser(profile)
+        : { id: result.user.id, name: email, email, type: 'student' as const }
+      login(user)
+      return user
+    }
+
     try {
       const profile = await localStorageDB.loginUser(email, password)
-      const user = convertProfileToUser(profile)
+      const user = profileToUser(profile)
       login(user)
       return user
     } catch (error) {
@@ -136,6 +254,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signInWithGoogle = async () => {
+    if (isSupabaseConfigured) {
+      setIsLoading(true)
+      try {
+        await authOperations.signInWithGoogle(`${window.location.origin}/dashboard`)
+        // Browser will redirect to Google, then back - no further action here.
+      } catch (error) {
+        setIsLoading(false)
+        throw error
+      }
+      return
+    }
+
     try {
       setIsLoading(true)
       console.log('Starting Google sign-in process...')
@@ -192,6 +322,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // Returns the current Supabase access token, used to authenticate calls to
+  // our own API routes (e.g. /api/bookings) so Row Level Security applies.
+  const getAccessToken = async (): Promise<string | null> => {
+    if (!isSupabaseConfigured || !supabase) return null
+    const { data } = await supabase.auth.getSession()
+    return data.session?.access_token || null
+  }
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -201,7 +339,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loginWithEmailPassword,
       isLoading, 
       signInWithGoogle, 
-      signInWithFacebook
+      signInWithFacebook,
+      getAccessToken,
     }}>
       {children}
     </AuthContext.Provider>
@@ -233,3 +372,4 @@ export const demoUsers = {
     type: 'tutor' as const
   }
 }
+

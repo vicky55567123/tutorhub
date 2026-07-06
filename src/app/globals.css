@@ -26,6 +26,18 @@ body {
   box-shadow: 0 8px 30px rgba(37, 99, 235, 0.4) !important;
 }
 
+/* Hide scrollbar but keep horizontal scroll functionality (used by the
+   main navigation links so they never push the Login/Sign Up buttons
+   off-screen on medium-width viewports) */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 .btn-secondary {
   background: white !important;
   color: #374151 !important;

@@ -4,11 +4,14 @@ import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { useAuth } from './AuthContext'
 
 interface NavigationItem {
   href: string
   name: string
   icon: React.ComponentType<{ className: string }>
+  /** If set, item is only shown to logged-in users whose account type is in this list. Omit to show to everyone. */
+  roles?: Array<'student' | 'tutor'>
 }
 
 const navigationItems: NavigationItem[] = [
@@ -85,6 +88,36 @@ const navigationItems: NavigationItem[] = [
     )
   },
   {
+    href: '/book-session',
+    name: 'Book a Session',
+    roles: ['student'],
+    icon: ({ className }) => (
+      <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+      </svg>
+    )
+  },
+  {
+    href: '/tutor/availability',
+    name: 'My Availability',
+    roles: ['tutor'],
+    icon: ({ className }) => (
+      <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+      </svg>
+    )
+  },
+  {
+    href: '/tutor/profile',
+    name: 'Edit My Profile',
+    roles: ['tutor'],
+    icon: ({ className }) => (
+      <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+      </svg>
+    )
+  },
+  {
     href: 'https://wa.me/923134567890?text=Hello!%20I%20need%20help%20with%20my%20studies.%20Can%20you%20assist%20me?',
     name: 'WhatsApp Support',
     icon: ({ className }) => (
@@ -99,6 +132,11 @@ export default function SidebarNavigation() {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const pathname = usePathname()
+  const { user } = useAuth()
+
+  const visibleNavigationItems = navigationItems.filter(
+    (item) => !item.roles || (user && item.roles.includes(user.type))
+  )
 
   useEffect(() => {
     if (isMobileOpen) {
@@ -181,7 +219,7 @@ export default function SidebarNavigation() {
           {/* Navigation Items */}
           <nav className="flex-1 py-4">
             <ul className="space-y-2">
-              {navigationItems.map((item) => {
+              {visibleNavigationItems.map((item) => {
                 const isActive = pathname === item.href
                 const isWhatsApp = item.href.startsWith('https://wa.me/')
                 

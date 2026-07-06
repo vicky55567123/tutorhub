@@ -2,8 +2,10 @@
 
 import { useAuth } from '@/components/AuthContext'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { 
   UserCircleIcon,
   BookOpenIcon,
@@ -12,12 +14,17 @@ import {
   AcademicCapIcon,
   ChartBarIcon,
   CalendarIcon,
-  TrophyIcon
+  TrophyIcon,
+  VideoCameraIcon,
+  XCircleIcon
 } from '@heroicons/react/24/outline'
+import { Booking, isSupabaseConfigured } from '@/lib/supabase'
 
 export default function DashboardPage() {
-  const { user } = useAuth()
+  const { user, getAccessToken } = useAuth()
   const [enrolledCourses, setEnrolledCourses] = useState<number[]>([])
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [loadingBookings, setLoadingBookings] = useState(true)
 
   useEffect(() => {
     if (user) {
@@ -26,6 +33,143 @@ export default function DashboardPage() {
       setEnrolledCourses(enrolled)
     }
   }, [user])
+
+  const loadBookings = useCallback(async () => {
+    if (!user || !isSupabaseConfigured) {
+      setLoadingBookings(false)
+      return
+    }
+    setLoadingBookings(true)
+    try {
+      const token = await getAccessToken()
+      if (!token) {
+        setLoadingBookings(false)
+        return
+      }
+      const res = await fetch('/api/bookings', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (data.success) setBookings(data.bookings)
+    } catch (error) {
+      console.error('Error loading bookings:', error)
+    } finally {
+      setLoadingBookings(false)
+    }
+  }, [user, getAccessToken])
+
+  useEffect(() => {
+    loadBookings()
+  }, [loadBookings])
+
+  const handleCancelBooking = async (bookingId: string) => {
+    try {
+      const token = await getAccessToken()
+      if (!token) return
+      const res = await fetch('/api/bookings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ bookingId, status: 'cancelled' }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success('Session cancelled')
+        setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, status: 'cancelled' } : b)))
+      } else {
+        toast.error(data.error || 'Failed to cancel session')
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error('Failed to cancel session')
+    }
+  }
+
+  const upcomingBookings = bookings
+    .filter((b) => b.status !== 'cancelled' && b.status !== 'completed' && new Date(b.start_time) > new Date())
+    .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+
+  const nextBooking = upcomingBookings[0]
+
+  const UpcomingSessions = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5 }}
+      className="bg-white rounded-xl p-6 shadow-sm mb-8"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-gray-900">Upcoming Sessions</h2>
+        {user?.type === 'student' ? (
+          <Link href="/book-session" className="text-sm font-medium text-primary-600 hover:text-primary-700">
+            + Book a session
+          </Link>
+        ) : (
+          <Link href="/tutor/availability" className="text-sm font-medium text-primary-600 hover:text-primary-700">
+            Manage availability
+          </Link>
+        )}
+      </div>
+
+      {loadingBookings ? (
+        <p className="text-gray-500 text-center py-8">Loading your sessions...</p>
+      ) : upcomingBookings.length === 0 ? (
+        <div className="text-center py-12">
+          <CalendarIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No sessions scheduled</h3>
+          <p className="text-gray-500 mb-6">
+            {user?.type === 'student'
+              ? 'Book a session with one of our tutors to get started!'
+              : 'Set your availability so students can book sessions with you.'}
+          </p>
+          <Link
+            href={user?.type === 'student' ? '/book-session' : '/tutor/availability'}
+            className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            <AcademicCapIcon className="h-5 w-5 mr-2" />
+            {user?.type === 'student' ? 'Book a Session' : 'Set Availability'}
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {upcomingBookings.map((booking) => {
+            const other = user?.type === 'student' ? booking.tutor : booking.student
+            return (
+              <div
+                key={booking.id}
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-gray-50 rounded-lg p-4"
+              >
+                <div>
+                  <p className="font-medium text-gray-900">{booking.title}</p>
+                  <p className="text-sm text-gray-500">
+                    with {other?.full_name || 'Unknown'} ·{' '}
+                    {new Date(booking.start_time).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {booking.meeting_url && (
+                    <a
+                      href={booking.meeting_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg"
+                    >
+                      <VideoCameraIcon className="h-4 w-4" /> Join Meeting
+                    </a>
+                  )}
+                  <button
+                    onClick={() => handleCancelBooking(booking.id)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 border border-red-200 text-red-600 hover:bg-red-50 text-sm font-medium rounded-lg"
+                  >
+                    <XCircleIcon className="h-4 w-4" /> Cancel
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </motion.div>
+  )
 
   if (!user) {
     return (
@@ -130,13 +274,21 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Next Session</p>
-              <p className="text-sm font-bold text-gray-900">None scheduled</p>
-              <p className="text-xs text-gray-400 mt-1">Book your first session</p>
+              <p className="text-sm font-bold text-gray-900">
+                {nextBooking
+                  ? new Date(nextBooking.start_time).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })
+                  : 'None scheduled'}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                {nextBooking ? `with ${nextBooking.tutor?.full_name || 'your tutor'}` : 'Book your first session'}
+              </p>
             </div>
             <CalendarIcon className="h-8 w-8 text-purple-600" />
           </div>
         </motion.div>
       </div>
+
+      <UpcomingSessions />
 
       {/* Current Courses */}
       <motion.div 
@@ -274,34 +426,21 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Next Session</p>
-              <p className="text-sm font-bold text-gray-900">None scheduled</p>
-              <p className="text-xs text-gray-400 mt-1">Create your availability</p>
+              <p className="text-sm font-bold text-gray-900">
+                {nextBooking
+                  ? new Date(nextBooking.start_time).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })
+                  : 'None scheduled'}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                {nextBooking ? `with ${nextBooking.student?.full_name || 'your student'}` : 'Create your availability'}
+              </p>
             </div>
             <CalendarIcon className="h-8 w-8 text-purple-600" />
           </div>
         </motion.div>
       </div>
 
-      {/* Recent Activity */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="bg-white rounded-xl p-6 shadow-sm mb-8"
-      >
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Teaching Schedule</h2>
-        <div className="text-center py-12">
-          <CalendarIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No sessions scheduled</h3>
-          <p className="text-gray-500 mb-6">
-            Set up your availability and start accepting students!
-          </p>
-          <button className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-            <AcademicCapIcon className="h-5 w-5 mr-2" />
-            Set Availability
-          </button>
-        </div>
-      </motion.div>
+      <UpcomingSessions />
     </>
   )
 

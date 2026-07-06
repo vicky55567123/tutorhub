@@ -92,9 +92,45 @@ export default function SignupModal({ isOpen, onClose, onSwitchToLogin }: Signup
       
     } catch (error: any) {
       setIsLoading(false)
-      const errorMessage = error.message === 'Email already exists' 
-        ? 'An account with this email already exists. Please try logging in instead.'
-        : 'Failed to create account. Please try again.'
+
+      if (error?.code === 'EMAIL_CONFIRMATION_REQUIRED') {
+        toast.success(
+          `Account created! Please check ${formData.email} and click the confirmation link before logging in.`,
+          {
+            duration: 8000,
+            style: {
+              borderRadius: '10px',
+              background: '#10B981',
+              color: '#fff',
+            },
+          }
+        )
+        onClose()
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: '',
+          confirmPassword: ''
+        })
+        setAgreeToTerms(false)
+        return
+      }
+
+      const rawMessage: string = error?.message || ''
+      let errorMessage = rawMessage || 'Failed to create account. Please try again.'
+
+      if (rawMessage === 'Email already exists' || rawMessage.toLowerCase().includes('already registered')) {
+        errorMessage = 'An account with this email already exists. Please try logging in instead.'
+      } else if (rawMessage.toLowerCase().includes('password')) {
+        errorMessage = rawMessage
+      } else if (rawMessage.toLowerCase().includes('rate limit') || rawMessage.toLowerCase().includes('429')) {
+        errorMessage = 'Too many attempts. Please wait a minute and try again.'
+      } else if (rawMessage.toLowerCase().includes('supabase not configured')) {
+        errorMessage = 'The backend is not configured yet. Please contact the site admin.'
+      }
+
+      console.error('Signup error:', error)
       toast.error(errorMessage)
     }
   }
