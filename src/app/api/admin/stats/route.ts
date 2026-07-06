@@ -55,7 +55,11 @@ export async function GET(request: NextRequest) {
         'id, full_name, email, user_type, phone, subjects, hourly_rate, bio, years_experience, qualifications, is_approved, created_at'
       )
       .order('created_at', { ascending: false }),
-    admin.from('bookings').select('id, student_id, tutor_id, subject, title, duration_minutes, status, start_time'),
+    admin
+      .from('bookings')
+      .select(
+        'id, student_id, tutor_id, subject, title, duration_minutes, status, start_time, end_time, is_trial, price, payment_status'
+      ),
   ])
 
   if (profilesError) {
@@ -79,6 +83,27 @@ export async function GET(request: NextRequest) {
       const own = allBookings.filter((b) => b.student_id === p.id && activeStatuses.has(b.status))
       const totalHours = own.reduce((sum, b) => sum + (b.duration_minutes || 0), 0) / 60
       const subjects = Array.from(new Set(own.map((b) => b.subject).filter(Boolean))) as string[]
+      const totalPaid = own.reduce((sum, b) => sum + (b.payment_status === 'paid' ? Number(b.price) || 0 : 0), 0)
+
+      const sessions = own
+        .map((b) => {
+          const tutor = allProfiles.find((tp) => tp.id === b.tutor_id)
+          return {
+            id: b.id,
+            title: b.title,
+            subject: b.subject || 'General',
+            withName: tutor?.full_name || tutor?.email || 'Unknown tutor',
+            startTime: b.start_time,
+            endTime: b.end_time,
+            durationMinutes: b.duration_minutes,
+            status: b.status,
+            isTrial: !!b.is_trial,
+            price: Number(b.price) || 0,
+            paymentStatus: b.payment_status,
+          }
+        })
+        .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
+
       return {
         id: p.id,
         name: p.full_name || p.email,
@@ -86,8 +111,10 @@ export async function GET(request: NextRequest) {
         phone: p.phone || null,
         sessionsCount: own.length,
         totalHours: Math.round(totalHours * 100) / 100,
+        totalPaid: Math.round(totalPaid * 100) / 100,
         subjects,
         joinedAt: p.created_at,
+        sessions,
       }
     })
     .sort((a, b) => b.totalHours - a.totalHours)
@@ -97,16 +124,44 @@ export async function GET(request: NextRequest) {
     .map((p) => {
       const own = allBookings.filter((b) => b.tutor_id === p.id && activeStatuses.has(b.status))
       const totalHours = own.reduce((sum, b) => sum + (b.duration_minutes || 0), 0) / 60
+      const totalEarned = own.reduce((sum, b) => sum + (b.payment_status === 'paid' ? Number(b.price) || 0 : 0), 0)
 
       const hoursBySubject = new Map<string, number>()
+      const revenueBySubject = new Map<string, number>()
       for (const b of own) {
         const subj = b.subject || 'General'
         hoursBySubject.set(subj, (hoursBySubject.get(subj) || 0) + (b.duration_minutes || 0) / 60)
+        if (b.payment_status === 'paid') {
+          revenueBySubject.set(subj, (revenueBySubject.get(subj) || 0) + (Number(b.price) || 0))
+        }
       }
 
       const subjectBreakdown = Array.from(hoursBySubject.entries())
-        .map(([subject, hours]) => ({ subject, hours: Math.round(hours * 100) / 100 }))
+        .map(([subject, hours]) => ({
+          subject,
+          hours: Math.round(hours * 100) / 100,
+          revenue: Math.round((revenueBySubject.get(subject) || 0) * 100) / 100,
+        }))
         .sort((a, b) => b.hours - a.hours)
+
+      const sessions = own
+        .map((b) => {
+          const student = allProfiles.find((sp) => sp.id === b.student_id)
+          return {
+            id: b.id,
+            title: b.title,
+            subject: b.subject || 'General',
+            withName: student?.full_name || student?.email || 'Unknown student',
+            startTime: b.start_time,
+            endTime: b.end_time,
+            durationMinutes: b.duration_minutes,
+            status: b.status,
+            isTrial: !!b.is_trial,
+            price: Number(b.price) || 0,
+            paymentStatus: b.payment_status,
+          }
+        })
+        .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
 
       return {
         id: p.id,
@@ -120,8 +175,10 @@ export async function GET(request: NextRequest) {
         isApproved: !!p.is_approved,
         sessionsCount: own.length,
         totalHours: Math.round(totalHours * 100) / 100,
+        totalEarned: Math.round(totalEarned * 100) / 100,
         subjectBreakdown,
         joinedAt: p.created_at,
+        sessions,
       }
     })
     .sort((a, b) => b.totalHours - a.totalHours)
@@ -130,6 +187,12 @@ export async function GET(request: NextRequest) {
     (b) => activeStatuses.has(b.status) && b.status !== 'completed' && new Date(b.start_time) > now
   ).length
 
+  const totalRevenue = allBookings.reduce(
+    (sum, b) => sum + (b.payment_status === 'paid' ? Number(b.price) || 0 : 0),
+    0
+  )
+  const totalTrials = allBookings.filter((b) => b.is_trial && b.status !== 'cancelled').length
+
   return NextResponse.json({
     success: true,
     stats: {
@@ -137,6 +200,8 @@ export async function GET(request: NextRequest) {
       totalStudents: students.length,
       totalSessions: allBookings.length,
       upcomingSessions,
+      totalRevenue: Math.round(totalRevenue * 100) / 100,
+      totalTrials,
     },
     students,
     tutors,

@@ -14,6 +14,7 @@ import {
   GlobeAltIcon,
 } from '@heroicons/react/24/outline'
 import { useAuth } from '@/components/AuthContext'
+import SessionPaymentModal from '@/components/SessionPaymentModal'
 import { isSupabaseConfigured, dbOperations, UserProfile, TutorAvailability } from '@/lib/supabase'
 import {
   COMMON_TIMEZONES,
@@ -28,6 +29,7 @@ import {
 
 const SLOT_STEP_MINUTES = 30
 const DAYS_AHEAD = 14
+const TRIAL_DURATION_MINUTES = 20
 
 function addDays(date: Date, days: number) {
   const d = new Date(date)
@@ -100,6 +102,8 @@ export default function BookSessionPage() {
   const [selectedDay, setSelectedDay] = useState<Date>(() => new Date())
   const [selectedSlot, setSelectedSlot] = useState<Date | null>(null)
   const [duration, setDuration] = useState(60)
+  const [sessionType, setSessionType] = useState<'paid' | 'trial'>('paid')
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
   const [subject, setSubject] = useState('')
   const [customSubject, setCustomSubject] = useState('')
   const [topic, setTopic] = useState('')
@@ -113,6 +117,17 @@ export default function BookSessionPage() {
   const days = useMemo(() => Array.from({ length: DAYS_AHEAD }, (_, i) => addDays(new Date(), i)), [])
 
   const tutorTimezone = selectedTutor?.timezone || DEFAULT_TIMEZONE
+
+  // Trials are always a fixed 20 minutes; paid sessions use the chosen duration.
+  const effectiveDuration = sessionType === 'trial' ? TRIAL_DURATION_MINUTES : duration
+
+  // Price for a PAID session, computed from the tutor's hourly rate. null
+  // means the tutor hasn't set a rate yet, so paid booking is disabled.
+  const computedPrice = useMemo(() => {
+    if (sessionType === 'trial') return 0
+    if (!selectedTutor?.hourly_rate) return null
+    return Math.round(selectedTutor.hourly_rate * (duration / 60) * 100) / 100
+  }, [sessionType, selectedTutor, duration])
 
   useEffect(() => {
     async function loadTutors() {
@@ -165,6 +180,7 @@ export default function BookSessionPage() {
       setSubject('')
       setCustomSubject('')
       setTopic('')
+      setSessionType('paid')
       try {
         const res = await fetch(`/api/availability?tutorId=${selectedTutor!.id}`)
         const data = await res.json()
@@ -186,8 +202,8 @@ export default function BookSessionPage() {
 
   const slotsForSelectedDay = useMemo(() => {
     if (!selectedTutor) return []
-    return computeSlotsForDay(selectedDay, availability, busySlots, duration, tutorTimezone)
-  }, [selectedTutor, selectedDay, availability, busySlots, duration, tutorTimezone])
+    return computeSlotsForDay(selectedDay, availability, busySlots, effectiveDuration, tutorTimezone)
+  }, [selectedTutor, selectedDay, availability, busySlots, effectiveDuration, tutorTimezone])
 
   const handleBook = async () => {
     if (!user) {
@@ -209,6 +225,21 @@ export default function BookSessionPage() {
       return
     }
 
+    if (sessionType === 'trial') {
+      await submitBooking(false)
+    } else {
+      if (computedPrice == null) {
+        toast.error("This tutor hasn't set an hourly rate yet, so paid sessions can't be booked right now.")
+        return
+      }
+      setIsPaymentModalOpen(true)
+    }
+  }
+
+  const submitBooking = async (paymentConfirmed: boolean) => {
+    if (!user || !selectedTutor || !selectedSlot) return
+
+    const finalSubject = (subject === '__other__' ? customSubject : subject).trim()
     const sessionTitle = `${finalSubject} - ${topic.trim()}`
 
     setIsBooking(true)
@@ -232,33 +263,44 @@ export default function BookSessionPage() {
           subject: finalSubject,
           description: [`Topic: ${topic.trim()}`, description.trim()].filter(Boolean).join('\n\n'),
           startTime: selectedSlot.toISOString(),
-          durationMinutes: duration,
+          durationMinutes: effectiveDuration,
           tutorEmail: selectedTutor.email,
           studentEmail: user.email,
+          isTrial: sessionType === 'trial',
+          paymentConfirmed,
         }),
       })
 
       const data = await res.json()
 
       if (data.success) {
-        toast.success('Session booked! Check your email for the Google Meet invite.')
+        setIsPaymentModalOpen(false)
+        toast.success(
+          sessionType === 'trial'
+            ? 'Free trial booked! Check your email for the Google Meet invite.'
+            : 'Session booked! Check your email for the Google Meet invite.'
+        )
         setSelectedSlot(null)
         setSubject('')
         setCustomSubject('')
         setTopic('')
         setDescription('')
+        setSessionType('paid')
         // Refresh busy slots so the just-booked slot disappears
         const from = new Date()
         const to = addDays(from, DAYS_AHEAD)
         const busy = await dbOperations.getTutorBusySlots(selectedTutor.id, from.toISOString(), to.toISOString())
         setBusySlots(busy)
       } else if (data.requiresAuth || data.requiresSetup) {
+        setIsPaymentModalOpen(false)
         toast.error(data.error || 'Google Meet is not set up yet on the server.')
       } else {
+        setIsPaymentModalOpen(false)
         toast.error(data.error || 'Failed to book session')
       }
     } catch (error) {
       console.error(error)
+      setIsPaymentModalOpen(false)
       toast.error('Failed to book session')
     } finally {
       setIsBooking(false)
@@ -418,17 +460,77 @@ export default function BookSessionPage() {
                 <h2 className="text-lg font-semibold text-gray-900">
                   Availability for {selectedTutor.full_name}
                 </h2>
-                <select
-                  value={duration}
-                  onChange={(e) => setDuration(Number(e.target.value))}
-                  aria-label="Session duration"
-                  className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
-                >
-                  <option value={30}>30 minutes</option>
-                  <option value={60}>60 minutes</option>
-                  <option value={90}>90 minutes</option>
-                </select>
               </div>
+
+              {/* Session type: paid vs one-time free trial */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+                <div className="inline-flex rounded-lg border border-gray-200 p-1 bg-gray-50">
+                  <button
+                    onClick={() => {
+                      setSessionType('paid')
+                      setSelectedSlot(null)
+                    }}
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                      sessionType === 'paid' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Paid Session
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSessionType('trial')
+                      setSelectedSlot(null)
+                    }}
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                      sessionType === 'trial' ? 'bg-green-600 text-white' : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Free Trial (20 min)
+                  </button>
+                </div>
+
+                {sessionType === 'paid' ? (
+                  <select
+                    value={duration}
+                    onChange={(e) => {
+                      setDuration(Number(e.target.value))
+                      setSelectedSlot(null)
+                    }}
+                    aria-label="Session duration"
+                    className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                  >
+                    <option value={30}>30 minutes</option>
+                    <option value={60}>60 minutes</option>
+                    <option value={90}>90 minutes</option>
+                  </select>
+                ) : (
+                  <span className="text-sm text-gray-500">Fixed at 20 minutes · one-time only per student</span>
+                )}
+              </div>
+
+              {sessionType === 'paid' ? (
+                <p className="text-sm font-medium text-gray-700 mb-3">
+                  {computedPrice != null ? (
+                    <>
+                      Price:{' '}
+                      <span className="text-primary-700 font-bold">£{computedPrice.toFixed(2)}</span>{' '}
+                      <span className="text-gray-400 font-normal">
+                        (£{selectedTutor.hourly_rate}/hr × {duration} min)
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-red-600">
+                      This tutor hasn&apos;t set an hourly rate yet - paid sessions aren&apos;t available. Try a free
+                      trial instead.
+                    </span>
+                  )}
+                </p>
+              ) : (
+                <p className="text-sm font-medium text-green-700 mb-3">
+                  Free - available once per student. If you&apos;ve already used your trial, booking will be blocked.
+                </p>
+              )}
+
               <p className="text-xs text-gray-400 mb-4">
                 Tutor&apos;s local time zone: {timeZoneAbbreviation(tutorTimezone)} · Times below are shown in{' '}
                 {timeZoneAbbreviation(studentTimezone)} (your selection) with the tutor&apos;s local time alongside.
@@ -561,15 +663,22 @@ export default function BookSessionPage() {
 
                   <button
                     onClick={handleBook}
-                    disabled={isBooking}
-                    className="w-full flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-60 text-white font-semibold py-3 rounded-lg transition-colors"
+                    disabled={isBooking || (sessionType === 'paid' && computedPrice == null)}
+                    className={`w-full flex items-center justify-center gap-2 disabled:opacity-60 text-white font-semibold py-3 rounded-lg transition-colors ${
+                      sessionType === 'trial' ? 'bg-green-600 hover:bg-green-700' : 'bg-primary-600 hover:bg-primary-700'
+                    }`}
                   >
                     {isBooking ? (
                       'Booking...'
+                    ) : sessionType === 'trial' ? (
+                      <>
+                        <VideoCameraIcon className="h-5 w-5" />
+                        Book Free Trial (20 min)
+                      </>
                     ) : (
                       <>
                         <VideoCameraIcon className="h-5 w-5" />
-                        Confirm &amp; Create Google Meet
+                        {computedPrice != null ? `Pay £${computedPrice.toFixed(2)} & Book` : 'Confirm & Create Google Meet'}
                       </>
                     )}
                   </button>
@@ -577,7 +686,8 @@ export default function BookSessionPage() {
                     <span className="flex items-center gap-1">
                       <CheckCircleIcon className="h-4 w-4 text-green-500" />
                       {formatInTimeZone(selectedSlot, studentTimezone, 'EEE d MMM yyyy, h:mm a')} ({timeZoneAbbreviation(studentTimezone)}, your time)
-                      · {duration} min
+                      · {effectiveDuration} min
+                      {sessionType === 'trial' ? ' · Free Trial' : computedPrice != null ? ` · £${computedPrice.toFixed(2)}` : ''}
                     </span>
                     {tutorTimezone !== studentTimezone && (
                       <span className="pl-5 text-gray-400">
@@ -591,6 +701,17 @@ export default function BookSessionPage() {
           )}
         </div>
       </div>
+
+      {selectedTutor && (
+        <SessionPaymentModal
+          isOpen={isPaymentModalOpen}
+          amount={computedPrice ?? 0}
+          description={`${effectiveDuration}-minute session with ${selectedTutor.full_name}`}
+          onClose={() => setIsPaymentModalOpen(false)}
+          onSuccess={() => submitBooking(true)}
+        />
+      )}
     </div>
   )
 }
+

@@ -52,6 +52,7 @@ export interface TutorAvailability {
 }
 
 export type BookingStatus = 'scheduled' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled'
+export type PaymentStatus = 'unpaid' | 'paid' | 'free'
 
 export interface Booking {
   id: string
@@ -64,6 +65,9 @@ export interface Booking {
   end_time: string
   duration_minutes: number
   status: BookingStatus
+  is_trial: boolean
+  price: number
+  payment_status: PaymentStatus
   google_event_id?: string
   meeting_url?: string
   calendar_link?: string

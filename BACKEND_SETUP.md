@@ -26,10 +26,16 @@ Auth + instant REST API) so you don't need to run your own database server.
    - `tutor_availability` - weekly recurring slots (or one-off dates) that a
      tutor is free to teach
    - `bookings` - a confirmed session between a student and a tutor, with the
-     Google Meet link attached
+     Google Meet link attached, plus payment fields (`is_trial`, `price`,
+     `payment_status`)
    - Row Level Security policies so users can only see/edit their own data
    - A `get_tutor_busy_slots()` function so students can see which times are
      taken without exposing other students' private booking details
+
+   If your project already existed before payments/trials were added, instead
+   run [database/booking_payments_and_trial.sql](database/booking_payments_and_trial.sql)
+   to add the 3 new columns to your existing `bookings` table (safe, additive
+   migration - `schema.sql` already includes them for fresh installs).
 
 ## 2. Configure environment variables
 
@@ -140,14 +146,19 @@ never any ambiguity about which time zone a session is happening in.
 ## 10. Admin Dashboard
 
 Visit `/admin` (also appears in the sidebar as "Admin Dashboard") to see:
-- Total registered tutors / students
-- Total sessions booked and how many are still upcoming
+- Total registered tutors / students, total sessions, upcoming sessions,
+  **total revenue** (sum of all paid sessions), and how many free trials have
+  been used
 - A table of every student with their phone, number of booked sessions,
-  total hours, subjects studied, and join date
+  total hours, **total amount paid**, subjects studied, and join date - click
+  their name to expand the full list of their sessions with the **exact
+  date and time**, tutor, subject, duration, status, price and payment status
 - A table of every tutor with their phone, hourly rate, approval status,
-  number of sessions, total hours taught, an hours-per-subject breakdown,
-  and (click their name to expand) bio / years of experience / qualifications
-  / join date
+  number of sessions, total hours taught, **total amount earned**, an
+  hours-and-revenue-per-subject breakdown, and (click their name to expand)
+  bio / years of experience / qualifications / join date **and** the same
+  detailed session-by-session list (exact date/time, student, subject,
+  price, payment status)
 
 **Adding a tutor or student as an admin:** click "Add Student" or "Add Tutor"
 at the top of `/admin`. Fill in their name, email, a temporary password, and
@@ -177,6 +188,35 @@ set manually for security. Both admin APIs (`/api/admin/stats`,
 `/api/admin/users`) check this field server-side using the service role key,
 so only genuine admins can see or modify everyone's data.
 
+## 11. Payments &amp; the Free Trial
+
+Students can no longer book a **paid** session without paying first. The
+rules, enforced server-side in [src/app/api/bookings/route.ts](src/app/api/bookings/route.ts)
+(so they can't be bypassed from the browser):
+
+- **Paid session**: price = the tutor's `hourly_rate` × session length. The
+  student sees the price on **Book a Session**, clicks "Pay & Book", and a
+  demo checkout modal ([src/components/SessionPaymentModal.tsx](src/components/SessionPaymentModal.tsx))
+  collects card details (client-side format validation only - no real card
+  processor is wired up yet; Stripe integration is still on the roadmap).
+  Once "paid", the booking API is called again with `paymentConfirmed: true`
+  and the booking is created with `payment_status = 'paid'` and the
+  calculated `price`. If a tutor hasn't set an `hourly_rate` yet, paid
+  booking is disabled for them until an admin or the tutor sets one.
+- **Free trial**: fixed at **20 minutes**, `price = 0`,
+  `payment_status = 'free'`, `is_trial = true`. A student can only ever book
+  **one** trial - the API checks by the student's **account email** (via the
+  service-role client, across all their bookings, not just what RLS would
+  normally let them see) and rejects a second trial attempt with a 409 error
+  telling them to book a paid session instead.
+- Both the price and payment status are visible to admins for every session
+  in the Admin Dashboard (see section 10), including total revenue collected
+  and how many free trials have been used platform-wide.
+
+If you already have a `bookings` table from before this feature, run
+[database/booking_payments_and_trial.sql](database/booking_payments_and_trial.sql)
+in the Supabase SQL Editor to add the missing columns.
+
 ---
 
 ### Troubleshooting
@@ -191,4 +231,10 @@ so only genuine admins can see or modify everyone's data.
   Supabase.
 - **"Admins only" on /admin** - your account's `user_type` in the `profiles`
   table isn't set to `admin` yet (see section 10 above).
+- **"Payment is required before this session can be booked"** - the student
+  tried to book a paid session without completing the checkout step; this is
+  expected and enforced server-side in `/api/bookings` (see section 11).
+- **Paid session button is disabled / tutor has no rate** - set an
+  `hourly_rate` on that tutor's profile (Edit Profile, or via the Admin
+  Dashboard "Edit" button) before students can book a paid session with them.
 

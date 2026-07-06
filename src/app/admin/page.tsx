@@ -14,9 +14,25 @@ import {
   XMarkIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  CurrencyPoundIcon,
+  GiftIcon,
 } from '@heroicons/react/24/outline'
 import { useAuth } from '@/components/AuthContext'
 import { isSupabaseConfigured } from '@/lib/supabase'
+
+interface SessionRow {
+  id: string
+  title: string
+  subject: string
+  withName: string
+  startTime: string
+  endTime: string
+  durationMinutes: number
+  status: string
+  isTrial: boolean
+  price: number
+  paymentStatus: 'unpaid' | 'paid' | 'free'
+}
 
 interface StudentRow {
   id: string
@@ -25,8 +41,10 @@ interface StudentRow {
   phone?: string | null
   sessionsCount: number
   totalHours: number
+  totalPaid: number
   subjects: string[]
   joinedAt?: string
+  sessions: SessionRow[]
 }
 
 interface TutorRow {
@@ -41,8 +59,10 @@ interface TutorRow {
   isApproved?: boolean
   sessionsCount: number
   totalHours: number
-  subjectBreakdown: { subject: string; hours: number }[]
+  totalEarned: number
+  subjectBreakdown: { subject: string; hours: number; revenue: number }[]
   joinedAt?: string
+  sessions: SessionRow[]
 }
 
 interface AdminStats {
@@ -50,6 +70,8 @@ interface AdminStats {
   totalStudents: number
   totalSessions: number
   upcomingSessions: number
+  totalRevenue: number
+  totalTrials: number
 }
 
 type ModalType = 'student' | 'tutor' | null
@@ -85,6 +107,74 @@ function formatDate(value?: string) {
   }
 }
 
+function formatDateTime(value?: string) {
+  if (!value) return '—'
+  try {
+    return new Date(value).toLocaleString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    })
+  } catch {
+    return '—'
+  }
+}
+
+function paymentBadgeClasses(status: string) {
+  if (status === 'paid') return 'bg-green-50 text-green-700'
+  if (status === 'free') return 'bg-blue-50 text-blue-700'
+  return 'bg-yellow-50 text-yellow-700'
+}
+
+function SessionsTable({ sessions, withLabel }: { sessions: SessionRow[]; withLabel: string }) {
+  if (sessions.length === 0) {
+    return <p className="text-gray-500 text-xs">No sessions booked yet.</p>
+  }
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-xs">
+        <thead>
+          <tr className="text-left text-gray-400 border-b border-gray-200">
+            <th className="py-1.5 pr-3 font-medium">Date &amp; Time</th>
+            <th className="py-1.5 pr-3 font-medium">{withLabel}</th>
+            <th className="py-1.5 pr-3 font-medium">Subject</th>
+            <th className="py-1.5 pr-3 font-medium">Duration</th>
+            <th className="py-1.5 pr-3 font-medium">Status</th>
+            <th className="py-1.5 pr-3 font-medium">Price</th>
+            <th className="py-1.5 pr-3 font-medium">Payment</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sessions.map((s) => (
+            <tr key={s.id} className="border-b border-gray-100 last:border-0">
+              <td className="py-1.5 pr-3 text-gray-700 whitespace-nowrap">{formatDateTime(s.startTime)}</td>
+              <td className="py-1.5 pr-3 text-gray-700">{s.withName}</td>
+              <td className="py-1.5 pr-3 text-gray-500">
+                {s.subject}
+                {s.isTrial && (
+                  <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-green-100 text-green-700">
+                    TRIAL
+                  </span>
+                )}
+              </td>
+              <td className="py-1.5 pr-3 text-gray-500">{s.durationMinutes} min</td>
+              <td className="py-1.5 pr-3 text-gray-500 capitalize">{s.status}</td>
+              <td className="py-1.5 pr-3 text-gray-700 font-medium">£{s.price.toFixed(2)}</td>
+              <td className="py-1.5 pr-3">
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${paymentBadgeClasses(s.paymentStatus)}`}>
+                  {s.paymentStatus}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 export default function AdminDashboardPage() {
   const { user, getAccessToken } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
@@ -98,6 +188,7 @@ export default function AdminDashboardPage() {
   const [form, setForm] = useState<UserFormState>(emptyForm)
   const [isSaving, setIsSaving] = useState(false)
   const [expandedTutorId, setExpandedTutorId] = useState<string | null>(null)
+  const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null)
 
   const loadStats = useCallback(async () => {
     if (!user) return
@@ -294,6 +385,8 @@ export default function AdminDashboardPage() {
     { label: 'Registered Students', value: stats?.totalStudents ?? 0, icon: UsersIcon, color: 'from-blue-600 to-primary-600' },
     { label: 'Total Sessions Booked', value: stats?.totalSessions ?? 0, icon: CalendarIcon, color: 'from-purple-600 to-pink-600' },
     { label: 'Upcoming Sessions', value: stats?.upcomingSessions ?? 0, icon: ClockIcon, color: 'from-orange-500 to-red-500' },
+    { label: 'Total Revenue', value: `£${(stats?.totalRevenue ?? 0).toFixed(2)}`, icon: CurrencyPoundIcon, color: 'from-emerald-600 to-teal-600' },
+    { label: 'Free Trials Used', value: stats?.totalTrials ?? 0, icon: GiftIcon, color: 'from-sky-500 to-blue-600' },
   ]
 
   return (
@@ -327,7 +420,7 @@ export default function AdminDashboardPage() {
       ) : (
         <>
           {/* Stat cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-10">
             {statCards.map((card) => (
               <motion.div
                 key={card.label}
@@ -359,31 +452,60 @@ export default function AdminDashboardPage() {
                       <th className="py-2 pr-4 font-medium">Phone</th>
                       <th className="py-2 pr-4 font-medium">Sessions</th>
                       <th className="py-2 pr-4 font-medium">Total Hours</th>
+                      <th className="py-2 pr-4 font-medium">Total Paid</th>
                       <th className="py-2 pr-4 font-medium">Subjects Studied</th>
                       <th className="py-2 pr-4 font-medium">Joined</th>
                       <th className="py-2 pr-4 font-medium text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {students.map((s) => (
-                      <tr key={s.id} className="border-b border-gray-50 last:border-0">
-                        <td className="py-2 pr-4 font-medium text-gray-900">{s.name}</td>
-                        <td className="py-2 pr-4 text-gray-500">{s.email}</td>
-                        <td className="py-2 pr-4 text-gray-500">{s.phone || '—'}</td>
-                        <td className="py-2 pr-4">{s.sessionsCount}</td>
-                        <td className="py-2 pr-4">{s.totalHours}h</td>
-                        <td className="py-2 pr-4 text-gray-500">{s.subjects.join(', ') || '—'}</td>
-                        <td className="py-2 pr-4 text-gray-500">{formatDate(s.joinedAt)}</td>
-                        <td className="py-2 pr-4 text-right">
-                          <button
-                            onClick={() => openEditModal('student', s)}
-                            className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-800 font-medium text-xs"
-                          >
-                            <PencilSquareIcon className="h-4 w-4" /> Edit
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {students.map((s) => {
+                      const isExpanded = expandedStudentId === s.id
+                      return (
+                        <Fragment key={s.id}>
+                          <tr className="border-b border-gray-50 last:border-0 align-top">
+                            <td className="py-2 pr-4 font-medium text-gray-900">
+                              <button
+                                onClick={() => setExpandedStudentId(isExpanded ? null : s.id)}
+                                className="inline-flex items-center gap-1 hover:text-primary-700"
+                              >
+                                {isExpanded ? (
+                                  <ChevronUpIcon className="h-4 w-4 text-gray-400" />
+                                ) : (
+                                  <ChevronDownIcon className="h-4 w-4 text-gray-400" />
+                                )}
+                                {s.name}
+                              </button>
+                            </td>
+                            <td className="py-2 pr-4 text-gray-500">{s.email}</td>
+                            <td className="py-2 pr-4 text-gray-500">{s.phone || '—'}</td>
+                            <td className="py-2 pr-4">{s.sessionsCount}</td>
+                            <td className="py-2 pr-4">{s.totalHours}h</td>
+                            <td className="py-2 pr-4 font-medium text-gray-700">£{s.totalPaid.toFixed(2)}</td>
+                            <td className="py-2 pr-4 text-gray-500">{s.subjects.join(', ') || '—'}</td>
+                            <td className="py-2 pr-4 text-gray-500">{formatDate(s.joinedAt)}</td>
+                            <td className="py-2 pr-4 text-right">
+                              <button
+                                onClick={() => openEditModal('student', s)}
+                                className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-800 font-medium text-xs"
+                              >
+                                <PencilSquareIcon className="h-4 w-4" /> Edit
+                              </button>
+                            </td>
+                          </tr>
+                          {isExpanded && (
+                            <tr className="bg-gray-50 border-b border-gray-100">
+                              <td colSpan={9} className="py-3 px-4">
+                                <p className="text-gray-400 uppercase tracking-wide text-xs mb-2">
+                                  Sessions ({s.sessions.length}) - exact date &amp; time
+                                </p>
+                                <SessionsTable sessions={s.sessions} withLabel="Tutor" />
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -409,6 +531,7 @@ export default function AdminDashboardPage() {
                       <th className="py-2 pr-4 font-medium">Approved</th>
                       <th className="py-2 pr-4 font-medium">Sessions</th>
                       <th className="py-2 pr-4 font-medium">Total Hours</th>
+                      <th className="py-2 pr-4 font-medium">Total Earned</th>
                       <th className="py-2 pr-4 font-medium">Hours by Subject</th>
                       <th className="py-2 pr-4 font-medium text-right">Actions</th>
                     </tr>
@@ -446,6 +569,7 @@ export default function AdminDashboardPage() {
                             </td>
                             <td className="py-2 pr-4">{t.sessionsCount}</td>
                             <td className="py-2 pr-4">{t.totalHours}h</td>
+                            <td className="py-2 pr-4 font-medium text-gray-700">£{t.totalEarned.toFixed(2)}</td>
                             <td className="py-2 pr-4">
                               {t.subjectBreakdown.length === 0 ? (
                                 <span className="text-gray-400">—</span>
@@ -456,7 +580,7 @@ export default function AdminDashboardPage() {
                                       key={sb.subject}
                                       className="inline-flex items-center gap-1 bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full text-xs font-medium"
                                     >
-                                      {sb.subject}: {sb.hours}h
+                                      {sb.subject}: {sb.hours}h (£{sb.revenue.toFixed(2)})
                                     </span>
                                   ))}
                                 </div>
@@ -473,7 +597,7 @@ export default function AdminDashboardPage() {
                           </tr>
                           {isExpanded && (
                             <tr className="bg-gray-50 border-b border-gray-100">
-                              <td colSpan={9} className="py-3 px-4">
+                              <td colSpan={10} className="py-3 px-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                                   <div>
                                     <p className="text-gray-400 uppercase tracking-wide mb-1">Joined</p>
@@ -493,6 +617,12 @@ export default function AdminDashboardPage() {
                                     <p className="text-gray-400 uppercase tracking-wide mb-1">Bio</p>
                                     <p className="text-gray-700">{t.bio || '—'}</p>
                                   </div>
+                                </div>
+                                <div className="mt-4 pt-3 border-t border-gray-200">
+                                  <p className="text-gray-400 uppercase tracking-wide text-xs mb-2">
+                                    Sessions ({t.sessions.length}) - exact date &amp; time
+                                  </p>
+                                  <SessionsTable sessions={t.sessions} withLabel="Student" />
                                 </div>
                               </td>
                             </tr>

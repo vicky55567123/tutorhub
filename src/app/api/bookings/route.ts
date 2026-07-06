@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseForToken, getAccessTokenFromRequest } from '@/lib/supabaseAdmin'
+import { getSupabaseForToken, getSupabaseAdmin, getAccessTokenFromRequest } from '@/lib/supabaseAdmin'
 import { createGoogleMeetEvent, deleteGoogleMeetEvent, GoogleMeetAuthError, GoogleMeetNotConfiguredError } from '@/lib/googleMeet'
+
+const TRIAL_DURATION_MINUTES = 20
 
 async function requireUser(request: NextRequest) {
   const token = getAccessTokenFromRequest(request)
@@ -58,7 +60,17 @@ export async function GET(request: NextRequest) {
 }
 
 // POST /api/bookings - student books a session with a tutor.
-// Body: { tutorId, title, subject, description, startTime (ISO), durationMinutes, tutorEmail, studentEmail }
+// Body: { tutorId, title, subject, description, startTime (ISO), durationMinutes,
+//         tutorEmail, studentEmail, isTrial?, paymentConfirmed? }
+//
+// Payment rules:
+//   - isTrial=true: forced to a fixed 20-minute, free (£0) session. Only
+//     allowed once per student email - checked across ALL accounts via the
+//     service-role client, not just the caller's own bookings (which RLS
+//     would otherwise limit them to).
+//   - isTrial=false (default): price = tutor's hourly_rate * duration, and
+//     the request must include paymentConfirmed=true (set after the student
+//     completes the checkout step client-side) or it's rejected with 402.
 export async function POST(request: NextRequest) {
   const auth = await requireUser(request)
   if ('error' in auth) return auth.error
@@ -71,9 +83,11 @@ export async function POST(request: NextRequest) {
     subject,
     description,
     startTime,
-    durationMinutes = 60,
+    durationMinutes: requestedDurationMinutes = 60,
     tutorEmail,
     studentEmail,
+    isTrial = false,
+    paymentConfirmed = false,
   } = body
 
   if (!tutorId || !title || !startTime) {
@@ -82,6 +96,9 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     )
   }
+
+  // Trials are always fixed at 20 minutes regardless of what the client sent.
+  const durationMinutes = isTrial ? TRIAL_DURATION_MINUTES : requestedDurationMinutes
 
   const startDateTime = new Date(startTime)
   if (isNaN(startDateTime.getTime()) || startDateTime.getTime() < Date.now()) {
@@ -108,6 +125,90 @@ export async function POST(request: NextRequest) {
       { success: false, error: 'This tutor is no longer available at the selected time. Please pick another slot.' },
       { status: 409 }
     )
+  }
+
+  // ----------------------------------------------------------------------
+  // Payment / free-trial enforcement
+  // ----------------------------------------------------------------------
+  const { data: tutorProfile, error: tutorProfileError } = await supabase
+    .from('profiles')
+    .select('hourly_rate')
+    .eq('id', tutorId)
+    .single()
+
+  if (tutorProfileError) {
+    return NextResponse.json({ success: false, error: 'Could not verify tutor details' }, { status: 500 })
+  }
+
+  let price = 0
+  let paymentStatus: 'paid' | 'free' = 'free'
+
+  if (isTrial) {
+    // A student may book exactly one free trial. We check by account EMAIL
+    // (not just this session's userId) using the service-role client so the
+    // check covers all of that person's bookings, bypassing RLS which would
+    // otherwise only show the caller their own rows.
+    const { data: ownProfile } = await supabase.from('profiles').select('email').eq('id', userId).single()
+    const effectiveEmail = ownProfile?.email || studentEmail
+
+    if (effectiveEmail) {
+      const admin = getSupabaseAdmin()
+      if (admin) {
+        const { data: matchingProfiles } = await admin.from('profiles').select('id').eq('email', effectiveEmail)
+        const matchingIds = (matchingProfiles || []).map((p) => p.id)
+
+        if (matchingIds.length > 0) {
+          const { data: priorTrials } = await admin
+            .from('bookings')
+            .select('id')
+            .in('student_id', matchingIds)
+            .eq('is_trial', true)
+            .neq('status', 'cancelled')
+            .limit(1)
+
+          if (priorTrials && priorTrials.length > 0) {
+            return NextResponse.json(
+              {
+                success: false,
+                error: 'You have already used your free trial session. Please book a paid session instead.',
+              },
+              { status: 409 }
+            )
+          }
+        }
+      }
+    }
+
+    price = 0
+    paymentStatus = 'free'
+  } else {
+    const hourlyRate = tutorProfile?.hourly_rate
+    if (!hourlyRate || hourlyRate <= 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "This tutor hasn't set an hourly rate yet, so paid sessions can't be booked. Try a free trial instead, or contact support.",
+        },
+        { status: 400 }
+      )
+    }
+
+    price = Math.round(hourlyRate * (durationMinutes / 60) * 100) / 100
+
+    if (!paymentConfirmed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Payment is required before this session can be booked.',
+          requiresPayment: true,
+          price,
+          currency: 'GBP',
+        },
+        { status: 402 }
+      )
+    }
+
+    paymentStatus = 'paid'
   }
 
   const url = new URL(request.url)
@@ -154,6 +255,9 @@ export async function POST(request: NextRequest) {
       end_time: endDateTime.toISOString(),
       duration_minutes: durationMinutes,
       status: 'scheduled',
+      is_trial: isTrial,
+      price,
+      payment_status: paymentStatus,
       google_event_id: meetResult.eventId,
       meeting_url: meetResult.meetingUrl,
       calendar_link: meetResult.calendarLink,
@@ -174,7 +278,9 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     success: true,
     booking,
-    message: 'Session booked! A Google Meet invite has been sent to both of you.',
+    message: isTrial
+      ? 'Free trial booked! A Google Meet invite has been sent to both of you.'
+      : 'Session booked! A Google Meet invite has been sent to both of you.',
   })
 }
 
