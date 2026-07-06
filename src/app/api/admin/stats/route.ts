@@ -51,7 +51,9 @@ export async function GET(request: NextRequest) {
   const [{ data: profiles, error: profilesError }, { data: bookings, error: bookingsError }] = await Promise.all([
     admin
       .from('profiles')
-      .select('id, full_name, email, user_type, subjects, hourly_rate, created_at')
+      .select(
+        'id, full_name, email, user_type, phone, subjects, hourly_rate, bio, years_experience, qualifications, is_approved, created_at'
+      )
       .order('created_at', { ascending: false }),
     admin.from('bookings').select('id, student_id, tutor_id, subject, title, duration_minutes, status, start_time'),
   ])
@@ -81,9 +83,11 @@ export async function GET(request: NextRequest) {
         id: p.id,
         name: p.full_name || p.email,
         email: p.email,
+        phone: p.phone || null,
         sessionsCount: own.length,
         totalHours: Math.round(totalHours * 100) / 100,
         subjects,
+        joinedAt: p.created_at,
       }
     })
     .sort((a, b) => b.totalHours - a.totalHours)
@@ -108,10 +112,16 @@ export async function GET(request: NextRequest) {
         id: p.id,
         name: p.full_name || p.email,
         email: p.email,
+        phone: p.phone || null,
         hourlyRate: p.hourly_rate,
+        bio: p.bio || null,
+        yearsExperience: p.years_experience ?? null,
+        qualifications: p.qualifications || [],
+        isApproved: !!p.is_approved,
         sessionsCount: own.length,
         totalHours: Math.round(totalHours * 100) / 100,
         subjectBreakdown,
+        joinedAt: p.created_at,
       }
     })
     .sort((a, b) => b.totalHours - a.totalHours)

@@ -85,15 +85,6 @@ export default function ContactPage() {
       color: 'green'
     },
     {
-      title: 'Email Support',
-      description: 'Detailed inquiries and support',
-      icon: EnvelopeIcon,
-      contact: 'contact@ahmedtutors.com',
-      action: 'mailto:contact@ahmedtutors.com',
-      available: '24 hours response',
-      color: 'purple'
-    },
-    {
       title: 'Help Center',
       description: 'Self-service support resources',
       icon: QuestionMarkCircleIcon,
@@ -139,7 +130,7 @@ export default function ContactPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
             How Can We Help You?
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {contactMethods.map((method, index) => (
               <motion.div
                 key={method.title}

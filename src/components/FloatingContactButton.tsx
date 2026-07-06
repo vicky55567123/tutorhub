@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { PhoneIcon, XMarkIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline'
+import { PhoneIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useState } from 'react'
 
 // WhatsApp Icon Component
@@ -69,14 +69,6 @@ export default function FloatingContactButton() {
               WhatsApp Chat
             </a>
             
-            <a
-              href="mailto:contact@ahmedtutors.com"
-              className="flex items-center gap-3 w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 rounded-xl transition-colors font-medium"
-              onClick={() => setIsExpanded(false)}
-            >
-              <ChatBubbleLeftRightIcon className="h-5 w-5" />
-              Email Us
-            </a>
           </div>
           
           <div className="mt-4 pt-4 border-t border-gray-200">

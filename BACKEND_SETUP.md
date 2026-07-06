@@ -142,16 +142,31 @@ never any ambiguity about which time zone a session is happening in.
 Visit `/admin` (also appears in the sidebar as "Admin Dashboard") to see:
 - Total registered tutors / students
 - Total sessions booked and how many are still upcoming
-- A table of every student with their number of booked sessions, total
-  hours, and which subjects they've studied
-- A table of every tutor with their number of sessions, total hours taught,
-  and an hours-per-subject breakdown
+- A table of every student with their phone, number of booked sessions,
+  total hours, subjects studied, and join date
+- A table of every tutor with their phone, hourly rate, approval status,
+  number of sessions, total hours taught, an hours-per-subject breakdown,
+  and (click their name to expand) bio / years of experience / qualifications
+  / join date
+
+**Adding a tutor or student as an admin:** click "Add Student" or "Add Tutor"
+at the top of `/admin`. Fill in their name, email, a temporary password, and
+(for tutors) subjects/rate/bio/experience, then submit. This calls
+`POST /api/admin/users`, which creates a real Supabase Auth account
+(pre-confirmed, no email verification needed) and fills in their profile -
+they can log in immediately with the email/password you set. Give them their
+temporary password so they can log in and change it from Settings.
+
+**Editing an existing student/tutor's details:** click "Edit" on their row to
+update phone, subjects, and (for tutors) hourly rate/bio/years of experience.
+This calls `PATCH /api/admin/users`. Email can't be changed from this form.
 
 **To make a user an admin:** open the Supabase Table Editor -> `profiles`
 table, find their row, and change `user_type` from `student`/`tutor` to
 `admin`. There's no sign-up option for this - it must be set manually for
-security. The stats API (`/api/admin/stats`) checks this field server-side
-using the service role key, so only genuine admins can see everyone's data.
+security. Both admin APIs (`/api/admin/stats`, `/api/admin/users`) check this
+field server-side using the service role key, so only genuine admins can see
+or modify everyone's data.
 
 ---
 

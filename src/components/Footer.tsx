@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { PhoneIcon, EnvelopeIcon } from '@heroicons/react/24/outline'
+import { PhoneIcon } from '@heroicons/react/24/outline'
 
 export default function Footer() {
   return (
@@ -32,15 +32,6 @@ export default function Footer() {
                   className="text-green-400 hover:text-green-300 transition duration-150 font-medium"
                 >
                   WhatsApp Chat
-                </a>
-              </div>
-              <div className="flex items-center">
-                <EnvelopeIcon className="h-5 w-5 text-blue-400 mr-2" />
-                <a 
-                  href="mailto:contact@ahmedtutors.com" 
-                  className="text-blue-400 hover:text-blue-300 transition duration-150"
-                >
-                  contact@ahmedtutors.com
                 </a>
               </div>
             </div>
@@ -131,7 +122,7 @@ export default function Footer() {
         
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">
-            © 2025 Ahmed Tutors. All rights reserved.
+            © {new Date().getFullYear()} Ahmed Tutors. All rights reserved.
           </p>
         </div>
       </div>

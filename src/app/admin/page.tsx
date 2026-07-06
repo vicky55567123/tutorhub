@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { Fragment, useCallback, useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import {
   UsersIcon,
@@ -9,6 +9,11 @@ import {
   CalendarIcon,
   ClockIcon,
   ShieldCheckIcon,
+  PlusIcon,
+  PencilSquareIcon,
+  XMarkIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
 } from '@heroicons/react/24/outline'
 import { useAuth } from '@/components/AuthContext'
 import { isSupabaseConfigured } from '@/lib/supabase'
@@ -17,19 +22,27 @@ interface StudentRow {
   id: string
   name: string
   email: string
+  phone?: string | null
   sessionsCount: number
   totalHours: number
   subjects: string[]
+  joinedAt?: string
 }
 
 interface TutorRow {
   id: string
   name: string
   email: string
-  hourlyRate?: number
+  phone?: string | null
+  hourlyRate?: number | null
+  bio?: string | null
+  yearsExperience?: number | null
+  qualifications?: string[]
+  isApproved?: boolean
   sessionsCount: number
   totalHours: number
   subjectBreakdown: { subject: string; hours: number }[]
+  joinedAt?: string
 }
 
 interface AdminStats {
@@ -37,6 +50,39 @@ interface AdminStats {
   totalStudents: number
   totalSessions: number
   upcomingSessions: number
+}
+
+type ModalType = 'student' | 'tutor' | null
+
+interface UserFormState {
+  fullName: string
+  email: string
+  password: string
+  phone: string
+  subjects: string
+  hourlyRate: string
+  bio: string
+  yearsExperience: string
+}
+
+const emptyForm: UserFormState = {
+  fullName: '',
+  email: '',
+  password: '',
+  phone: '',
+  subjects: '',
+  hourlyRate: '',
+  bio: '',
+  yearsExperience: '',
+}
+
+function formatDate(value?: string) {
+  if (!value) return '—'
+  try {
+    return new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+  } catch {
+    return '—'
+  }
 }
 
 export default function AdminDashboardPage() {
@@ -47,39 +93,159 @@ export default function AdminDashboardPage() {
   const [students, setStudents] = useState<StudentRow[]>([])
   const [tutors, setTutors] = useState<TutorRow[]>([])
 
-  useEffect(() => {
-    async function load() {
-      if (!user) return
-      setIsLoading(true)
-      setForbidden(false)
-      try {
-        const token = await getAccessToken()
-        if (!token) {
-          setIsLoading(false)
-          return
-        }
-        const res = await fetch('/api/admin/stats', {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        const data = await res.json()
-        if (data.success) {
-          setStats(data.stats)
-          setStudents(data.students)
-          setTutors(data.tutors)
-        } else if (res.status === 403) {
-          setForbidden(true)
-        } else {
-          toast.error(data.error || 'Failed to load admin stats')
-        }
-      } catch (error) {
-        console.error(error)
-        toast.error('Failed to load admin stats')
-      } finally {
+  const [modalType, setModalType] = useState<ModalType>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [form, setForm] = useState<UserFormState>(emptyForm)
+  const [isSaving, setIsSaving] = useState(false)
+  const [expandedTutorId, setExpandedTutorId] = useState<string | null>(null)
+
+  const loadStats = useCallback(async () => {
+    if (!user) return
+    setIsLoading(true)
+    setForbidden(false)
+    try {
+      const token = await getAccessToken()
+      if (!token) {
         setIsLoading(false)
+        return
+      }
+      const res = await fetch('/api/admin/stats', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (data.success) {
+        setStats(data.stats)
+        setStudents(data.students)
+        setTutors(data.tutors)
+      } else if (res.status === 403) {
+        setForbidden(true)
+      } else {
+        toast.error(data.error || 'Failed to load admin stats')
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error('Failed to load admin stats')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [user, getAccessToken])
+
+  useEffect(() => {
+    loadStats()
+  }, [loadStats])
+
+  function openAddModal(type: 'student' | 'tutor') {
+    setModalType(type)
+    setEditingId(null)
+    setForm(emptyForm)
+  }
+
+  function openEditModal(type: 'student' | 'tutor', row: StudentRow | TutorRow) {
+    setModalType(type)
+    setEditingId(row.id)
+    const subjectsText =
+      type === 'student'
+        ? (row as StudentRow).subjects.join(', ')
+        : (row as TutorRow).subjectBreakdown.map((s) => s.subject).join(', ')
+    setForm({
+      fullName: row.name,
+      email: row.email,
+      password: '',
+      phone: row.phone || '',
+      subjects: subjectsText,
+      hourlyRate: type === 'tutor' ? String((row as TutorRow).hourlyRate ?? '') : '',
+      bio: type === 'tutor' ? (row as TutorRow).bio || '' : '',
+      yearsExperience: type === 'tutor' ? String((row as TutorRow).yearsExperience ?? '') : '',
+    })
+  }
+
+  function closeModal() {
+    setModalType(null)
+    setEditingId(null)
+    setForm(emptyForm)
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!modalType) return
+    if (!form.fullName.trim()) {
+      toast.error('Full name is required')
+      return
+    }
+    if (!editingId) {
+      if (!form.email.trim()) {
+        toast.error('Email is required')
+        return
+      }
+      if (!form.password || form.password.length < 6) {
+        toast.error('Password must be at least 6 characters')
+        return
       }
     }
-    load()
-  }, [user, getAccessToken])
+
+    setIsSaving(true)
+    try {
+      const token = await getAccessToken()
+      if (!token) {
+        toast.error('Session expired, please log in again')
+        return
+      }
+
+      const subjectsArray = form.subjects
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+
+      const tutorFields =
+        modalType === 'tutor'
+          ? {
+              hourlyRate: form.hourlyRate ? Number(form.hourlyRate) : null,
+              bio: form.bio || null,
+              yearsExperience: form.yearsExperience ? Number(form.yearsExperience) : null,
+            }
+          : {}
+
+      let res: Response
+      if (editingId) {
+        res = await fetch('/api/admin/users', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            id: editingId,
+            fullName: form.fullName,
+            phone: form.phone || null,
+            subjects: subjectsArray,
+            ...tutorFields,
+          }),
+        })
+      } else {
+        res = await fetch('/api/admin/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            userType: modalType,
+            fullName: form.fullName,
+            email: form.email,
+            password: form.password,
+            phone: form.phone || null,
+            subjects: subjectsArray,
+            ...tutorFields,
+          }),
+        })
+      }
+
+      const data = await res.json()
+      if (!data.success) throw new Error(data.error || 'Something went wrong')
+
+      toast.success(editingId ? 'Details updated' : `${modalType === 'tutor' ? 'Tutor' : 'Student'} added`)
+      closeModal()
+      loadStats()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Something went wrong')
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   if (!isSupabaseConfigured) {
     return (
@@ -132,12 +298,28 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <ShieldCheckIcon className="h-8 w-8 text-primary-600" />
-          Admin Dashboard
-        </h1>
-        <p className="text-gray-600 mt-1">Platform-wide overview of registered users and booked sessions.</p>
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <ShieldCheckIcon className="h-8 w-8 text-primary-600" />
+            Admin Dashboard
+          </h1>
+          <p className="text-gray-600 mt-1">Platform-wide overview of registered users and booked sessions.</p>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={() => openAddModal('student')}
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors"
+          >
+            <PlusIcon className="h-4 w-4" /> Add Student
+          </button>
+          <button
+            onClick={() => openAddModal('tutor')}
+            className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors"
+          >
+            <PlusIcon className="h-4 w-4" /> Add Tutor
+          </button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -174,9 +356,12 @@ export default function AdminDashboardPage() {
                     <tr className="text-left text-gray-500 border-b border-gray-100">
                       <th className="py-2 pr-4 font-medium">Name</th>
                       <th className="py-2 pr-4 font-medium">Email</th>
+                      <th className="py-2 pr-4 font-medium">Phone</th>
                       <th className="py-2 pr-4 font-medium">Sessions</th>
                       <th className="py-2 pr-4 font-medium">Total Hours</th>
                       <th className="py-2 pr-4 font-medium">Subjects Studied</th>
+                      <th className="py-2 pr-4 font-medium">Joined</th>
+                      <th className="py-2 pr-4 font-medium text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -184,9 +369,19 @@ export default function AdminDashboardPage() {
                       <tr key={s.id} className="border-b border-gray-50 last:border-0">
                         <td className="py-2 pr-4 font-medium text-gray-900">{s.name}</td>
                         <td className="py-2 pr-4 text-gray-500">{s.email}</td>
+                        <td className="py-2 pr-4 text-gray-500">{s.phone || '—'}</td>
                         <td className="py-2 pr-4">{s.sessionsCount}</td>
                         <td className="py-2 pr-4">{s.totalHours}h</td>
                         <td className="py-2 pr-4 text-gray-500">{s.subjects.join(', ') || '—'}</td>
+                        <td className="py-2 pr-4 text-gray-500">{formatDate(s.joinedAt)}</td>
+                        <td className="py-2 pr-4 text-right">
+                          <button
+                            onClick={() => openEditModal('student', s)}
+                            className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-800 font-medium text-xs"
+                          >
+                            <PencilSquareIcon className="h-4 w-4" /> Edit
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -209,36 +404,102 @@ export default function AdminDashboardPage() {
                     <tr className="text-left text-gray-500 border-b border-gray-100">
                       <th className="py-2 pr-4 font-medium">Name</th>
                       <th className="py-2 pr-4 font-medium">Email</th>
+                      <th className="py-2 pr-4 font-medium">Phone</th>
+                      <th className="py-2 pr-4 font-medium">Rate</th>
+                      <th className="py-2 pr-4 font-medium">Approved</th>
                       <th className="py-2 pr-4 font-medium">Sessions</th>
                       <th className="py-2 pr-4 font-medium">Total Hours</th>
                       <th className="py-2 pr-4 font-medium">Hours by Subject</th>
+                      <th className="py-2 pr-4 font-medium text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {tutors.map((t) => (
-                      <tr key={t.id} className="border-b border-gray-50 last:border-0 align-top">
-                        <td className="py-2 pr-4 font-medium text-gray-900">{t.name}</td>
-                        <td className="py-2 pr-4 text-gray-500">{t.email}</td>
-                        <td className="py-2 pr-4">{t.sessionsCount}</td>
-                        <td className="py-2 pr-4">{t.totalHours}h</td>
-                        <td className="py-2 pr-4">
-                          {t.subjectBreakdown.length === 0 ? (
-                            <span className="text-gray-400">—</span>
-                          ) : (
-                            <div className="flex flex-wrap gap-1">
-                              {t.subjectBreakdown.map((sb) => (
-                                <span
-                                  key={sb.subject}
-                                  className="inline-flex items-center gap-1 bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full text-xs font-medium"
-                                >
-                                  {sb.subject}: {sb.hours}h
-                                </span>
-                              ))}
-                            </div>
+                    {tutors.map((t) => {
+                      const isExpanded = expandedTutorId === t.id
+                      return (
+                        <Fragment key={t.id}>
+                          <tr className="border-b border-gray-50 last:border-0 align-top">
+                            <td className="py-2 pr-4 font-medium text-gray-900">
+                              <button
+                                onClick={() => setExpandedTutorId(isExpanded ? null : t.id)}
+                                className="inline-flex items-center gap-1 hover:text-primary-700"
+                              >
+                                {isExpanded ? (
+                                  <ChevronUpIcon className="h-4 w-4 text-gray-400" />
+                                ) : (
+                                  <ChevronDownIcon className="h-4 w-4 text-gray-400" />
+                                )}
+                                {t.name}
+                              </button>
+                            </td>
+                            <td className="py-2 pr-4 text-gray-500">{t.email}</td>
+                            <td className="py-2 pr-4 text-gray-500">{t.phone || '—'}</td>
+                            <td className="py-2 pr-4 text-gray-500">{t.hourlyRate ? `£${t.hourlyRate}/hr` : '—'}</td>
+                            <td className="py-2 pr-4">
+                              <span
+                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                  t.isApproved ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'
+                                }`}
+                              >
+                                {t.isApproved ? 'Approved' : 'Pending'}
+                              </span>
+                            </td>
+                            <td className="py-2 pr-4">{t.sessionsCount}</td>
+                            <td className="py-2 pr-4">{t.totalHours}h</td>
+                            <td className="py-2 pr-4">
+                              {t.subjectBreakdown.length === 0 ? (
+                                <span className="text-gray-400">—</span>
+                              ) : (
+                                <div className="flex flex-wrap gap-1">
+                                  {t.subjectBreakdown.map((sb) => (
+                                    <span
+                                      key={sb.subject}
+                                      className="inline-flex items-center gap-1 bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full text-xs font-medium"
+                                    >
+                                      {sb.subject}: {sb.hours}h
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </td>
+                            <td className="py-2 pr-4 text-right">
+                              <button
+                                onClick={() => openEditModal('tutor', t)}
+                                className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-800 font-medium text-xs"
+                              >
+                                <PencilSquareIcon className="h-4 w-4" /> Edit
+                              </button>
+                            </td>
+                          </tr>
+                          {isExpanded && (
+                            <tr className="bg-gray-50 border-b border-gray-100">
+                              <td colSpan={9} className="py-3 px-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                                  <div>
+                                    <p className="text-gray-400 uppercase tracking-wide mb-1">Joined</p>
+                                    <p className="text-gray-700">{formatDate(t.joinedAt)}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-400 uppercase tracking-wide mb-1">Years Experience</p>
+                                    <p className="text-gray-700">{t.yearsExperience ?? '—'}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-400 uppercase tracking-wide mb-1">Qualifications</p>
+                                    <p className="text-gray-700">
+                                      {t.qualifications && t.qualifications.length > 0 ? t.qualifications.join(', ') : '—'}
+                                    </p>
+                                  </div>
+                                  <div className="sm:col-span-3">
+                                    <p className="text-gray-400 uppercase tracking-wide mb-1">Bio</p>
+                                    <p className="text-gray-700">{t.bio || '—'}</p>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
                           )}
-                        </td>
-                      </tr>
-                    ))}
+                        </Fragment>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -246,6 +507,150 @@ export default function AdminDashboardPage() {
           </motion.div>
         </>
       )}
+
+      {/* Add / Edit user modal */}
+      <AnimatePresence>
+        {modalType && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={closeModal}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {editingId ? 'Edit' : 'Add'} {modalType === 'tutor' ? 'Tutor' : 'Student'}
+                </h3>
+                <button onClick={closeModal} className="text-gray-400 hover:text-gray-600" aria-label="Close">
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              </div>
+              <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={form.fullName}
+                    onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="e.g. Sarah Ahmed"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email {editingId ? '' : '*'}</label>
+                  <input
+                    type="email"
+                    required={!editingId}
+                    disabled={!!editingId}
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-gray-100 disabled:text-gray-500"
+                    placeholder="name@example.com"
+                  />
+                  {editingId && <p className="text-xs text-gray-400 mt-1">Email cannot be changed here.</p>}
+                </div>
+                {!editingId && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Temporary Password *</label>
+                    <input
+                      type="text"
+                      required
+                      value={form.password}
+                      onChange={(e) => setForm({ ...form, password: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="At least 6 characters"
+                    />
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <input
+                    type="text"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="+44 7..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subjects <span className="text-gray-400 font-normal">(comma-separated)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={form.subjects}
+                    onChange={(e) => setForm({ ...form, subjects: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="Maths, Physics, Chemistry"
+                  />
+                </div>
+                {modalType === 'tutor' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Hourly Rate (£)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.5"
+                        value={form.hourlyRate}
+                        onChange={(e) => setForm({ ...form, hourlyRate: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="25"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={form.yearsExperience}
+                        onChange={(e) => setForm({ ...form, yearsExperience: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="5"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                      <textarea
+                        rows={3}
+                        value={form.bio}
+                        onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                        placeholder="Short tutor bio..."
+                      />
+                    </div>
+                  </>
+                )}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={closeModal}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="flex-1 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium disabled:opacity-50"
+                  >
+                    {isSaving ? 'Saving...' : editingId ? 'Save Changes' : 'Create Account'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

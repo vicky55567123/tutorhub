@@ -293,7 +293,7 @@ export default function SidebarNavigation() {
                 animate={{ opacity: 1 }}
                 className="text-center text-blue-200 text-sm"
               >
-                <p>© 2024 Ahmed Tutors</p>
+                <p>© {new Date().getFullYear()} Ahmed Tutors</p>
                 <p>Excellence in Education</p>
               </motion.div>
             )}
