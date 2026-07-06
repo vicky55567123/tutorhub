@@ -161,12 +161,21 @@ temporary password so they can log in and change it from Settings.
 update phone, subjects, and (for tutors) hourly rate/bio/years of experience.
 This calls `PATCH /api/admin/users`. Email can't be changed from this form.
 
-**To make a user an admin:** open the Supabase Table Editor -> `profiles`
-table, find their row, and change `user_type` from `student`/`tutor` to
-`admin`. There's no sign-up option for this - it must be set manually for
-security. Both admin APIs (`/api/admin/stats`, `/api/admin/users`) check this
-field server-side using the service role key, so only genuine admins can see
-or modify everyone's data.
+**To make a user an admin:** open the Supabase dashboard -> **SQL Editor** ->
+New query, and run (replace the email with the account you want to promote):
+
+```sql
+update public.profiles
+set user_type = 'admin'
+where email = 'you@example.com';
+```
+
+Then log out and back in on the site - the "Admin Dashboard" link appears in
+the sidebar immediately. (A ready-to-copy version of this lives in
+`database/make_admin.sql`.) There's no sign-up option for admin - it must be
+set manually for security. Both admin APIs (`/api/admin/stats`,
+`/api/admin/users`) check this field server-side using the service role key,
+so only genuine admins can see or modify everyone's data.
 
 ---
 
