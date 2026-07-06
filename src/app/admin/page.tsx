@@ -179,6 +179,7 @@ export default function AdminDashboardPage() {
   const { user, getAccessToken } = useAuth()
   const [isLoading, setIsLoading] = useState(true)
   const [forbidden, setForbidden] = useState(false)
+  const [migrationRequired, setMigrationRequired] = useState<string | null>(null)
   const [stats, setStats] = useState<AdminStats | null>(null)
   const [students, setStudents] = useState<StudentRow[]>([])
   const [tutors, setTutors] = useState<TutorRow[]>([])
@@ -194,6 +195,7 @@ export default function AdminDashboardPage() {
     if (!user) return
     setIsLoading(true)
     setForbidden(false)
+    setMigrationRequired(null)
     try {
       const token = await getAccessToken()
       if (!token) {
@@ -210,6 +212,8 @@ export default function AdminDashboardPage() {
         setTutors(data.tutors)
       } else if (res.status === 403) {
         setForbidden(true)
+      } else if (data.migrationRequired) {
+        setMigrationRequired(data.error)
       } else {
         toast.error(data.error || 'Failed to load admin stats')
       }
@@ -376,6 +380,34 @@ export default function AdminDashboardPage() {
         <ShieldCheckIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Access denied</h1>
         <p className="text-gray-600">The server did not recognise this account as an admin.</p>
+      </div>
+    )
+  }
+
+  if (migrationRequired) {
+    return (
+      <div className="max-w-2xl mx-auto py-16 px-4 text-center">
+        <ShieldCheckIcon className="h-16 w-16 text-amber-500 mx-auto mb-4" />
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Database update needed</h1>
+        <p className="text-gray-600 mb-4">{migrationRequired}</p>
+        <div className="bg-gray-900 text-gray-100 text-left text-xs rounded-lg p-4 overflow-x-auto mb-4">
+          <pre>{`alter table public.bookings
+  add column if not exists is_trial boolean not null default false,
+  add column if not exists price numeric(10,2) not null default 0,
+  add column if not exists payment_status text not null default 'unpaid'
+    check (payment_status in ('unpaid','paid','free'));`}</pre>
+        </div>
+        <p className="text-sm text-gray-500 mb-4">
+          Paste that into your Supabase project&apos;s SQL Editor and run it (the full file is also at{' '}
+          <code className="bg-gray-100 px-1 rounded">database/booking_payments_and_trial.sql</code> in the repo), then
+          refresh this page.
+        </p>
+        <button
+          onClick={() => loadStats()}
+          className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg px-4 py-2"
+        >
+          I&apos;ve run it - refresh
+        </button>
       </div>
     )
   }

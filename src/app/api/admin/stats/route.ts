@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseForToken, getSupabaseAdmin, getAccessTokenFromRequest } from '@/lib/supabaseAdmin'
+import { getSupabaseForToken, getSupabaseAdmin, getAccessTokenFromRequest, friendlyDbError } from '@/lib/supabaseAdmin'
 
 /**
  * Admin-only aggregated stats: how many tutors/students are registered, how
@@ -63,10 +63,12 @@ export async function GET(request: NextRequest) {
   ])
 
   if (profilesError) {
-    return NextResponse.json({ success: false, error: profilesError.message }, { status: 500 })
+    const { message, migrationRequired } = friendlyDbError(profilesError)
+    return NextResponse.json({ success: false, error: message, migrationRequired }, { status: 500 })
   }
   if (bookingsError) {
-    return NextResponse.json({ success: false, error: bookingsError.message }, { status: 500 })
+    const { message, migrationRequired } = friendlyDbError(bookingsError)
+    return NextResponse.json({ success: false, error: message, migrationRequired }, { status: 500 })
   }
 
   const allProfiles = profiles || []

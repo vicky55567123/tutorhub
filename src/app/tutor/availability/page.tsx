@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { PlusIcon, TrashIcon, ClockIcon, CalendarDaysIcon, GlobeAltIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '@/components/AuthContext'
@@ -22,6 +23,7 @@ export default function TutorAvailabilityPage() {
 
   const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE)
   const [isSavingTimezone, setIsSavingTimezone] = useState(false)
+  const [hourlyRate, setHourlyRate] = useState<number | null | undefined>(undefined)
 
   const loadSlots = async () => {
     if (!user) return
@@ -33,6 +35,7 @@ export default function TutorAvailabilityPage() {
 
       const profile = await dbOperations.getProfile(user.id)
       if (profile?.timezone) setTimezone(profile.timezone)
+      setHourlyRate(profile?.hourly_rate ?? null)
     } catch (error) {
       console.error(error)
     } finally {
@@ -156,6 +159,21 @@ export default function TutorAvailabilityPage() {
           Set the weekly hours you&apos;re free to teach. Students will only be able to book slots inside these windows.
         </p>
       </div>
+
+      {(hourlyRate === null || hourlyRate === 0) && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <p className="text-sm text-amber-800">
+            <strong>You haven&apos;t set an hourly rate yet.</strong> Students won&apos;t be able to book (and pay for)
+            paid sessions with you until you do - free trial bookings still work.
+          </p>
+          <Link
+            href="/tutor/profile"
+            className="inline-flex shrink-0 items-center justify-center bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg px-4 py-2"
+          >
+            Set hourly rate
+          </Link>
+        </div>
+      )}
 
       {/* Timezone */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-xl shadow-sm p-6 mb-6">

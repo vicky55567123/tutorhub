@@ -18,13 +18,14 @@ import {
   VideoCameraIcon,
   XCircleIcon
 } from '@heroicons/react/24/outline'
-import { Booking, isSupabaseConfigured } from '@/lib/supabase'
+import { Booking, isSupabaseConfigured, dbOperations } from '@/lib/supabase'
 
 export default function DashboardPage() {
   const { user, getAccessToken } = useAuth()
   const [enrolledCourses, setEnrolledCourses] = useState<number[]>([])
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loadingBookings, setLoadingBookings] = useState(true)
+  const [hourlyRate, setHourlyRate] = useState<number | null | undefined>(undefined)
 
   useEffect(() => {
     if (user) {
@@ -32,6 +33,14 @@ export default function DashboardPage() {
       const enrolled = JSON.parse(localStorage.getItem(`enrolledCourses_${user.email}`) || '[]')
       setEnrolledCourses(enrolled)
     }
+  }, [user])
+
+  useEffect(() => {
+    if (!user || user.type !== 'tutor' || !isSupabaseConfigured) return
+    dbOperations
+      .getProfile(user.id)
+      .then((profile) => setHourlyRate(profile?.hourly_rate ?? null))
+      .catch(() => setHourlyRate(null))
   }, [user])
 
   const loadBookings = useCallback(async () => {
@@ -366,6 +375,25 @@ export default function DashboardPage() {
           </div>
         </div>
       </motion.div>
+
+      {(hourlyRate === null || hourlyRate === 0) && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+        >
+          <p className="text-sm text-amber-800">
+            <strong>Set your hourly rate</strong> so students can book (and pay for) paid sessions with you. Free
+            trial sessions still work without one.
+          </p>
+          <Link
+            href="/tutor/profile"
+            className="inline-flex shrink-0 items-center justify-center bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg px-4 py-2"
+          >
+            Set hourly rate
+          </Link>
+        </motion.div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

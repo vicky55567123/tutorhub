@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { SupabaseClient } from '@supabase/supabase-js'
-import { getSupabaseForToken, getSupabaseAdmin, getAccessTokenFromRequest } from '@/lib/supabaseAdmin'
+import { getSupabaseForToken, getSupabaseAdmin, getAccessTokenFromRequest, friendlyDbError } from '@/lib/supabaseAdmin'
 
 /**
  * Admin-only user management: create brand-new tutor/student accounts, or
@@ -122,7 +122,8 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (updateError) {
-    return NextResponse.json({ success: false, error: updateError.message }, { status: 500 })
+    const { message, migrationRequired } = friendlyDbError(updateError)
+    return NextResponse.json({ success: false, error: message, migrationRequired }, { status: 500 })
   }
 
   return NextResponse.json({ success: true, profile })
@@ -170,7 +171,8 @@ export async function PATCH(request: NextRequest) {
   const { data: profile, error } = await admin.from('profiles').update(updates).eq('id', id).select().single()
 
   if (error) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    const { message, migrationRequired } = friendlyDbError(error)
+    return NextResponse.json({ success: false, error: message, migrationRequired }, { status: 500 })
   }
 
   return NextResponse.json({ success: true, profile })

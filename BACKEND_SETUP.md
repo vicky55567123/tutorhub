@@ -231,10 +231,19 @@ in the Supabase SQL Editor to add the missing columns.
   Supabase.
 - **"Admins only" on /admin** - your account's `user_type` in the `profiles`
   table isn't set to `admin` yet (see section 10 above).
+- **"column bookings.is_trial/price/payment_status does not exist"** - the
+  `database/booking_payments_and_trial.sql` migration was never run against
+  this Supabase project (pushing code to git does NOT apply SQL migrations -
+  they must be run manually once in the Supabase SQL Editor). The admin
+  dashboard now detects this and shows a "Database update needed" screen with
+  the exact SQL to paste; run it once and refresh.
 - **"Payment is required before this session can be booked"** - the student
   tried to book a paid session without completing the checkout step; this is
   expected and enforced server-side in `/api/bookings` (see section 11).
-- **Paid session button is disabled / tutor has no rate** - set an
-  `hourly_rate` on that tutor's profile (Edit Profile, or via the Admin
-  Dashboard "Edit" button) before students can book a paid session with them.
+- **Paid session button is disabled / tutor has no rate** - the tutor hasn't
+  set an `hourly_rate` yet. As the tutor: log in, open the sidebar → **Edit My
+  Profile** (`/tutor/profile`), enter a value under "Hourly rate (£)" and save.
+  A tutor with no rate set will now also see an amber reminder banner on their
+  Dashboard and Availability pages linking straight there. Admins can also set
+  it directly via the Admin Dashboard's "Edit" button on that tutor's row.
 

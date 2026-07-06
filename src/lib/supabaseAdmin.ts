@@ -56,3 +56,38 @@ export function getSupabaseAnon(): SupabaseClient | null {
     auth: { autoRefreshToken: false, persistSession: false },
   })
 }
+
+interface PostgrestLikeError {
+  message?: string | null
+  code?: string | null
+}
+
+/**
+ * Turns a raw Postgres/PostgREST error into a clear, actionable message when
+ * it looks like a column/table is missing - almost always because a SQL
+ * migration file (e.g. database/booking_payments_and_trial.sql) has been
+ * shipped in the code but never actually run against this Supabase project.
+ * Falls back to the original error message for anything else.
+ */
+export function friendlyDbError(err: PostgrestLikeError | null | undefined): {
+  message: string
+  migrationRequired: boolean
+} {
+  const raw = err?.message || ''
+  const looksLikeMissingColumnOrTable =
+    err?.code === '42703' || // undefined_column
+    err?.code === '42P01' || // undefined_table
+    /column .* does not exist/i.test(raw) ||
+    /relation .* does not exist/i.test(raw)
+
+  if (looksLikeMissingColumnOrTable) {
+    return {
+      message:
+        'This database is missing recent columns/tables (likely the payments & free-trial update). ' +
+        'An admin needs to run database/booking_payments_and_trial.sql in the Supabase SQL Editor, then refresh.',
+      migrationRequired: true,
+    }
+  }
+
+  return { message: raw || 'Unexpected database error', migrationRequired: false }
+}

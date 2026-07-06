@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabaseForToken, getSupabaseAdmin, getAccessTokenFromRequest } from '@/lib/supabaseAdmin'
+import { getSupabaseForToken, getSupabaseAdmin, getAccessTokenFromRequest, friendlyDbError } from '@/lib/supabaseAdmin'
 import { createGoogleMeetEvent, deleteGoogleMeetEvent, GoogleMeetAuthError, GoogleMeetNotConfiguredError } from '@/lib/googleMeet'
 
 const TRIAL_DURATION_MINUTES = 20
@@ -269,10 +269,11 @@ export async function POST(request: NextRequest) {
     // Roll back the Google Calendar event so we don't leave an orphaned meeting
     await deleteGoogleMeetEvent(meetResult.eventId, baseUrl)
     console.error('Error saving booking:', insertError)
-    const message = insertError.message.includes('overlap')
+    const { message, migrationRequired } = friendlyDbError(insertError)
+    const finalMessage = insertError.message.includes('overlap')
       ? 'This tutor was just booked for that time. Please choose another slot.'
-      : insertError.message
-    return NextResponse.json({ success: false, error: message }, { status: 409 })
+      : message
+    return NextResponse.json({ success: false, error: finalMessage, migrationRequired }, { status: 409 })
   }
 
   return NextResponse.json({
