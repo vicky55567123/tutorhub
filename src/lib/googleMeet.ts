@@ -108,8 +108,15 @@ export async function createGoogleMeetEvent(
       calendarLink: response.data.htmlLink || undefined,
     }
   } catch (error: any) {
-    if (error?.code === 401) {
-      throw new GoogleMeetAuthError('Google authorization has expired. Please re-authorize at /api/auth/google/authorize.')
+    // googleapis surfaces an expired/revoked refresh token in different
+    // shapes depending on the failure point - sometimes a 401 with no body,
+    // sometimes a 400 with { error: 'invalid_grant' } from the token
+    // endpoint itself. Treat all of these as "needs re-authorization" so the
+    // caller gets a clear, actionable error instead of a generic 500.
+    const status = error?.code ?? error?.response?.status
+    const reason = error?.response?.data?.error || error?.errors?.[0]?.reason
+    if (status === 401 || reason === 'invalid_grant' || reason === 'unauthorized_client') {
+      throw new GoogleMeetAuthError('Google authorization has expired or was revoked. Please re-authorize at /api/auth/google/authorize.')
     }
     throw error
   }

@@ -278,11 +278,19 @@ export default function BookSessionPage() {
 
       if (data.success) {
         setIsPaymentModalOpen(false)
-        toast.success(
-          sessionType === 'trial'
-            ? 'Free trial booked! Check your email for the Google Meet invite.'
-            : 'Session booked! Your payment is pending admin verification - check your email for the Google Meet invite.'
-        )
+        if (data.meetingPending) {
+          toast.success(
+            sessionType === 'trial'
+              ? "Free trial booked! We're finalising your video call link - you'll receive it by email shortly."
+              : "Session booked! Your payment is pending admin verification, and we're finalising your video call link - you'll receive it by email shortly."
+          )
+        } else {
+          toast.success(
+            sessionType === 'trial'
+              ? 'Free trial booked! Check your email for the Google Meet invite.'
+              : 'Session booked! Your payment is pending admin verification - check your email for the Google Meet invite.'
+          )
+        }
         setSelectedSlot(null)
         setSubject('')
         setCustomSubject('')

@@ -117,6 +117,10 @@ export interface BookingEmailDetails {
   price: number
   meetingUrl?: string
   calendarLink?: string
+  /** True when the Google Meet link could not be created automatically
+   *  (not configured, expired auth, transient error) - the booking still
+   *  went ahead, but someone needs to send a video link manually. */
+  meetingPending?: boolean
 }
 
 /** Sends the "new session booked" notification to the tutor being booked. */
@@ -139,6 +143,7 @@ export async function sendTutorBookingEmail(details: BookingEmailDetails): Promi
       </table>
       ${details.meetingUrl ? `<p><a href="${details.meetingUrl}" style="background:#1d4ed8;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-block;">Join Google Meet</a></p>` : ''}
       ${details.calendarLink ? `<p><a href="${details.calendarLink}">View in Google Calendar</a></p>` : ''}
+      ${details.meetingPending ? `<p style="background:#fef3c7;color:#92400e;padding:10px 14px;border-radius:8px;">The video call link couldn't be generated automatically for this session - we'll send it to you separately.</p>` : ''}
       <p style="color:#6b7280;font-size:13px;">You can manage this session from your Ahmed Tutors dashboard.</p>
     </div>
   `
@@ -165,6 +170,7 @@ export async function sendAdminBookingEmail(details: BookingEmailDetails): Promi
         <tr><td style="padding: 6px 0; color: #6b7280;">Duration</td><td style="padding: 6px 0; font-weight: 600;">${details.durationMinutes} minutes</td></tr>
         <tr><td style="padding: 6px 0; color: #6b7280;">Payment</td><td style="padding: 6px 0; font-weight: 600;">${priceLine}</td></tr>
       </table>
+      ${details.meetingPending ? `<p style="background:#fef3c7;color:#92400e;padding:10px 14px;border-radius:8px;"><strong>Action needed:</strong> the Google Meet link could not be created automatically for this session (check the Google connection at /api/auth/google/authorize, or send a meeting link manually).</p>` : ''}
       <p style="color:#6b7280;font-size:13px;">View full details, and (for paid sessions) review the payment proof, in the Admin Dashboard.</p>
     </div>
   `

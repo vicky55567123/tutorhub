@@ -83,6 +83,13 @@ export async function GET(request: NextRequest) {
 // tutor via the Calendar API), a notification email is also sent to the
 // tutor and to every admin (src/lib/email.ts) - best-effort, never blocks
 // the booking response if SMTP isn't configured or fails.
+//
+// Google Meet creation is ALSO best-effort: if it fails (not configured,
+// expired/revoked Google authorization, a transient API error, etc.) the
+// booking is still created with meeting_url/google_event_id left null and
+// `meetingPending: true` in the response, rather than losing the booking
+// (and any payment proof the student just submitted). Admins are notified
+// by email so they can fix the Google connection and send a manual link.
 export async function POST(request: NextRequest) {
   const auth = await requireUser(request)
   if ('error' in auth) return auth.error
@@ -246,7 +253,15 @@ export async function POST(request: NextRequest) {
   const url = new URL(request.url)
   const baseUrl = `${url.protocol}//${url.host}`
 
-  let meetResult
+  // Google Meet creation is best-effort: if it fails for any reason (not
+  // configured, expired/revoked authorization, a transient Google API
+  // error, etc.) we still create the booking - the student has already
+  // paid/submitted proof, and losing that entirely would be much worse
+  // than a session with no video link yet. The specific failure reason is
+  // logged server-side and surfaced to admins by email so they can fix the
+  // Google connection and/or send the student a meeting link manually.
+  let meetResult: { eventId?: string; meetingUrl?: string; calendarLink?: string } = {}
+  let meetingSetupError: string | null = null
   try {
     meetResult = await createGoogleMeetEvent(
       {
@@ -260,19 +275,13 @@ export async function POST(request: NextRequest) {
     )
   } catch (err: any) {
     if (err instanceof GoogleMeetNotConfiguredError) {
-      return NextResponse.json(
-        { success: false, error: err.message, requiresSetup: true, setupUrl: '/api/auth/google/authorize' },
-        { status: 503 }
-      )
+      meetingSetupError = 'Google Meet is not configured on the server yet.'
+    } else if (err instanceof GoogleMeetAuthError) {
+      meetingSetupError = 'Google Calendar authorization has expired or was revoked.'
+    } else {
+      meetingSetupError = 'An unexpected error occurred while creating the Google Meet link.'
     }
-    if (err instanceof GoogleMeetAuthError) {
-      return NextResponse.json(
-        { success: false, error: err.message, requiresAuth: true, authUrl: '/api/auth/google/authorize' },
-        { status: 401 }
-      )
-    }
-    console.error('Error creating Google Meet event:', err)
-    return NextResponse.json({ success: false, error: 'Failed to create the Google Meet session' }, { status: 500 })
+    console.error('Error creating Google Meet event - continuing without a video link:', err)
   }
 
   const { data: booking, error: insertError } = await supabase
@@ -295,16 +304,16 @@ export async function POST(request: NextRequest) {
         : [payerName, paymentReference].filter(Boolean).join(' - ') || null,
       payment_proof: isTrial ? null : paymentProof || null,
       payment_submitted_at: isTrial ? null : new Date().toISOString(),
-      google_event_id: meetResult.eventId,
-      meeting_url: meetResult.meetingUrl,
-      calendar_link: meetResult.calendarLink,
+      google_event_id: meetResult.eventId || null,
+      meeting_url: meetResult.meetingUrl || null,
+      calendar_link: meetResult.calendarLink || null,
     })
     .select()
     .single()
 
   if (insertError) {
     // Roll back the Google Calendar event so we don't leave an orphaned meeting
-    await deleteGoogleMeetEvent(meetResult.eventId, baseUrl)
+    if (meetResult.eventId) await deleteGoogleMeetEvent(meetResult.eventId, baseUrl)
     console.error('Error saving booking:', insertError)
     const { message, migrationRequired } = friendlyDbError(insertError)
     const finalMessage = insertError.message.includes('overlap')
@@ -329,6 +338,7 @@ export async function POST(request: NextRequest) {
     price,
     meetingUrl: meetResult.meetingUrl,
     calendarLink: meetResult.calendarLink,
+    meetingPending: !meetResult.meetingUrl,
   }
   Promise.all([sendTutorBookingEmail(emailDetails), sendAdminBookingEmail(emailDetails)]).catch((err) =>
     console.error('Failed to send booking notification emails:', err)
@@ -337,9 +347,13 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     success: true,
     booking,
-    message: isTrial
-      ? 'Free trial booked! A Google Meet invite has been sent to both of you.'
-      : 'Session booked! A Google Meet invite has been sent to both of you.',
+    meetingPending: !meetResult.meetingUrl,
+    meetingSetupError,
+    message: meetResult.meetingUrl
+      ? isTrial
+        ? 'Free trial booked! A Google Meet invite has been sent to both of you.'
+        : 'Session booked! A Google Meet invite has been sent to both of you.'
+      : "Session booked! We're finalising your video call link - you'll receive it by email shortly.",
   })
 }
 

@@ -283,8 +283,16 @@ port `587`), SendGrid, Mailgun, Amazon SES, Outlook/Office365, etc.
 - **"Backend not configured" message** - `NEXT_PUBLIC_SUPABASE_URL` /
   `NEXT_PUBLIC_SUPABASE_ANON_KEY` are missing from `.env.local` (restart `npm
   run dev` after adding them).
-- **Booking fails with a Google error** - visit `/api/auth/google/authorize`
-  again to refresh `GOOGLE_REFRESH_TOKEN`.
+- **"Failed to create the Google Meet session" toast right after paying/
+  booking, but the booking still shows as booked** - this is expected and
+  not a bug: Google Meet link creation is best-effort. If `GOOGLE_REFRESH_TOKEN`
+  is missing/expired/revoked, or Google's API has a transient error, the
+  booking is still created (with `meeting_url` left empty) instead of losing
+  the student's payment proof. Admins get an email flagging the session as
+  needing a manual meeting link. To fix it going forward: visit
+  `/api/auth/google/authorize` again (as an admin) to refresh
+  `GOOGLE_REFRESH_TOKEN`, then send the affected student/tutor a Meet link
+  manually for that specific session.
 - **New tutor doesn't show up in Book a Session** - the tutors list only
   returns rows where `user_type = 'tutor'`; check the `profiles` table in
   Supabase.

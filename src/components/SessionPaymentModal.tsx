@@ -150,7 +150,7 @@ export default function SessionPaymentModal({
     // Small simulated delay so the "Submitting..." state is visible.
     await new Promise((resolve) => setTimeout(resolve, 500))
     setIsSubmitting(false)
-    toast.success('Payment proof submitted - your session is booked!')
+    toast.success('Payment proof submitted - confirming your booking...')
     onSuccess({ payerName: payerName.trim(), reference: reference.trim(), screenshotDataUrl })
   }
 
