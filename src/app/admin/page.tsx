@@ -37,6 +37,7 @@ interface SessionRow {
   paymentReference?: string | null
   paymentProof?: string | null
   paymentSubmittedAt?: string | null
+  hasMeetingLink: boolean
 }
 
 interface StudentRow {
@@ -145,10 +146,14 @@ function SessionsTable({
   sessions,
   withLabel,
   onReview,
+  onRetryMeeting,
+  retryingId,
 }: {
   sessions: SessionRow[]
   withLabel: string
   onReview?: (session: SessionRow) => void
+  onRetryMeeting?: (session: SessionRow) => void
+  retryingId?: string | null
 }) {
   if (sessions.length === 0) {
     return <p className="text-gray-500 text-xs">No sessions booked yet.</p>
@@ -165,6 +170,7 @@ function SessionsTable({
             <th className="py-1.5 pr-3 font-medium">Status</th>
             <th className="py-1.5 pr-3 font-medium">Price</th>
             <th className="py-1.5 pr-3 font-medium">Payment</th>
+            <th className="py-1.5 pr-3 font-medium">Video link</th>
           </tr>
         </thead>
         <tbody>
@@ -199,6 +205,23 @@ function SessionsTable({
                   )}
                 </div>
               </td>
+              <td className="py-1.5 pr-3">
+                {s.hasMeetingLink ? (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-50 text-green-700">
+                    Ready
+                  </span>
+                ) : s.paymentStatus === 'paid' || s.paymentStatus === 'free' ? (
+                  <button
+                    onClick={() => onRetryMeeting?.(s)}
+                    disabled={retryingId === s.id}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 disabled:opacity-50"
+                  >
+                    {retryingId === s.id ? 'Retrying...' : 'Send video link'}
+                  </button>
+                ) : (
+                  <span className="text-gray-400">—</span>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -225,6 +248,7 @@ export default function AdminDashboardPage() {
   const [expandedStudentId, setExpandedStudentId] = useState<string | null>(null)
   const [reviewSession, setReviewSession] = useState<SessionRow | null>(null)
   const [isReviewing, setIsReviewing] = useState(false)
+  const [retryingMeetingId, setRetryingMeetingId] = useState<string | null>(null)
 
   const loadStats = useCallback(async () => {
     if (!user) return
@@ -347,6 +371,42 @@ export default function AdminDashboardPage() {
       toast.error(error instanceof Error ? error.message : 'Failed to update payment')
     } finally {
       setIsReviewing(false)
+    }
+  }
+
+  async function handleRetryMeeting(session: SessionRow) {
+    setRetryingMeetingId(session.id)
+    try {
+      const token = await getAccessToken()
+      if (!token) {
+        toast.error('Session expired, please log in again')
+        return
+      }
+      const res = await fetch('/api/admin/bookings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ id: session.id, retryMeetingOnly: true }),
+      })
+      const data = await res.json()
+      if (!data.success) throw new Error(data.error || 'Failed to retry video link')
+
+      if (data.meetingPending) {
+        toast.error(
+          `Still no video link${data.meetingSetupError ? ` (${data.meetingSetupError})` : ''}. See BACKEND_SETUP.md to fix this.`,
+          { duration: 8000 }
+        )
+      } else if (data.emailConfigured === false) {
+        toast.success('Video link created! (Email notifications are not configured, so the student/tutor were not emailed.)', { duration: 6000 })
+      } else if (data.emailSent === false) {
+        toast.success('Video link created, but the notification email failed to send.')
+      } else {
+        toast.success('Video link created and sent to student + tutor by email')
+      }
+      loadStats()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to retry video link')
+    } finally {
+      setRetryingMeetingId(null)
     }
   }
 
@@ -654,7 +714,13 @@ export default function AdminDashboardPage() {
                                 <p className="text-gray-400 uppercase tracking-wide text-xs mb-2">
                                   Sessions ({s.sessions.length}) - exact date &amp; time
                                 </p>
-                                <SessionsTable sessions={s.sessions} withLabel="Tutor" onReview={setReviewSession} />
+                                <SessionsTable
+                                  sessions={s.sessions}
+                                  withLabel="Tutor"
+                                  onReview={setReviewSession}
+                                  onRetryMeeting={handleRetryMeeting}
+                                  retryingId={retryingMeetingId}
+                                />
                               </td>
                             </tr>
                           )}
@@ -777,7 +843,13 @@ export default function AdminDashboardPage() {
                                   <p className="text-gray-400 uppercase tracking-wide text-xs mb-2">
                                     Sessions ({t.sessions.length}) - exact date &amp; time
                                   </p>
-                                  <SessionsTable sessions={t.sessions} withLabel="Student" onReview={setReviewSession} />
+                                  <SessionsTable
+                                    sessions={t.sessions}
+                                    withLabel="Student"
+                                    onReview={setReviewSession}
+                                    onRetryMeeting={handleRetryMeeting}
+                                    retryingId={retryingMeetingId}
+                                  />
                                 </div>
                               </td>
                             </tr>

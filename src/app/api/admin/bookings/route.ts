@@ -62,15 +62,25 @@ async function requireAdmin(
 interface UpdatePaymentBody {
   id?: string
   paymentStatus?: 'paid' | 'unpaid' | 'rejected'
+  /** When true, ignore paymentStatus and just (re)try creating the Google
+   *  Meet link + re-send the confirmation email for a booking that's
+   *  already paid/free but still missing a video link - e.g. after fixing
+   *  an expired Google authorization, so the admin doesn't have to toggle
+   *  the payment status back and forth to trigger a retry. */
+  retryMeetingOnly?: boolean
 }
 
-/** PATCH: approve or reject a booking's submitted bank-transfer payment proof.
+/** PATCH: approve/reject a booking's bank-transfer payment proof, OR (with
+ *  retryMeetingOnly: true) just retry creating its Google Meet link without
+ *  touching payment_status.
  *
- * On approval ('paid') this also, best-effort:
+ * On approval ('paid') / retry, this also, best-effort:
  *   - Retries Google Meet event creation if it wasn't created at booking
  *     time (e.g. the Google connection had expired), so the session can
- *     still get a video link once it's actually confirmed.
- *   - Emails the student ("payment confirmed") and the tutor (heads-up).
+ *     still get a video link once it's actually confirmed / once the
+ *     Google connection has been fixed.
+ *   - Emails the student ("payment confirmed") and the tutor (heads-up),
+ *     now including the real video link if the retry succeeded.
  * On rejection this emails the student so they know to resubmit proof or
  * contact support - previously neither outcome sent any notification at
  * all, leaving students/tutors with no way to know a decision had been
@@ -82,35 +92,58 @@ export async function PATCH(request: NextRequest) {
   const { admin } = check
 
   const body = (await request.json().catch(() => null)) as UpdatePaymentBody | null
-  if (!body?.id || !body?.paymentStatus) {
-    return NextResponse.json({ success: false, error: 'id and paymentStatus are required' }, { status: 400 })
+  if (!body?.id) {
+    return NextResponse.json({ success: false, error: 'id is required' }, { status: 400 })
   }
-
-  if (!['paid', 'unpaid', 'rejected'].includes(body.paymentStatus)) {
+  if (!body.retryMeetingOnly && !body.paymentStatus) {
+    return NextResponse.json({ success: false, error: 'paymentStatus is required (or set retryMeetingOnly: true)' }, { status: 400 })
+  }
+  if (body.paymentStatus && !['paid', 'unpaid', 'rejected'].includes(body.paymentStatus)) {
     return NextResponse.json({ success: false, error: 'paymentStatus must be paid, unpaid or rejected' }, { status: 400 })
   }
 
-  const { data: booking, error } = await admin
-    .from('bookings')
-    .update({ payment_status: body.paymentStatus })
-    .eq('id', body.id)
-    .select(`
-      *,
-      student:profiles!student_id ( id, full_name, email ),
-      tutor:profiles!tutor_id ( id, full_name, email )
-    `)
-    .single()
-
-  if (error) {
-    const { message, migrationRequired } = friendlyDbError(error)
-    return NextResponse.json({ success: false, error: message, migrationRequired }, { status: 500 })
+  let booking: any
+  if (body.retryMeetingOnly) {
+    const { data, error } = await admin
+      .from('bookings')
+      .select(`
+        *,
+        student:profiles!student_id ( id, full_name, email ),
+        tutor:profiles!tutor_id ( id, full_name, email )
+      `)
+      .eq('id', body.id)
+      .single()
+    if (error) {
+      const { message, migrationRequired } = friendlyDbError(error)
+      return NextResponse.json({ success: false, error: message, migrationRequired }, { status: 500 })
+    }
+    booking = data
+  } else {
+    const { data, error } = await admin
+      .from('bookings')
+      .update({ payment_status: body.paymentStatus })
+      .eq('id', body.id)
+      .select(`
+        *,
+        student:profiles!student_id ( id, full_name, email ),
+        tutor:profiles!tutor_id ( id, full_name, email )
+      `)
+      .single()
+    if (error) {
+      const { message, migrationRequired } = friendlyDbError(error)
+      return NextResponse.json({ success: false, error: message, migrationRequired }, { status: 500 })
+    }
+    booking = data
   }
 
   let meetingPending: boolean | undefined
   let meetingSetupError: string | null = null
   let emailSent: boolean | undefined
 
-  if (body.paymentStatus === 'paid') {
+  const shouldEnsureMeeting =
+    body.retryMeetingOnly || body.paymentStatus === 'paid'
+
+  if (shouldEnsureMeeting) {
     let meetingUrl: string | null = booking.meeting_url
     let calendarLink: string | null = booking.calendar_link
     let googleEventId: string | null = booking.google_event_id
@@ -147,7 +180,7 @@ export async function PATCH(request: NextRequest) {
             .eq('id', booking.id)
         } catch (err) {
           meetingSetupError = err instanceof Error ? err.message : 'Failed to create the Google Meet link.'
-          console.error('Retry of Google Meet creation on payment confirmation failed - continuing without a video link:', err)
+          console.error('Retry of Google Meet creation failed - continuing without a video link:', err)
         }
       }
     }

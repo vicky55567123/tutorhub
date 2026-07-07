@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     admin
       .from('bookings')
       .select(
-        'id, student_id, tutor_id, subject, title, duration_minutes, status, start_time, end_time, is_trial, price, payment_status, payment_reference, payment_proof, payment_submitted_at'
+        'id, student_id, tutor_id, subject, title, duration_minutes, status, start_time, end_time, is_trial, price, payment_status, payment_reference, payment_proof, payment_submitted_at, meeting_url'
       ),
   ])
 
@@ -107,6 +107,7 @@ export async function GET(request: NextRequest) {
             paymentReference: b.payment_reference || null,
             paymentProof: b.payment_proof || null,
             paymentSubmittedAt: b.payment_submitted_at || null,
+            hasMeetingLink: !!b.meeting_url,
           }
         })
         .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
@@ -169,6 +170,7 @@ export async function GET(request: NextRequest) {
             paymentReference: b.payment_reference || null,
             paymentProof: b.payment_proof || null,
             paymentSubmittedAt: b.payment_submitted_at || null,
+            hasMeetingLink: !!b.meeting_url,
           }
         })
         .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
