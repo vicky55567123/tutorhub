@@ -698,6 +698,11 @@ export default function AdminDashboardPage() {
                     {String(googleStatus.googleError.reason ?? 'unknown')}
                   </p>
                 )}
+                {googleStatus.envStatus && (
+                  <pre className="mt-2 bg-black/5 rounded p-2 overflow-x-auto text-[11px] leading-relaxed">
+                    {JSON.stringify(googleStatus.envStatus, null, 2)}
+                  </pre>
+                )}
               </div>
             )}
           </div>

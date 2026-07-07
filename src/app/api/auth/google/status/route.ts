@@ -45,7 +45,14 @@ export async function GET(request: NextRequest) {
     hasClientSecret: !!clientSecret,
     hasRefreshToken: !!refreshToken,
     // Helps spot copy/paste mistakes (accidental whitespace/newline/quotes)
-    // without printing the actual secret values.
+    // without printing the actual secret values. Compare these lengths
+    // against what you expect locally to catch truncation in Netlify's env
+    // var UI (a very common cause of an *immediate* invalid_grant on a
+    // freshly-minted token, as opposed to the 7-day Testing-mode expiry).
+    clientIdLength: clientId ? clientId.trim().length : 0,
+    clientIdLooksTrimmed: clientId ? clientId === clientId.trim() : null,
+    clientSecretLength: clientSecret ? clientSecret.trim().length : 0,
+    clientSecretLooksTrimmed: clientSecret ? clientSecret === clientSecret.trim() : null,
     refreshTokenLength: refreshToken ? refreshToken.trim().length : 0,
     refreshTokenLooksTrimmed: refreshToken ? refreshToken === refreshToken.trim() : null,
   }
@@ -112,7 +119,7 @@ export async function GET(request: NextRequest) {
     let diagnosis = `Google rejected the request (status ${status ?? 'unknown'}, reason: ${reason ?? 'unknown'}).`
     if (reason === 'invalid_grant') {
       diagnosis +=
-        ' This specifically means the refresh token itself is dead - either it was revoked, the Google account\'s password/security settings changed, it\'s older than 6 months unused, or (very common) your OAuth consent screen is still in "Testing" publishing status in Google Cloud Console, which causes Google to auto-expire refresh tokens after 7 days regardless of use. Fix: in Google Cloud Console -> APIs & Services -> OAuth consent screen, either publish the app to "In production", or add this Google account under "Test users" AND re-authorize (redo /api/auth/google/authorize) right before testing so the 7-day window hasn\'t elapsed. Also double check GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET on Netlify are the exact pair the token was issued for - a mismatched client/secret also produces invalid_grant.'
+        ' This means the refresh token itself is dead. If this token is more than a few minutes old, the most likely cause is your OAuth consent screen still being in "Testing" publishing status in Google Cloud Console, which auto-expires refresh tokens after 7 days. Fix: publish the app to "In production". BUT if you just generated this token moments ago via /api/auth/google/authorize and it is ALREADY failing, the 7-day rule cannot be the cause (not enough time has passed) - instead this means GOOGLE_CLIENT_ID and/or GOOGLE_CLIENT_SECRET stored in this environment do not match the pair that was active when the token was issued. Check the clientIdLength/clientSecretLength below against your Google Cloud Console credentials, make sure there is only ONE Netlify env var entry per key (no duplicate scoped entries), and make sure the redeploy that picked up the new GOOGLE_REFRESH_TOKEN did not happen with a stale/different GOOGLE_CLIENT_SECRET. Re-authorizing again will not help unless the client id/secret pairing is fixed first.'
     } else if (status === 403 || reason === 'accessNotConfigured' || /calendar api/i.test(String(reason))) {
       diagnosis +=
         ' This looks like the Google Calendar API is not enabled for this Google Cloud project. Fix: Google Cloud Console -> APIs & Services -> Library -> search "Google Calendar API" -> Enable.'
