@@ -151,6 +151,99 @@ export async function sendTutorBookingEmail(details: BookingEmailDetails): Promi
   await sendEmail({ to: details.tutorEmail, subject: `New session booked: ${details.subject || details.title}`, html })
 }
 
+/** Sends the "you're booked" confirmation to the student who made the booking. */
+export async function sendStudentBookingEmail(details: BookingEmailDetails): Promise<void> {
+  if (!details.studentEmail) return
+
+  const when = formatSessionDateTime(details.startTime)
+  const priceLine = details.isTrial ? 'Free trial session (20 minutes)' : `£${details.price.toFixed(2)} - paid session`
+
+  const paymentNotice = details.isTrial
+    ? ''
+    : `<p style="background:#eff6ff;color:#1e40af;padding:10px 14px;border-radius:8px;">Your payment proof has been submitted and is awaiting review by our team. We'll email you again as soon as it's confirmed.</p>`
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
+      <h2 style="color: #1d4ed8;">Your session is booked!</h2>
+      <p>Hi ${escapeHtml(details.studentName)},</p>
+      <p>Your session with <strong>${escapeHtml(details.tutorName)}</strong> has been booked.</p>
+      <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+        <tr><td style="padding: 6px 0; color: #6b7280;">Subject</td><td style="padding: 6px 0; font-weight: 600;">${escapeHtml(details.subject || details.title)}</td></tr>
+        <tr><td style="padding: 6px 0; color: #6b7280;">When</td><td style="padding: 6px 0; font-weight: 600;">${when}</td></tr>
+        <tr><td style="padding: 6px 0; color: #6b7280;">Duration</td><td style="padding: 6px 0; font-weight: 600;">${details.durationMinutes} minutes</td></tr>
+        <tr><td style="padding: 6px 0; color: #6b7280;">Payment</td><td style="padding: 6px 0; font-weight: 600;">${priceLine}</td></tr>
+      </table>
+      ${details.meetingUrl ? `<p><a href="${details.meetingUrl}" style="background:#1d4ed8;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-block;">Join Google Meet</a></p>` : ''}
+      ${details.calendarLink ? `<p><a href="${details.calendarLink}">View in Google Calendar</a></p>` : ''}
+      ${details.meetingPending ? `<p style="background:#fef3c7;color:#92400e;padding:10px 14px;border-radius:8px;">We're finalising your video call link and will email it to you separately.</p>` : ''}
+      ${paymentNotice}
+      <p style="color:#6b7280;font-size:13px;">You can manage this session from your Ahmed Tutors dashboard.</p>
+    </div>
+  `
+
+  await sendEmail({ to: details.studentEmail, subject: `Session booked with ${details.tutorName}`, html })
+}
+
+/** Sends a "payment confirmed" email to the student (and a heads-up to the
+ *  tutor) once an admin has verified the bank-transfer proof in the Admin
+ *  Dashboard. */
+export async function sendPaymentConfirmedEmail(details: BookingEmailDetails): Promise<void> {
+  const when = formatSessionDateTime(details.startTime)
+
+  const studentHtml = `
+    <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
+      <h2 style="color: #059669;">Payment confirmed - your session is all set!</h2>
+      <p>Hi ${escapeHtml(details.studentName)},</p>
+      <p>We've confirmed your payment of <strong>£${details.price.toFixed(2)}</strong> for your session with <strong>${escapeHtml(details.tutorName)}</strong>.</p>
+      <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+        <tr><td style="padding: 6px 0; color: #6b7280;">Subject</td><td style="padding: 6px 0; font-weight: 600;">${escapeHtml(details.subject || details.title)}</td></tr>
+        <tr><td style="padding: 6px 0; color: #6b7280;">When</td><td style="padding: 6px 0; font-weight: 600;">${when}</td></tr>
+        <tr><td style="padding: 6px 0; color: #6b7280;">Duration</td><td style="padding: 6px 0; font-weight: 600;">${details.durationMinutes} minutes</td></tr>
+      </table>
+      ${details.meetingUrl ? `<p><a href="${details.meetingUrl}" style="background:#1d4ed8;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-block;">Join Google Meet</a></p>` : ''}
+      ${details.calendarLink ? `<p><a href="${details.calendarLink}">View in Google Calendar</a></p>` : ''}
+      ${details.meetingPending ? `<p style="background:#fef3c7;color:#92400e;padding:10px 14px;border-radius:8px;">We're still finalising your video call link and will email it to you separately before the session.</p>` : ''}
+      <p style="color:#6b7280;font-size:13px;">You can manage this session from your Ahmed Tutors dashboard.</p>
+    </div>
+  `
+
+  const tutorHtml = `
+    <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
+      <h2 style="color: #059669;">Payment confirmed for an upcoming session</h2>
+      <p>Hi ${escapeHtml(details.tutorName)},</p>
+      <p>${escapeHtml(details.studentName)}'s payment for your session on <strong>${when}</strong> has been confirmed by our team - it's ready to go.</p>
+      ${details.meetingUrl ? `<p><a href="${details.meetingUrl}" style="background:#1d4ed8;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-block;">Join Google Meet</a></p>` : ''}
+    </div>
+  `
+
+  await Promise.all([
+    details.studentEmail
+      ? sendEmail({ to: details.studentEmail, subject: `Payment confirmed: your session with ${details.tutorName}`, html: studentHtml })
+      : Promise.resolve(false),
+    details.tutorEmail
+      ? sendEmail({ to: details.tutorEmail, subject: `Payment confirmed: session with ${details.studentName}`, html: tutorHtml })
+      : Promise.resolve(false),
+  ])
+}
+
+/** Sends a "we couldn't verify your payment" email to the student when an
+ *  admin rejects the submitted bank-transfer proof. */
+export async function sendPaymentRejectedEmail(details: BookingEmailDetails): Promise<void> {
+  if (!details.studentEmail) return
+  const when = formatSessionDateTime(details.startTime)
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
+      <h2 style="color: #dc2626;">We couldn't verify your payment</h2>
+      <p>Hi ${escapeHtml(details.studentName)},</p>
+      <p>Unfortunately we couldn't verify the payment proof you submitted for your session with <strong>${escapeHtml(details.tutorName)}</strong> on <strong>${when}</strong>.</p>
+      <p>Please reply to this email, or contact support, with a clearer screenshot/reference so we can take another look - or book again with a new payment.</p>
+    </div>
+  `
+
+  await sendEmail({ to: details.studentEmail, subject: `Action needed: payment issue with your session`, html })
+}
+
 /** Sends the "new session booked" notification to every admin. */
 export async function sendAdminBookingEmail(details: BookingEmailDetails): Promise<void> {
   const admins = await getAdminNotificationEmails()

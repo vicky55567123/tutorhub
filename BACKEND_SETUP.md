@@ -239,22 +239,45 @@ order:
 ## 12. Email Notifications
 
 Whenever a student books a session (paid or free trial), besides the Google
-Meet calendar invite, two plain notification emails are sent by
+Meet calendar invite, three plain notification emails are sent by
 [src/lib/email.ts](src/lib/email.ts) via SMTP (using `nodemailer`):
 
+- **To the student** - confirming the booking, the subject, date/time,
+  duration, price, the Google Meet link (if it was created), and - for paid
+  sessions - a note that their payment proof is awaiting admin review.
 - **To the tutor** - who booked, the subject, exact date/time, duration,
   price (or "Free trial"), and a link to join the Google Meet.
 - **To every admin** - the same details plus the student's and tutor's
   names/emails, so admins immediately know a new session (and, for paid
   sessions, a pending payment) needs attention.
 
-Both are **best-effort**: if SMTP isn't configured, or sending fails for any
-reason, the booking still succeeds - the error is only logged server-side,
-never shown to the student.
+Then, once an admin approves or rejects a paid session's bank-transfer proof
+in the Admin Dashboard (`PATCH /api/admin/bookings`), two more notifications
+go out:
+
+- **On approval ("paid")** - the student gets a "payment confirmed" email
+  (with the Google Meet link if one exists), and the tutor gets a short
+  heads-up. If the Meet link couldn't be created at booking time, the server
+  **retries creating it at this point** (the Google connection may have been
+  fixed in the meantime) and saves it to the booking before emailing.
+- **On rejection** - the student gets an email explaining their payment
+  proof couldn't be verified, asking them to resubmit or contact support.
+
+All of these are **best-effort**: if SMTP isn't configured, or sending fails
+for any reason, the booking/approval still succeeds - the error is only
+logged server-side, never shown to the user.
+
+**If NO emails at all are arriving** (not tutor, not student, not admin),
+the most likely cause is that `SMTP_HOST` / `SMTP_USER` / `SMTP_PASSWORD`
+simply aren't set in your hosting provider's environment variables (e.g.
+Netlify's Site settings → Environment variables) - `.env.local` only applies
+to your local machine, it isn't deployed. Check your function logs for the
+`Email notifications are not configured...` warning to confirm.
 
 ### Setup
 
-Add these to `.env.local` (see `.env.example`):
+Add these to `.env.local` (see `.env.example`) **and to your Netlify site's
+environment variables** so they also apply in production:
 
 ```dotenv
 SMTP_HOST=smtp.example.com
@@ -276,6 +299,7 @@ port `587`), SendGrid, Mailgun, Amazon SES, Outlook/Office365, etc.
    separated) - useful before you've promoted any account to admin yet.
 
 ---
+
 
 
 ### Troubleshooting

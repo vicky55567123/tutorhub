@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseForToken, getSupabaseAdmin, getAccessTokenFromRequest, friendlyDbError } from '@/lib/supabaseAdmin'
 import { createGoogleMeetEvent, deleteGoogleMeetEvent, GoogleMeetAuthError, GoogleMeetNotConfiguredError } from '@/lib/googleMeet'
-import { sendTutorBookingEmail, sendAdminBookingEmail } from '@/lib/email'
+import { sendTutorBookingEmail, sendStudentBookingEmail, sendAdminBookingEmail } from '@/lib/email'
 
 const TRIAL_DURATION_MINUTES = 20
 
@@ -340,9 +340,11 @@ export async function POST(request: NextRequest) {
     calendarLink: meetResult.calendarLink,
     meetingPending: !meetResult.meetingUrl,
   }
-  Promise.all([sendTutorBookingEmail(emailDetails), sendAdminBookingEmail(emailDetails)]).catch((err) =>
-    console.error('Failed to send booking notification emails:', err)
-  )
+  Promise.all([
+    sendStudentBookingEmail(emailDetails),
+    sendTutorBookingEmail(emailDetails),
+    sendAdminBookingEmail(emailDetails),
+  ]).catch((err) => console.error('Failed to send booking notification emails:', err))
 
   return NextResponse.json({
     success: true,

@@ -148,7 +148,31 @@ export default function DashboardPage() {
                 className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-gray-50 rounded-lg p-4"
               >
                 <div>
-                  <p className="font-medium text-gray-900">{booking.title}</p>
+                  <p className="font-medium text-gray-900 flex items-center gap-2 flex-wrap">
+                    {booking.title}
+                    {!booking.is_trial && (
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          booking.payment_status === 'paid'
+                            ? 'bg-green-50 text-green-700'
+                            : booking.payment_status === 'rejected'
+                            ? 'bg-red-50 text-red-700'
+                            : 'bg-amber-50 text-amber-700'
+                        }`}
+                      >
+                        {booking.payment_status === 'paid'
+                          ? 'Payment confirmed'
+                          : booking.payment_status === 'rejected'
+                          ? 'Payment rejected'
+                          : 'Payment awaiting admin review'}
+                      </span>
+                    )}
+                    {!booking.meeting_url && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                        Video link pending
+                      </span>
+                    )}
+                  </p>
                   <p className="text-sm text-gray-500">
                     with {other?.full_name || 'Unknown'} ·{' '}
                     {new Date(booking.start_time).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
@@ -178,6 +202,7 @@ export default function DashboardPage() {
         </div>
       )}
     </motion.div>
+
   )
 
   if (!user) {
