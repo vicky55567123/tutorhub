@@ -249,6 +249,13 @@ export default function AdminDashboardPage() {
   const [reviewSession, setReviewSession] = useState<SessionRow | null>(null)
   const [isReviewing, setIsReviewing] = useState(false)
   const [retryingMeetingId, setRetryingMeetingId] = useState<string | null>(null)
+  const [isCheckingGoogle, setIsCheckingGoogle] = useState(false)
+  const [googleStatus, setGoogleStatus] = useState<{
+    success: boolean
+    diagnosis: string
+    googleError?: { status?: number; reason?: string }
+    envStatus?: Record<string, unknown>
+  } | null>(null)
 
   const loadStats = useCallback(async () => {
     if (!user) return
@@ -407,6 +414,27 @@ export default function AdminDashboardPage() {
       toast.error(error instanceof Error ? error.message : 'Failed to retry video link')
     } finally {
       setRetryingMeetingId(null)
+    }
+  }
+
+  async function handleCheckGoogleConnection() {
+    setIsCheckingGoogle(true)
+    setGoogleStatus(null)
+    try {
+      const token = await getAccessToken()
+      if (!token) {
+        toast.error('Session expired, please log in again')
+        return
+      }
+      const res = await fetch('/api/auth/google/status', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      setGoogleStatus(data)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to check Google connection')
+    } finally {
+      setIsCheckingGoogle(false)
     }
   }
 
@@ -633,6 +661,46 @@ export default function AdminDashboardPage() {
               </div>
             </div>
           )}
+
+          {/* Google connection diagnostic - env vars can be *present* but the
+              refresh token can still be dead (revoked, expired, wrong
+              client pairing, Calendar API disabled, OAuth consent screen
+              stuck in "Testing" mode). This actually tests it against
+              Google and explains the real cause, rather than just checking
+              whether the env vars exist (see the banner above). */}
+          <div className="mb-6 rounded-xl border border-gray-200 bg-white p-4">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">Google Calendar / Meet connection</p>
+                <p className="text-xs text-gray-500">
+                  Tests GOOGLE_REFRESH_TOKEN against Google directly and explains exactly why video links might be failing.
+                </p>
+              </div>
+              <button
+                onClick={handleCheckGoogleConnection}
+                disabled={isCheckingGoogle}
+                className="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg font-medium text-xs disabled:opacity-50"
+              >
+                {isCheckingGoogle ? 'Checking...' : 'Check Google connection'}
+              </button>
+            </div>
+            {googleStatus && (
+              <div
+                className={`mt-3 rounded-lg p-3 text-xs ${
+                  googleStatus.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                }`}
+              >
+                <p className="font-semibold mb-1">{googleStatus.success ? '✅ Working' : '❌ Not working'}</p>
+                <p className="whitespace-pre-wrap">{googleStatus.diagnosis}</p>
+                {googleStatus.googleError && (
+                  <p className="mt-1 text-red-600">
+                    Google error: status {String(googleStatus.googleError.status ?? 'unknown')}, reason{' '}
+                    {String(googleStatus.googleError.reason ?? 'unknown')}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Stat cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-10">
