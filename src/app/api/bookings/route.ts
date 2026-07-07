@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseForToken, getSupabaseAdmin, getAccessTokenFromRequest, friendlyDbError } from '@/lib/supabaseAdmin'
 import { createGoogleMeetEvent, deleteGoogleMeetEvent, GoogleMeetAuthError, GoogleMeetNotConfiguredError } from '@/lib/googleMeet'
+import { sendTutorBookingEmail, sendAdminBookingEmail } from '@/lib/email'
 
 const TRIAL_DURATION_MINUTES = 20
 
@@ -77,6 +78,11 @@ export async function GET(request: NextRequest) {
 //     accepted the booking is created immediately with payment_status =
 //     'pending' - an admin must review the screenshot in the Admin
 //     Dashboard and mark it 'paid' or 'rejected' afterwards.
+//
+// On success, besides the Google Meet calendar invite (sent to student +
+// tutor via the Calendar API), a notification email is also sent to the
+// tutor and to every admin (src/lib/email.ts) - best-effort, never blocks
+// the booking response if SMTP isn't configured or fails.
 export async function POST(request: NextRequest) {
   const auth = await requireUser(request)
   if ('error' in auth) return auth.error
@@ -141,13 +147,15 @@ export async function POST(request: NextRequest) {
   // ----------------------------------------------------------------------
   const { data: tutorProfile, error: tutorProfileError } = await supabase
     .from('profiles')
-    .select('hourly_rate')
+    .select('full_name, email, hourly_rate')
     .eq('id', tutorId)
     .single()
 
   if (tutorProfileError) {
     return NextResponse.json({ success: false, error: 'Could not verify tutor details' }, { status: 500 })
   }
+
+  const { data: studentProfile } = await supabase.from('profiles').select('full_name, email').eq('id', userId).single()
 
   let price = 0
   let paymentStatus: 'pending' | 'free' = 'free'
@@ -157,8 +165,7 @@ export async function POST(request: NextRequest) {
     // (not just this session's userId) using the service-role client so the
     // check covers all of that person's bookings, bypassing RLS which would
     // otherwise only show the caller their own rows.
-    const { data: ownProfile } = await supabase.from('profiles').select('email').eq('id', userId).single()
-    const effectiveEmail = ownProfile?.email || studentEmail
+    const effectiveEmail = studentProfile?.email || studentEmail
 
     if (effectiveEmail) {
       const admin = getSupabaseAdmin()
@@ -305,6 +312,27 @@ export async function POST(request: NextRequest) {
       : message
     return NextResponse.json({ success: false, error: finalMessage, migrationRequired }, { status: 409 })
   }
+
+  // Notify the tutor and every admin by email. Fire-and-forget: booking
+  // creation has already succeeded above, so an email provider hiccup must
+  // never turn into a failed booking response.
+  const emailDetails = {
+    studentName: studentProfile?.full_name || studentEmail || 'A student',
+    studentEmail: studentProfile?.email || studentEmail || '',
+    tutorName: tutorProfile?.full_name || tutorEmail || 'Tutor',
+    tutorEmail: tutorProfile?.email || tutorEmail || '',
+    subject,
+    title,
+    startTime: startDateTime.toISOString(),
+    durationMinutes,
+    isTrial,
+    price,
+    meetingUrl: meetResult.meetingUrl,
+    calendarLink: meetResult.calendarLink,
+  }
+  Promise.all([sendTutorBookingEmail(emailDetails), sendAdminBookingEmail(emailDetails)]).catch((err) =>
+    console.error('Failed to send booking notification emails:', err)
+  )
 
   return NextResponse.json({
     success: true,

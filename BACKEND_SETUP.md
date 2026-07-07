@@ -236,6 +236,47 @@ order:
 
 ---
 
+## 12. Email Notifications
+
+Whenever a student books a session (paid or free trial), besides the Google
+Meet calendar invite, two plain notification emails are sent by
+[src/lib/email.ts](src/lib/email.ts) via SMTP (using `nodemailer`):
+
+- **To the tutor** - who booked, the subject, exact date/time, duration,
+  price (or "Free trial"), and a link to join the Google Meet.
+- **To every admin** - the same details plus the student's and tutor's
+  names/emails, so admins immediately know a new session (and, for paid
+  sessions, a pending payment) needs attention.
+
+Both are **best-effort**: if SMTP isn't configured, or sending fails for any
+reason, the booking still succeeds - the error is only logged server-side,
+never shown to the student.
+
+### Setup
+
+Add these to `.env.local` (see `.env.example`):
+
+```dotenv
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your_smtp_username
+SMTP_PASSWORD=your_smtp_password
+EMAIL_FROM="Ahmed Tutors <no-reply@ahmedtutors.com>"
+ADMIN_NOTIFICATION_EMAILS=admin@example.com
+```
+
+Any standard SMTP provider works - a Gmail account with an
+[App Password](https://myaccount.google.com/apppasswords) (`smtp.gmail.com`,
+port `587`), SendGrid, Mailgun, Amazon SES, Outlook/Office365, etc.
+
+"Admin" recipients are worked out two ways, combined and de-duplicated:
+1. Every profile in Supabase with `user_type = 'admin'` (see section 10).
+2. Any extra addresses listed in `ADMIN_NOTIFICATION_EMAILS` (comma
+   separated) - useful before you've promoted any account to admin yet.
+
+---
+
 
 ### Troubleshooting
 
@@ -268,4 +309,10 @@ order:
   A tutor with no rate set will now also see an amber reminder banner on their
   Dashboard and Availability pages linking straight there. Admins can also set
   it directly via the Admin Dashboard's "Edit" button on that tutor's row.
+- **Tutor/admin didn't get a booking notification email** - check
+  `SMTP_HOST`/`SMTP_USER`/`SMTP_PASSWORD` are set in `.env.local` (see section
+  12); if any are missing, sending is silently skipped and a warning is
+  logged in the server console. Also check the tutor's `profiles.email` is
+  correct, and that at least one account has `user_type = 'admin'` or
+  `ADMIN_NOTIFICATION_EMAILS` is set.
 
