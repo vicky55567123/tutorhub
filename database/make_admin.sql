@@ -13,9 +13,9 @@
 
 update public.profiles
 set user_type = 'admin'
-where email = 'waqarahmedmwa@gmail.com';
+where email = 'ahmed.waqarbentley@gmail.com';
 
 -- Optional: verify it worked
 select id, email, full_name, user_type
 from public.profiles
-where email = 'waqarahmedmwa@gmail.com';
+where email = 'ahmed.waqarbentley@gmail.com';
