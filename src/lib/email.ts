@@ -35,6 +35,12 @@ function getTransporter(): Transporter | null {
   return _transporter
 }
 
+/** True if SMTP_HOST/SMTP_USER/SMTP_PASSWORD are all set, i.e. email
+ *  notifications are expected to actually send (not just silently skip). */
+export function isEmailConfigured(): boolean {
+  return !!(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASSWORD)
+}
+
 interface SendEmailParams {
   to: string | string[]
   subject: string
@@ -186,8 +192,10 @@ export async function sendStudentBookingEmail(details: BookingEmailDetails): Pro
 
 /** Sends a "payment confirmed" email to the student (and a heads-up to the
  *  tutor) once an admin has verified the bank-transfer proof in the Admin
- *  Dashboard. */
-export async function sendPaymentConfirmedEmail(details: BookingEmailDetails): Promise<void> {
+ *  Dashboard. Returns true if at least one of the two emails actually sent
+ *  (e.g. SMTP is configured and reachable) so the caller can warn the admin
+ *  if not. */
+export async function sendPaymentConfirmedEmail(details: BookingEmailDetails): Promise<boolean> {
   const when = formatSessionDateTime(details.startTime)
 
   const studentHtml = `
@@ -216,7 +224,7 @@ export async function sendPaymentConfirmedEmail(details: BookingEmailDetails): P
     </div>
   `
 
-  await Promise.all([
+  const results = await Promise.all([
     details.studentEmail
       ? sendEmail({ to: details.studentEmail, subject: `Payment confirmed: your session with ${details.tutorName}`, html: studentHtml })
       : Promise.resolve(false),
@@ -224,12 +232,14 @@ export async function sendPaymentConfirmedEmail(details: BookingEmailDetails): P
       ? sendEmail({ to: details.tutorEmail, subject: `Payment confirmed: session with ${details.studentName}`, html: tutorHtml })
       : Promise.resolve(false),
   ])
+  return results.some(Boolean)
 }
 
 /** Sends a "we couldn't verify your payment" email to the student when an
- *  admin rejects the submitted bank-transfer proof. */
-export async function sendPaymentRejectedEmail(details: BookingEmailDetails): Promise<void> {
-  if (!details.studentEmail) return
+ *  admin rejects the submitted bank-transfer proof. Returns true if the
+ *  email actually sent. */
+export async function sendPaymentRejectedEmail(details: BookingEmailDetails): Promise<boolean> {
+  if (!details.studentEmail) return false
   const when = formatSessionDateTime(details.startTime)
 
   const html = `
@@ -241,7 +251,7 @@ export async function sendPaymentRejectedEmail(details: BookingEmailDetails): Pr
     </div>
   `
 
-  await sendEmail({ to: details.studentEmail, subject: `Action needed: payment issue with your session`, html })
+  return sendEmail({ to: details.studentEmail, subject: `Action needed: payment issue with your session`, html })
 }
 
 /** Sends the "new session booked" notification to every admin. */

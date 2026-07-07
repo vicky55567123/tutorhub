@@ -80,6 +80,11 @@ interface AdminStats {
   pendingPayments: number
 }
 
+interface IntegrationStatus {
+  emailConfigured: boolean
+  googleMeetConfigured: boolean
+}
+
 type ModalType = 'student' | 'tutor' | null
 
 interface UserFormState {
@@ -208,6 +213,7 @@ export default function AdminDashboardPage() {
   const [forbidden, setForbidden] = useState(false)
   const [migrationRequired, setMigrationRequired] = useState<string | null>(null)
   const [stats, setStats] = useState<AdminStats | null>(null)
+  const [integrations, setIntegrations] = useState<IntegrationStatus | null>(null)
   const [students, setStudents] = useState<StudentRow[]>([])
   const [tutors, setTutors] = useState<TutorRow[]>([])
 
@@ -239,6 +245,7 @@ export default function AdminDashboardPage() {
         setStats(data.stats)
         setStudents(data.students)
         setTutors(data.tutors)
+        setIntegrations(data.integrations || null)
       } else if (res.status === 403) {
         setForbidden(true)
       } else if (data.migrationRequired) {
@@ -305,7 +312,35 @@ export default function AdminDashboardPage() {
       })
       const data = await res.json()
       if (!data.success) throw new Error(data.error || 'Failed to update payment')
-      toast.success(status === 'paid' ? 'Payment confirmed' : 'Payment rejected')
+
+      if (status === 'paid') {
+        const problems: string[] = []
+        if (data.meetingPending) {
+          problems.push(
+            data.meetingSetupError
+              ? `no video link (${data.meetingSetupError})`
+              : 'no video link created'
+          )
+        }
+        if (data.emailConfigured === false) {
+          problems.push('emails are not configured on the server (SMTP_HOST/SMTP_USER/SMTP_PASSWORD missing)')
+        } else if (data.emailSent === false) {
+          problems.push('the confirmation email failed to send')
+        }
+        if (problems.length > 0) {
+          toast.error(`Payment confirmed, but ${problems.join(' and ')}. See BACKEND_SETUP.md to fix this.`, { duration: 8000 })
+        } else {
+          toast.success('Payment confirmed - student and tutor notified by email')
+        }
+      } else {
+        if (data.emailConfigured === false) {
+          toast.error('Payment rejected, but emails are not configured on the server (SMTP_HOST/SMTP_USER/SMTP_PASSWORD missing) - the student was not notified.', { duration: 8000 })
+        } else if (data.emailSent === false) {
+          toast.error('Payment rejected, but the notification email failed to send.')
+        } else {
+          toast.success('Payment rejected - student notified by email')
+        }
+      }
       setReviewSession(null)
       loadStats()
     } catch (error) {
@@ -507,6 +542,38 @@ export default function AdminDashboardPage() {
         <p className="text-gray-500">Loading stats...</p>
       ) : (
         <>
+          {integrations && (!integrations.emailConfigured || !integrations.googleMeetConfigured) && (
+            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 flex items-start gap-3">
+              <ExclamationTriangleIcon className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-amber-800">
+                <p className="font-semibold mb-1">Some integrations aren&apos;t configured on this server</p>
+                <ul className="list-disc list-inside space-y-0.5">
+                  {!integrations.emailConfigured && (
+                    <li>
+                      <strong>Email notifications are OFF</strong> - students and tutors are not being emailed about
+                      bookings or payment decisions. Set <code className="bg-amber-100 px-1 rounded">SMTP_HOST</code>,{' '}
+                      <code className="bg-amber-100 px-1 rounded">SMTP_USER</code> and{' '}
+                      <code className="bg-amber-100 px-1 rounded">SMTP_PASSWORD</code> (see BACKEND_SETUP.md).
+                    </li>
+                  )}
+                  {!integrations.googleMeetConfigured && (
+                    <li>
+                      <strong>Google Meet links are OFF</strong> - sessions will stay &quot;video link pending&quot;
+                      forever. Set <code className="bg-amber-100 px-1 rounded">GOOGLE_CLIENT_ID</code>,{' '}
+                      <code className="bg-amber-100 px-1 rounded">GOOGLE_CLIENT_SECRET</code>, then visit{' '}
+                      <code className="bg-amber-100 px-1 rounded">/api/auth/google/authorize</code> once as an admin
+                      to generate <code className="bg-amber-100 px-1 rounded">GOOGLE_REFRESH_TOKEN</code>.
+                    </li>
+                  )}
+                </ul>
+                <p className="mt-1 text-amber-700">
+                  If this is deployed on Netlify, remember these must be set as Netlify environment variables, not
+                  just in your local .env.local file.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Stat cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-10">
             {statCards.map((card) => (

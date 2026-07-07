@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { SupabaseClient } from '@supabase/supabase-js'
 import { getSupabaseForToken, getSupabaseAdmin, getAccessTokenFromRequest, friendlyDbError } from '@/lib/supabaseAdmin'
-import { createGoogleMeetEvent } from '@/lib/googleMeet'
-import { sendPaymentConfirmedEmail, sendPaymentRejectedEmail } from '@/lib/email'
+import { createGoogleMeetEvent, isGoogleMeetConfigured } from '@/lib/googleMeet'
+import { sendPaymentConfirmedEmail, sendPaymentRejectedEmail, isEmailConfigured } from '@/lib/email'
 
 /**
  * Admin-only booking payment review: after a student submits bank-transfer
@@ -107,6 +107,8 @@ export async function PATCH(request: NextRequest) {
   }
 
   let meetingPending: boolean | undefined
+  let meetingSetupError: string | null = null
+  let emailSent: boolean | undefined
 
   if (body.paymentStatus === 'paid') {
     let meetingUrl: string | null = booking.meeting_url
@@ -118,34 +120,41 @@ export async function PATCH(request: NextRequest) {
     // fail may have been fixed since, and the student/tutor are about to be
     // told the session is confirmed, so this is the best moment to retry.
     if (!meetingUrl) {
-      try {
-        const url = new URL(request.url)
-        const baseUrl = `${url.protocol}//${url.host}`
-        const meetResult = await createGoogleMeetEvent(
-          {
-            title: booking.title,
-            description: booking.description || `Tutoring session: ${booking.subject || booking.title}`,
-            startTime: booking.start_time,
-            durationMinutes: booking.duration_minutes,
-            attendeeEmails: [booking.tutor?.email, booking.student?.email].filter(Boolean),
-          },
-          baseUrl
-        )
-        meetingUrl = meetResult.meetingUrl || null
-        calendarLink = meetResult.calendarLink || null
-        googleEventId = meetResult.eventId || null
-        await admin
-          .from('bookings')
-          .update({ google_event_id: googleEventId, meeting_url: meetingUrl, calendar_link: calendarLink })
-          .eq('id', booking.id)
-      } catch (err) {
-        console.error('Retry of Google Meet creation on payment confirmation failed - continuing without a video link:', err)
+      if (!isGoogleMeetConfigured()) {
+        meetingSetupError =
+          'Google Meet is not configured on the server (GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET/GOOGLE_REFRESH_TOKEN missing from environment variables).'
+        console.error(meetingSetupError)
+      } else {
+        try {
+          const url = new URL(request.url)
+          const baseUrl = `${url.protocol}//${url.host}`
+          const meetResult = await createGoogleMeetEvent(
+            {
+              title: booking.title,
+              description: booking.description || `Tutoring session: ${booking.subject || booking.title}`,
+              startTime: booking.start_time,
+              durationMinutes: booking.duration_minutes,
+              attendeeEmails: [booking.tutor?.email, booking.student?.email].filter(Boolean),
+            },
+            baseUrl
+          )
+          meetingUrl = meetResult.meetingUrl || null
+          calendarLink = meetResult.calendarLink || null
+          googleEventId = meetResult.eventId || null
+          await admin
+            .from('bookings')
+            .update({ google_event_id: googleEventId, meeting_url: meetingUrl, calendar_link: calendarLink })
+            .eq('id', booking.id)
+        } catch (err) {
+          meetingSetupError = err instanceof Error ? err.message : 'Failed to create the Google Meet link.'
+          console.error('Retry of Google Meet creation on payment confirmation failed - continuing without a video link:', err)
+        }
       }
     }
 
     meetingPending = !meetingUrl
 
-    await sendPaymentConfirmedEmail({
+    emailSent = await sendPaymentConfirmedEmail({
       studentName: booking.student?.full_name || 'Student',
       studentEmail: booking.student?.email || '',
       tutorName: booking.tutor?.full_name || 'Tutor',
@@ -161,7 +170,7 @@ export async function PATCH(request: NextRequest) {
       meetingPending,
     })
   } else if (body.paymentStatus === 'rejected') {
-    await sendPaymentRejectedEmail({
+    emailSent = await sendPaymentRejectedEmail({
       studentName: booking.student?.full_name || 'Student',
       studentEmail: booking.student?.email || '',
       tutorName: booking.tutor?.full_name || 'Tutor',
@@ -175,5 +184,12 @@ export async function PATCH(request: NextRequest) {
     })
   }
 
-  return NextResponse.json({ success: true, booking, meetingPending })
+  return NextResponse.json({
+    success: true,
+    booking,
+    meetingPending,
+    meetingSetupError,
+    emailSent,
+    emailConfigured: isEmailConfigured(),
+  })
 }

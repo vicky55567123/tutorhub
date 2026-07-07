@@ -32,6 +32,13 @@ export class GoogleMeetAuthError extends Error {
   }
 }
 
+/** True if GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET/GOOGLE_REFRESH_TOKEN are
+ *  all set, i.e. Google Meet creation is expected to actually work (not
+ *  just throw GoogleMeetNotConfiguredError/GoogleMeetAuthError). */
+export function isGoogleMeetConfigured(): boolean {
+  return !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN)
+}
+
 /**
  * Creates a Google Calendar event (with a Google Meet link) using a single
  * server-side "booking" Google account. The refresh token is generated once

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseForToken, getSupabaseAdmin, getAccessTokenFromRequest, friendlyDbError } from '@/lib/supabaseAdmin'
+import { isEmailConfigured } from '@/lib/email'
+import { isGoogleMeetConfigured } from '@/lib/googleMeet'
 
 /**
  * Admin-only aggregated stats: how many tutors/students are registered, how
@@ -215,5 +217,12 @@ export async function GET(request: NextRequest) {
     },
     students,
     tutors,
+    // Lets the Admin Dashboard show a clear "not configured" banner instead
+    // of leaving admins to guess why bookings show "video link pending" or
+    // why no emails ever arrive - both silently no-op when unset.
+    integrations: {
+      emailConfigured: isEmailConfigured(),
+      googleMeetConfigured: isGoogleMeetConfigured(),
+    },
   })
 }
