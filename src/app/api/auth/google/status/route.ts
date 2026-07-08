@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
+import { createHash } from 'crypto'
 import { getSupabaseForToken, getSupabaseAdmin, getAccessTokenFromRequest } from '@/lib/supabaseAdmin'
 
 /**
@@ -51,10 +52,25 @@ export async function GET(request: NextRequest) {
     // freshly-minted token, as opposed to the 7-day Testing-mode expiry).
     clientIdLength: clientId ? clientId.trim().length : 0,
     clientIdLooksTrimmed: clientId ? clientId === clientId.trim() : null,
+    clientIdLast6: clientId ? clientId.trim().slice(-6) : null,
     clientSecretLength: clientSecret ? clientSecret.trim().length : 0,
     clientSecretLooksTrimmed: clientSecret ? clientSecret === clientSecret.trim() : null,
+    // A short, non-reversible fingerprint of the secret (NOT the secret
+    // itself) so you can confirm two deploys/environments are using the
+    // exact same secret value without ever exposing it.
+    clientSecretFingerprint: clientSecret
+      ? createHash('sha256').update(clientSecret.trim()).digest('hex').slice(0, 12)
+      : null,
     refreshTokenLength: refreshToken ? refreshToken.trim().length : 0,
     refreshTokenLooksTrimmed: refreshToken ? refreshToken === refreshToken.trim() : null,
+    refreshTokenLast6: refreshToken ? refreshToken.trim().slice(-6) : null,
+    // Netlify auto-injects these at build/runtime - lets us prove exactly
+    // which deploy and context is actually serving this request, to rule
+    // out "the env var change didn't actually get deployed yet" as a cause.
+    netlifyContext: process.env.CONTEXT ?? null,
+    netlifyDeployId: process.env.DEPLOY_ID ?? null,
+    netlifyCommitRef: process.env.COMMIT_REF ?? null,
+    netlifySiteUrl: process.env.URL ?? null,
   }
 
   if (!clientId || !clientSecret) {
