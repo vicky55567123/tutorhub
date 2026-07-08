@@ -77,7 +77,7 @@ export default function OLevelMathsTutorPage() {
             {[
               { title: 'Cambridge Syllabus Expertise', desc: 'Deep knowledge of the Cambridge O-Level Maths syllabus with targeted past paper practice.' },
               { title: 'A* Grade Strategy', desc: 'Focus on the higher-mark questions and topics most commonly tested at the top grade boundary.' },
-              { title: 'International Student Support', desc: 'Experienced tutoring students across Pakistan, Sri Lanka, Malaysia, and beyond.' },
+              { title: 'International Student Support', desc: 'Experienced tutoring students across the UK, UAE, and beyond.' },
               { title: 'Flexible Online Sessions', desc: 'Available worldwide — all you need is an internet connection.' },
             ].map(({ title, desc }) => (
               <motion.div key={title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex gap-4 p-6 rounded-2xl border border-gray-100 shadow-sm">

@@ -77,7 +77,7 @@ export default function OLevelChemistryTutorPage() {
             {[
               { title: 'Cambridge Syllabus Mastery', desc: 'Comprehensive coverage of Cambridge O-Level Chemistry 5070 syllabus with structured revision.' },
               { title: 'Chemical Equations & Calculations', desc: 'Step-by-step guidance on balancing equations, mole calculations, and stoichiometry.' },
-              { title: 'International Student Support', desc: 'Experienced working with students in Pakistan, Sri Lanka, Malaysia, and East Africa.' },
+              { title: 'International Student Support', desc: 'Experienced working with students across the UK and UAE.' },
               { title: 'Flexible Online Sessions', desc: 'Available worldwide — all you need is an internet connection.' },
             ].map(({ title, desc }) => (
               <motion.div key={title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex gap-4 p-6 rounded-2xl border border-gray-100 shadow-sm">
